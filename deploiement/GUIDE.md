@@ -281,12 +281,32 @@ passe**, pas celui que vous utilisez ailleurs.
 
 ## Étape 6 — Déclarer l'application web
 
-Onglet **Web** → *Add a new web app* → *Next*.
+### D'abord, deux préalables
 
-1. Framework : choisissez **Manual configuration** (surtout pas « Django », qui
-   créerait un projet vide par-dessus le vôtre).
-2. Version de Python : la même qu'à l'étape 3.
-3. Sur la page de configuration qui s'ouvre, renseignez :
+**Réactivez le site.** Onglet **Web**, bouton *Run until 1 month from today*.
+Tant qu'il est expiré, rien ne répondra, quelle que soit la configuration.
+
+**Créez le dossier des photos**, sinon la seconde règle de fichiers statiques
+pointera dans le vide :
+
+```bash
+mkdir -p ~/suivi_compteurs_project/media
+```
+
+### Ensuite, la configuration
+
+Vous avez **déjà** une application web à `cimeclean.pythonanywhere.com`, et
+l'offre gratuite n'en autorise qu'une. Ne cliquez donc pas sur *Add a new web
+app* : vous n'y arriveriez pas. Ouvrez l'application existante dans la colonne
+de gauche et modifiez ses réglages — tous les champs ci-dessous sont éditables,
+quelle qu'ait été sa configuration d'origine.
+
+> Si quelque chose résiste, supprimez l'application (lien *Delete* en bas de sa
+> page) puis recréez-la avec **Manual configuration** — surtout pas « Django »,
+> qui créerait un projet vide par-dessus le vôtre. Vous ne perdez rien : vos
+> données sont dans la base, pas dans cette configuration.
+
+Renseignez :
 
 | Champ | Valeur |
 |---|---|
