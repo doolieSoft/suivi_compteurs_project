@@ -6,8 +6,12 @@ __pycache__/
 
 # Base locale, secrets et fichiers produits
 db.sqlite3
+
+# Fichiers de configuration d'environnement, où qu'ils se trouvent : ils
+# portent les secrets. Le motif est volontairement large — un fichier déposé
+# à la racine plutôt que dans deploiement/ doit être couvert lui aussi.
 .env
-deploiement/env.*
+env.*
 !deploiement/env.exemple
 staticfiles/
 media/
