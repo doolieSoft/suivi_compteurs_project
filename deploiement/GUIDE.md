@@ -113,51 +113,74 @@ exclues, et le resteront :
 
 ### Sur votre PC
 
-Le dépôt local est déjà initialisé et le premier enregistrement est fait. Il
-reste à le relier à GitHub :
+Tout est déjà en place : dépôt initialisé, premier enregistrement fait, branche
+`main`, et le distant pointe sur
+`https://github.com/doolieSoft/suivi_compteurs_project.git`.
 
-1. Sur <https://github.com/new>, créez un dépôt **vide** — ni README, ni
-   `.gitignore`, ni licence, sinon le premier envoi sera refusé pour cause
-   d'historiques divergents.
-2. Nommez-le par exemple `suivi-compteurs`.
-3. **Public ou privé ?** Aucun secret ne part dans le dépôt, un dépôt public est
-   donc sans danger — et c'est le plus simple à cloner sur PythonAnywhere. Un
-   dépôt privé reste préférable si vous ne souhaitez pas exposer l'adresse de
-   votre serveur ; il demande alors une étape d'authentification, décrite plus
-   bas.
-4. De retour dans votre console, en remplaçant `VOTRECOMPTE` :
+Il ne reste qu'à envoyer, **depuis votre propre terminal** — pas depuis une
+console web, car le gestionnaire d'identifiants Windows a besoin d'ouvrir une
+fenêtre de connexion GitHub :
 
 ```bash
-git remote add origin https://github.com/VOTRECOMPTE/suivi-compteurs.git
-git branch -M main
+cd C:\Users\c158492\ProjetPerso\suivi_compteurs_project
 git push -u origin main
 ```
 
-### Sur PythonAnywhere
+Une fenêtre s'ouvre, vous vous connectez à GitHub, et c'est fait. Les envois
+suivants ne redemanderont rien.
 
-Onglet **Consoles** → *Bash*, puis :
+> Si GitHub refuse en invoquant des historiques divergents, c'est que le dépôt
+> a été créé avec un README ou un `.gitignore`. Le plus simple est alors de le
+> supprimer et d'en recréer un **entièrement vide**.
+
+### Sur PythonAnywhere — dépôt privé
+
+Votre dépôt est privé : un clonage anonyme échoue avec
+`Password authentication is not supported for Git operations`. GitHub a
+supprimé l'authentification par mot de passe en 2021 ; il faut un **jeton
+d'accès personnel**.
+
+Et le SSH n'est pas une option : les comptes gratuits n'atteignent internet
+qu'en HTTP(S), donc `git@github.com:…` ne fonctionnera jamais.
+
+**1. Créez le jeton** sur
+<https://github.com/settings/personal-access-tokens/new> :
+
+| Champ | Valeur |
+|---|---|
+| Token name | `pythonanywhere-lecture` |
+| Expiration | 1 an, ou *No expiration* si vous préférez ne pas y revenir |
+| Repository access | *Only select repositories* → `suivi_compteurs_project` |
+| Permissions → Repository permissions → **Contents** | **Read-only** |
+
+Ne cochez rien d'autre. Un jeton qui ne sait que lire un seul dépôt ne peut
+rien casser s'il fuite.
+
+Copiez-le immédiatement : GitHub ne le réaffichera plus.
+
+**2. Clonez**, en remplaçant `VOTRE_JETON` :
 
 ```bash
-git clone https://github.com/VOTRECOMPTE/suivi-compteurs.git suivi_compteurs_project
+git clone https://doolieSoft:VOTRE_JETON@github.com/doolieSoft/suivi_compteurs_project.git suivi_compteurs_project
 cd suivi_compteurs_project
 ls
 ```
 
 Vous devez voir `manage.py`, `config/`, `suivi/`, `requirements.txt`.
 
-> **Dépôt privé ?** Les comptes gratuits n'atteignent internet qu'en HTTP(S) :
-> le SSH (`git@github.com:…`) ne fonctionnera pas. Utilisez un jeton d'accès
-> personnel, créé sur
-> <https://github.com/settings/personal-access-tokens> avec la seule
-> permission *Contents : read-only* sur ce dépôt, puis :
+Les `git pull` ultérieurs ne redemanderont rien : le jeton est mémorisé dans
+`.git/config`. C'est précisément pourquoi il doit être restreint à la lecture
+de ce seul dépôt — il y est inscrit en clair.
+
+> **Vous préférez éviter le jeton ?** Passez le dépôt en public : *Settings* →
+> *General* → tout en bas, *Change repository visibility*. J'ai vérifié qu'il
+> ne contient aucun secret — ni jeton, ni mot de passe, ni vos relevés. La
+> seule information qu'il révèle est l'adresse `cimeclean.pythonanywhere.com`,
+> qui est de toute façon une URL publique. Le clonage devient alors :
 >
 > ```bash
-> git clone https://VOTRECOMPTE:VOTRE_JETON@github.com/VOTRECOMPTE/suivi-compteurs.git suivi_compteurs_project
+> git clone https://github.com/doolieSoft/suivi_compteurs_project.git suivi_compteurs_project
 > ```
->
-> Le jeton reste alors inscrit dans `.git/config` sur le serveur. C'est
-> acceptable sur un compte qui n'est qu'à vous, et c'est la raison pour
-> laquelle il doit être restreint à la lecture de ce seul dépôt.
 
 ---
 
