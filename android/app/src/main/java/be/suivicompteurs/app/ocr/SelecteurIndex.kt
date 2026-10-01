@@ -122,7 +122,14 @@ object SelecteurIndex {
             // Et les premiers chiffres ne changent quasiment jamais : entre deux
             // relevés, 24978 devient 24979, jamais 27364. C'est ce qui distingue
             // l'index du numéro de série quand les deux ont la bonne longueur.
+            // Un cadran isolé rend une suite de longueur connue : cinq chiffres
+            // noirs plus trois rouges sur ce compteur. Quand la lecture tombe
+            // juste sur ce compte, la position de la virgule n'est plus une
+            // hypothèse mais une certitude, et prime sur tout le reste.
+            val longueurAttendue = chiffresAttendus + decimales
+
             val classement = compareBy<Candidat>(
+                { if (it.brut.length == longueurAttendue) 0 else 1 },
                 { if (chiffresEntiers(it.valeur) == chiffresAttendus) 0 else 1 },
                 { -prefixeCommun(it.valeur, dernierIndex) },
                 { floor(it.valeur) },

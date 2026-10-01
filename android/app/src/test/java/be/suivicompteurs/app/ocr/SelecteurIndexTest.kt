@@ -320,3 +320,56 @@ class SelecteurIndexIndexIllisibleTest {
         assertTrue(proposition.confiance >= 0.8)
     }
 }
+
+/**
+ * Lecture d'un cadran isolé, tel qu'il parvient après un entourage au doigt.
+ *
+ * C'est le cas que la sélection de zone rend courant : plus de numéro de série
+ * ni de millésime, mais la question de la virgule reste entière — les tambours
+ * ne l'impriment pas.
+ */
+class SelecteurIndexCadranIsoleTest {
+
+    private val precedent = 24978.737
+
+    @Test
+    fun `place la virgule d'apres le nombre de chiffres du compteur`() {
+        // Cinq chiffres noirs et trois rouges : « 24978975 » ne peut valoir
+        // que 24 978,975.
+        val proposition = SelecteurIndex.choisir(listOf("24978975"), precedent, 3)
+        assertNotNull(proposition)
+        assertEquals(24978.975, proposition!!.valeur, 0.001)
+        assertTrue(proposition.confiance >= 0.8)
+    }
+
+    @Test
+    fun `tolere que les tambours soient lus separement`() {
+        // Le cadre rouge sépare souvent les décimales du reste.
+        val proposition = SelecteurIndex.choisir(listOf("24978", "975"), precedent, 3)
+        assertNotNull(proposition)
+        assertEquals(24978.975, proposition!!.valeur, 0.001)
+    }
+
+    @Test
+    fun `se rabat sur le compte des chiffres entiers si une decimale manque`() {
+        // Un tambour à mi-course, et il n'en reste que deux de lisibles.
+        val proposition = SelecteurIndex.choisir(listOf("2497897"), precedent, 3)
+        assertNotNull(proposition)
+        assertEquals(24978.97, proposition!!.valeur, 0.001)
+    }
+
+    @Test
+    fun `n'est pas trompe par un zero de tete sur le cadran`() {
+        // Certains compteurs affichent le zéro de poids fort.
+        val proposition = SelecteurIndex.choisir(listOf("024978975"), precedent, 3)
+        assertNotNull(proposition)
+        assertEquals(24978.975, proposition!!.valeur, 0.001)
+    }
+
+    @Test
+    fun `fonctionne sur un compteur electrique sans decimale`() {
+        val proposition = SelecteurIndex.choisir(listOf("405127"), 40314.0, 1)
+        assertNotNull(proposition)
+        assertEquals(40512.7, proposition!!.valeur, 0.001)
+    }
+}

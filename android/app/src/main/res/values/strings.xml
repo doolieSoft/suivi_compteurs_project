@@ -40,6 +40,11 @@
     <string name="reprendre">Reprendre la photo</string>
     <string name="sans_photo">Sans photo</string>
     <string name="depuis_galerie">Depuis la galerie</string>
+    <string name="lampe_allumer">Lampe</string>
+    <string name="lampe_eteindre">Lampe allumée</string>
+    <string name="lampe_indisponible">Pas de lampe sur cet appareil</string>
+    <string name="entourer_le_cadran">Entourez les chiffres du cadran avec le doigt, puis relancez la lecture.</string>
+    <string name="lire_la_zone">Lire la zone entourée</string>
     <string name="photo_echouee">La photo n\'a pas pu être prise</string>
     <string name="camera_refusee">Appareil photo indisponible : saisissez l\'index à la main.</string>
     <string name="ocr_en_cours">Lecture de l\'index…</string>

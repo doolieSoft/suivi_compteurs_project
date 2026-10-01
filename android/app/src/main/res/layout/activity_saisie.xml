@@ -48,11 +48,25 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <androidx.camera.view.PreviewView
-            android:id="@+id/apercu"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1">
+
+            <androidx.camera.view.PreviewView
+                android:id="@+id/apercu"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/boutonLampe"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="12dp"
+                android:text="@string/lampe_allumer" />
+        </FrameLayout>
 
         <TextView
             android:layout_width="match_parent"
@@ -109,13 +123,32 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <ImageView
+            <be.suivicompteurs.app.ocr.VueCadrage
                 android:id="@+id/apercuPhoto"
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:scaleType="centerCrop"
+                android:layout_height="240dp"
                 android:visibility="gone"
-                android:contentDescription="@string/cadrer_le_compteur" />
+                android:contentDescription="@string/entourer_le_cadran" />
+
+            <TextView
+                android:id="@+id/consigneCadrage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/entourer_le_cadran"
+                android:textColor="@color/encre_3"
+                android:textSize="12.5sp"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/boutonLireZone"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:enabled="false"
+                android:text="@string/lire_la_zone"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/messageOcr"

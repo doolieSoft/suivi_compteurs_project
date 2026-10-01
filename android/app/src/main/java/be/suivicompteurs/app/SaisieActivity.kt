@@ -11,6 +11,7 @@ import android.view.View
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -57,6 +58,9 @@ class SaisieActivity : AppCompatActivity() {
 
     private val lecteur = LecteurIndex()
     private var captureur: ImageCapture? = null
+    private var camera: Camera? = null
+    private var lampeAllumee = false
+    private var imageAnalysee: Bitmap? = null
 
     /**
      * Choix d'une photo déjà prise.
@@ -96,6 +100,9 @@ class SaisieActivity : AppCompatActivity() {
         vues.boutonDeclencher.setOnClickListener { capturer() }
         vues.boutonReprendre.setOnClickListener { reprendrePhoto() }
         vues.boutonSansPhoto.setOnClickListener { basculerSaisieManuelle() }
+        vues.boutonLampe.setOnClickListener { appliquerLampe(!lampeAllumee) }
+        vues.boutonLireZone.setOnClickListener { relireLaZone() }
+        vues.apercuPhoto.auChangement = { active -> vues.boutonLireZone.isEnabled = active }
         vues.boutonGalerie.setOnClickListener {
             choisirPhoto.launch(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -164,13 +171,30 @@ class SaisieActivity : AppCompatActivity() {
                 .build()
             try {
                 fournisseur.unbindAll()
-                fournisseur.bindToLifecycle(
+                camera = fournisseur.bindToLifecycle(
                     this, CameraSelector.DEFAULT_BACK_CAMERA, apercu, captureur
                 )
+                // Les compteurs vivent en cave : sans lampe, la photo est trop
+                // sombre pour que les chiffres du cadran ressortent.
+                vues.boutonLampe.isEnabled = camera?.cameraInfo?.hasFlashUnit() == true
+                if (vues.boutonLampe.isEnabled) {
+                    appliquerLampe(lampeAllumee)
+                } else {
+                    vues.boutonLampe.setText(R.string.lampe_indisponible)
+                }
             } catch (e: Exception) {
                 afficherRefusCamera()
             }
         }, ContextCompat.getMainExecutor(this))
+    }
+
+    private fun appliquerLampe(allumer: Boolean) {
+        val commande = camera?.cameraControl ?: return
+        lampeAllumee = allumer
+        commande.enableTorch(allumer)
+        vues.boutonLampe.setText(
+            if (allumer) R.string.lampe_eteindre else R.string.lampe_allumer
+        )
     }
 
     private fun capturer() {
@@ -221,8 +245,15 @@ class SaisieActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             val image = withContext(Dispatchers.IO) { chargerRedresse(fichier) }
-            vues.apercuPhoto.setImageBitmap(image)
-            vues.apercuPhoto.visibility = View.VISIBLE
+            imageAnalysee = image
+            if (image != null) {
+                vues.apercuPhoto.definirImage(image)
+                vues.apercuPhoto.visibility = View.VISIBLE
+                vues.consigneCadrage.visibility = View.VISIBLE
+                vues.boutonLireZone.visibility = View.VISIBLE
+            }
+            // La lampe n'a plus d'objet une fois la photo prise.
+            if (lampeAllumee) appliquerLampe(false)
 
             val lecture = image?.let {
                 lecteur.lire(
@@ -234,66 +265,111 @@ class SaisieActivity : AppCompatActivity() {
             }
             proposition = lecture
             vues.boutonDeclencher.isEnabled = true
+            afficherLecture(lecture)
+        }
+    }
 
-            if (lecture == null || lecture.confiance <= 0.0) {
-                vues.messageOcr.text = buildString {
-                    append(getString(R.string.ocr_echec))
-                    lecture?.suitesLues?.takeIf { it.isNotEmpty() }?.let {
-                        appendLine()
-                        appendLine()
-                        append("Lu sur la photo : ")
-                        append(it.joinToString(" · "))
-                    }
-                }
-                vues.messageOcr.setTextColor(
-                    ContextCompat.getColor(this@SaisieActivity, R.color.critique)
-                )
-                vues.champIndex.requestFocus()
-            } else if (lecture.confiance <= SEUIL_PRE_REMPLISSAGE) {
-                // Une lecture que l'on sait fausse ne doit pas atterrir dans le
-                // champ : il suffirait d'un appui sur « Enregistrer » pour
-                // qu'un numéro de série entre dans douze ans d'historique. Le
-                // message explique, le champ reste vide et prend le curseur.
-                vues.champIndex.setText("")
-                vues.messageOcr.text = buildString {
-                    append(lecture.explication)
+    /**
+     * Reporte à l'écran ce que la reconnaissance a donné.
+     *
+     * Appelée après la première lecture comme après une relecture sur zone
+     * entourée : la façon de présenter un résultat douteux ne doit pas
+     * dépendre du chemin par lequel on y est arrivé.
+     */
+    private fun afficherLecture(lecture: Proposition?) {
+        proposition = lecture
+        vues.boutonDeclencher.isEnabled = true
+
+        if (lecture == null || lecture.confiance <= 0.0) {
+            vues.messageOcr.text = buildString {
+                append(getString(R.string.ocr_echec))
+                lecture?.suitesLues?.takeIf { it.isNotEmpty() }?.let {
                     appendLine()
                     appendLine()
                     append("Lu sur la photo : ")
-                    append(lecture.suitesLues.take(8).joinToString(" · "))
+                    append(it.joinToString(" · "))
                 }
-                vues.messageOcr.setTextColor(
-                    ContextCompat.getColor(this@SaisieActivity, R.color.critique)
-                )
-                vues.champIndex.requestFocus()
-            } else {
-                vues.champIndex.setText(formater(lecture.valeur))
-                vues.messageOcr.text = buildString {
-                    append(getString(R.string.ocr_resultat, lecture.brut, lecture.explication))
-                    // Quand la proposition est douteuse, montrer tout ce qui a
-                    // été lu : c'est la seule façon de comprendre pourquoi elle
-                    // l'est, et de savoir s'il faut recadrer ou simplement taper.
-                    if (lecture.confiance < 0.5 && lecture.suitesLues.size > 1) {
-                        appendLine()
-                        appendLine()
-                        append("Autres suites lues : ")
-                        append(
-                            lecture.suitesLues
-                                .filter { it != lecture.brut }
-                                .take(8)
-                                .joinToString(" · ")
-                        )
-                    }
-                }
-                vues.messageOcr.setTextColor(
-                    ContextCompat.getColor(
-                        this@SaisieActivity,
-                        if (lecture.confiance >= 0.8) R.color.bien else R.color.attention_texte,
-                    )
-                )
-                // Le champ est pré-sélectionné : une correction se fait d'un geste.
-                vues.champIndex.selectAll()
             }
+            vues.messageOcr.setTextColor(
+                ContextCompat.getColor(this@SaisieActivity, R.color.critique)
+            )
+            vues.champIndex.requestFocus()
+        } else if (lecture.confiance <= SEUIL_PRE_REMPLISSAGE) {
+            // Une lecture que l'on sait fausse ne doit pas atterrir dans le
+            // champ : il suffirait d'un appui sur « Enregistrer » pour
+            // qu'un numéro de série entre dans douze ans d'historique. Le
+            // message explique, le champ reste vide et prend le curseur.
+            vues.champIndex.setText("")
+            vues.messageOcr.text = buildString {
+                append(lecture.explication)
+                appendLine()
+                appendLine()
+                append("Lu sur la photo : ")
+                append(lecture.suitesLues.take(8).joinToString(" · "))
+            }
+            vues.messageOcr.setTextColor(
+                ContextCompat.getColor(this@SaisieActivity, R.color.critique)
+            )
+            vues.champIndex.requestFocus()
+        } else {
+            vues.champIndex.setText(formater(lecture.valeur))
+            vues.messageOcr.text = buildString {
+                append(getString(R.string.ocr_resultat, lecture.brut, lecture.explication))
+                // Quand la proposition est douteuse, montrer tout ce qui a
+                // été lu : c'est la seule façon de comprendre pourquoi elle
+                // l'est, et de savoir s'il faut recadrer ou simplement taper.
+                if (lecture.confiance < 0.5 && lecture.suitesLues.size > 1) {
+                    appendLine()
+                    appendLine()
+                    append("Autres suites lues : ")
+                    append(
+                        lecture.suitesLues
+                            .filter { it != lecture.brut }
+                            .take(8)
+                            .joinToString(" · ")
+                    )
+                }
+            }
+            vues.messageOcr.setTextColor(
+                ContextCompat.getColor(
+                    this@SaisieActivity,
+                    if (lecture.confiance >= 0.8) R.color.bien else R.color.attention_texte,
+                )
+            )
+            // Le champ est pré-sélectionné : une correction se fait d'un geste.
+            vues.champIndex.selectAll()
+        }
+    }
+
+    /**
+     * Relance la reconnaissance sur la seule zone entourée.
+     *
+     * C'est le levier le plus efficace : une plaque de compteur porte un
+     * numéro de série, un code-barres, un millésime et un numéro d'agrément,
+     * tous indiscernables d'un index pour un lecteur de texte. Les écarter du
+     * champ de vision vaut mieux que tout départage a posteriori.
+     */
+    private fun relireLaZone() {
+        val complete = imageAnalysee ?: return
+        val zone = vues.apercuPhoto.zoneSelectionnee() ?: return
+
+        val recadre = Bitmap.createBitmap(
+            complete, zone.left, zone.top, zone.width(), zone.height()
+        )
+        vues.messageOcr.visibility = View.VISIBLE
+        vues.messageOcr.setText(R.string.ocr_en_cours)
+        vues.boutonLireZone.isEnabled = false
+
+        lifecycleScope.launch {
+            val lecture = lecteur.lire(
+                recadre,
+                dernierIndexConnu,
+                compteur?.decimales ?: 3,
+                progressionPlausibleMax(),
+            )
+            recadre.recycle()
+            vues.boutonLireZone.isEnabled = true
+            afficherLecture(lecture)
         }
     }
 
