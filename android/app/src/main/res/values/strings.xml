@@ -35,10 +35,11 @@
     <string name="titre_saisie">Nouveau relevé</string>
     <string name="compteur_introuvable">Compteur introuvable</string>
     <string name="dernier_index">Dernier index connu : %1$s %2$s</string>
-    <string name="cadrer_le_compteur">Cadrez les chiffres du compteur</string>
+    <string name="cadrer_le_compteur">Approchez-vous : les chiffres doivent remplir la largeur</string>
     <string name="declencher">Photographier</string>
     <string name="reprendre">Reprendre la photo</string>
-    <string name="sans_photo">Saisir sans photo</string>
+    <string name="sans_photo">Sans photo</string>
+    <string name="depuis_galerie">Depuis la galerie</string>
     <string name="photo_echouee">La photo n\'a pas pu être prise</string>
     <string name="camera_refusee">Appareil photo indisponible : saisissez l\'index à la main.</string>
     <string name="ocr_en_cours">Lecture de l\'index…</string>

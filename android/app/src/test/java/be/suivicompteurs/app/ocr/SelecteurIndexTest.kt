@@ -53,7 +53,7 @@ class SelecteurIndexTest {
             "une lecture invraisemblable doit être signalée",
             proposition!!.confiance <= 0.3,
         )
-        assertTrue(proposition.explication.contains("inhabituelle"))
+        assertTrue(proposition.explication.contains("ressemble à l'index"))
     }
 
     @Test
@@ -85,7 +85,9 @@ class SelecteurIndexTest {
         assertNotNull(proposition)
         assertTrue(proposition!!.valeur > gazLiserons * 1.5)
         assertTrue(proposition.confiance <= 0.4)
-        assertTrue(proposition.explication.contains("inhabituelle"))
+        // Six chiffres entiers au lieu de cinq : ce n'est pas un index de ce
+        // compteur, et c'est plus juste à dire qu'une progression inhabituelle.
+        assertTrue(proposition.explication.contains("ressemble à l'index"))
     }
 
     @Test
@@ -173,7 +175,7 @@ class SelecteurIndexCompteurReelTest {
         "27364770",                       // numéro de série, près du code-barres
         "S3 Pmax T2 = 100 mbar",
         "DIN EN 1359:2007",
-        "2 4 9 7 8 , 9 7",                // l'index : chiffres noirs puis rouges
+        "2 4 9 7 8 , 9 7 5",              // l'index : chiffres noirs puis rouges
         "m3",
         "D02527364770   1 imp = 0,01m³",
     )
@@ -185,7 +187,7 @@ class SelecteurIndexCompteurReelTest {
         // apparence. Seule la partie entière le démasque : 27364 contre 24978.
         val proposition = SelecteurIndex.choisir(plaqueBkG6, 24978.737, 3)
         assertNotNull(proposition)
-        assertEquals(24978.97, proposition!!.valeur, 0.001)
+        assertEquals(24978.975, proposition!!.valeur, 0.001)
         assertTrue(
             "une lecture cohérente doit inspirer confiance",
             proposition.confiance >= 0.8,
@@ -197,14 +199,14 @@ class SelecteurIndexCompteurReelTest {
         // ML Kit ne garantit pas l'ordre : le résultat ne doit pas en dépendre.
         val proposition = SelecteurIndex.choisir(plaqueBkG6.reversed(), 24978.737, 3)
         assertNotNull(proposition)
-        assertEquals(24978.97, proposition!!.valeur, 0.001)
+        assertEquals(24978.975, proposition!!.valeur, 0.001)
     }
 
     @Test
     fun `suit le compteur quand la partie entiere avance`() {
         // Relevé suivant : les chiffres noirs sont passés à 24979.
         val lignes = plaqueBkG6.map { if (it.startsWith("2 4 9 7 8")) "24979,120" else it }
-        val proposition = SelecteurIndex.choisir(lignes, 24978.970, 3)
+        val proposition = SelecteurIndex.choisir(lignes, 24978.975, 3)
         assertNotNull(proposition)
         assertEquals(24979.120, proposition!!.valeur, 0.001)
     }
@@ -231,6 +233,90 @@ class SelecteurIndexCompteurReelTest {
             "une progression de plusieurs milliers de m³ doit être signalée",
             proposition!!.confiance <= 0.3,
         )
-        assertTrue(proposition.explication.contains("inhabituelle"))
+        // Le motif retenu est le bon : « 27364 » ne partage qu'un chiffre de
+        // tête avec « 24978 ». C'est plus précis que de parler de progression
+        // inhabituelle, qui laisserait croire que le compteur a bougé.
+        assertTrue(proposition.explication.contains("ressemble à l'index"))
+    }
+}
+
+
+/**
+ * Cas signalé après un essai réel : l'application a proposé un nombre tiré de
+ * la mention « D02527364770 » imprimée sous le cadran, parce que la
+ * reconnaissance n'avait pas lu la ligne de l'index.
+ *
+ * Le remède n'est pas de mieux départager les candidats — aucun n'était bon —
+ * mais de reconnaître qu'aucun ne ressemble à un index, et de le dire.
+ */
+class SelecteurIndexIndexIllisibleTest {
+
+    private val dernierIndex = 24978.737
+
+    /** La plaque sans la ligne de l'index : ce que voit l'OCR quand il échoue. */
+    private val plaqueSansIndex = listOf(
+        "elster",
+        "BK-G6",
+        "G6  2010",
+        "Qmax 10 m³/h",
+        "D087",
+        "Qmin 0,06 m³/h",
+        "122.43",
+        "27364770",
+        "S3 Pmax T2 = 100 mbar",
+        "DIN EN 1359:2007",
+        "m3",
+        "D02527364770   1 imp = 0,01m³",
+    )
+
+    @Test
+    fun `n'invente pas un index a partir de la mention sous le cadran`() {
+        val proposition = SelecteurIndex.choisir(plaqueSansIndex, dernierIndex, 3)
+        assertNotNull(proposition)
+        assertTrue(
+            "la confiance doit être au plancher quand rien ne ressemble à un index",
+            proposition!!.confiance <= 0.2,
+        )
+        assertTrue(
+            "le message doit inviter à saisir à la main, pas suggérer une valeur",
+            proposition.explication.contains("saisissez-le à la main"),
+        )
+    }
+
+    @Test
+    fun `le numero de serie ne gagne pas non plus`() {
+        // « 27364770 » a pourtant cinq chiffres entiers une fois la virgule
+        // posée — comme l'index. Seuls les chiffres de tête le trahissent.
+        val proposition = SelecteurIndex.choisir(plaqueSansIndex, dernierIndex, 3)
+        assertNotNull(proposition)
+        assertTrue(proposition!!.confiance <= 0.2)
+    }
+
+    @Test
+    fun `mais retrouve l'index des qu'il est lisible`() {
+        val avecIndex = plaqueSansIndex + "24978,975"
+        val proposition = SelecteurIndex.choisir(avecIndex, dernierIndex, 3)
+        assertNotNull(proposition)
+        assertEquals(24978.975, proposition!!.valeur, 0.001)
+        assertTrue(proposition.confiance >= 0.8)
+    }
+
+    @Test
+    fun `tolere que l'OCR espace les chiffres du cadran`() {
+        // Les tambours sont séparés : la reconnaissance rend souvent « 2 4 9 7 8 ».
+        val avecIndex = plaqueSansIndex + "2 4 9 7 8 , 9 7 5"
+        val proposition = SelecteurIndex.choisir(avecIndex, dernierIndex, 3)
+        assertNotNull(proposition)
+        assertEquals(24978.975, proposition!!.valeur, 0.001)
+    }
+
+    @Test
+    fun `accepte le passage a la dizaine superieure`() {
+        // 24978 -> 24980 : trois chiffres de tête communs, cela reste l'index.
+        val avecIndex = plaqueSansIndex + "24980,100"
+        val proposition = SelecteurIndex.choisir(avecIndex, dernierIndex, 3)
+        assertNotNull(proposition)
+        assertEquals(24980.100, proposition!!.valeur, 0.001)
+        assertTrue(proposition.confiance >= 0.8)
     }
 }

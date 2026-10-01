@@ -5,8 +5,10 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -56,6 +58,19 @@ class SaisieActivity : AppCompatActivity() {
     private val lecteur = LecteurIndex()
     private var captureur: ImageCapture? = null
 
+    /**
+     * Choix d'une photo déjà prise.
+     *
+     * Utile quand on a photographié le compteur sans ouvrir l'application —
+     * et c'est aussi la seule façon de rejouer une lecture qui s'est trompée,
+     * sur l'image même qui a posé problème.
+     */
+    private val choisirPhoto = registerForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) importer(uri)
+    }
+
     private val demanderCamera =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { accorde ->
             if (accorde) demarrerCamera() else afficherRefusCamera()
@@ -81,6 +96,11 @@ class SaisieActivity : AppCompatActivity() {
         vues.boutonDeclencher.setOnClickListener { capturer() }
         vues.boutonReprendre.setOnClickListener { reprendrePhoto() }
         vues.boutonSansPhoto.setOnClickListener { basculerSaisieManuelle() }
+        vues.boutonGalerie.setOnClickListener {
+            choisirPhoto.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        }
         vues.boutonEnregistrer.setOnClickListener { enregistrer() }
 
         charger(intent.getIntExtra(EXTRA_COMPTEUR, -1))
@@ -176,6 +196,23 @@ class SaisieActivity : AppCompatActivity() {
         )
     }
 
+    /** Recopie la photo choisie dans l'application, puis l'analyse. */
+    private fun importer(uri: Uri) {
+        val dossier = File(filesDir, "photos").apply { mkdirs() }
+        val fichier = File(dossier, "${UUID.randomUUID()}.jpg")
+        try {
+            contentResolver.openInputStream(uri).use { entree ->
+                if (entree == null) throw IllegalStateException("image illisible")
+                fichier.outputStream().use { sortie -> entree.copyTo(sortie) }
+            }
+        } catch (e: Exception) {
+            Snackbar.make(vues.root, R.string.photo_echouee, Snackbar.LENGTH_LONG).show()
+            return
+        }
+        photo = fichier
+        analyser(fichier)
+    }
+
     private fun analyser(fichier: File) {
         vues.zoneCamera.visibility = View.GONE
         vues.zoneFormulaire.visibility = View.VISIBLE
@@ -198,14 +235,56 @@ class SaisieActivity : AppCompatActivity() {
             proposition = lecture
             vues.boutonDeclencher.isEnabled = true
 
-            if (lecture == null) {
-                vues.messageOcr.setText(R.string.ocr_echec)
+            if (lecture == null || lecture.confiance <= 0.0) {
+                vues.messageOcr.text = buildString {
+                    append(getString(R.string.ocr_echec))
+                    lecture?.suitesLues?.takeIf { it.isNotEmpty() }?.let {
+                        appendLine()
+                        appendLine()
+                        append("Lu sur la photo : ")
+                        append(it.joinToString(" · "))
+                    }
+                }
+                vues.messageOcr.setTextColor(
+                    ContextCompat.getColor(this@SaisieActivity, R.color.critique)
+                )
+                vues.champIndex.requestFocus()
+            } else if (lecture.confiance <= SEUIL_PRE_REMPLISSAGE) {
+                // Une lecture que l'on sait fausse ne doit pas atterrir dans le
+                // champ : il suffirait d'un appui sur « Enregistrer » pour
+                // qu'un numéro de série entre dans douze ans d'historique. Le
+                // message explique, le champ reste vide et prend le curseur.
+                vues.champIndex.setText("")
+                vues.messageOcr.text = buildString {
+                    append(lecture.explication)
+                    appendLine()
+                    appendLine()
+                    append("Lu sur la photo : ")
+                    append(lecture.suitesLues.take(8).joinToString(" · "))
+                }
+                vues.messageOcr.setTextColor(
+                    ContextCompat.getColor(this@SaisieActivity, R.color.critique)
+                )
                 vues.champIndex.requestFocus()
             } else {
                 vues.champIndex.setText(formater(lecture.valeur))
-                vues.messageOcr.text = getString(
-                    R.string.ocr_resultat, lecture.brut, lecture.explication
-                )
+                vues.messageOcr.text = buildString {
+                    append(getString(R.string.ocr_resultat, lecture.brut, lecture.explication))
+                    // Quand la proposition est douteuse, montrer tout ce qui a
+                    // été lu : c'est la seule façon de comprendre pourquoi elle
+                    // l'est, et de savoir s'il faut recadrer ou simplement taper.
+                    if (lecture.confiance < 0.5 && lecture.suitesLues.size > 1) {
+                        appendLine()
+                        appendLine()
+                        append("Autres suites lues : ")
+                        append(
+                            lecture.suitesLues
+                                .filter { it != lecture.brut }
+                                .take(8)
+                                .joinToString(" · ")
+                        )
+                    }
+                }
                 vues.messageOcr.setTextColor(
                     ContextCompat.getColor(
                         this@SaisieActivity,
@@ -247,7 +326,21 @@ class SaisieActivity : AppCompatActivity() {
      * travaillerait sur une image couchée et ne verrait aucun chiffre.
      */
     private fun chargerRedresse(fichier: File): Bitmap? {
-        val options = BitmapFactory.Options().apply { inSampleSize = 2 }
+        // Mesure d'abord, décode ensuite. La version précédente divisait
+        // systématiquement la taille par deux : sur une photo où les chiffres
+        // du cadran ne font déjà qu'une trentaine de pixels de haut, cela
+        // suffisait à les rendre illisibles. On ne réduit donc que ce qui
+        // dépasse vraiment, et jamais en deçà du seuil utile.
+        val mesure = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(fichier.absolutePath, mesure)
+        val cote = maxOf(mesure.outWidth, mesure.outHeight)
+
+        var reduction = 1
+        while (cote / (reduction * 2) >= COTE_UTILE_MIN) {
+            reduction *= 2
+        }
+
+        val options = BitmapFactory.Options().apply { inSampleSize = reduction }
         val brut = BitmapFactory.decodeFile(fichier.absolutePath, options) ?: return null
         val rotation = when (
             ExifInterface(fichier.absolutePath)
@@ -347,6 +440,20 @@ class SaisieActivity : AppCompatActivity() {
 
         /** Évite de trouver suspecte une progression normale relevée le lendemain. */
         private const val TOLERANCE_ABSOLUE = 5.0
+
+        /**
+         * En deçà, la lecture n'est pas reportée dans le champ. Au-dessus, elle
+         * l'est mais reste sélectionnée, prête à être corrigée d'un geste.
+         */
+        private const val SEUIL_PRE_REMPLISSAGE = 0.25
+
+        /**
+         * Côté le plus long en deçà duquel on ne réduit plus l'image.
+         *
+         * Au-delà, réduire allège le traitement sans perte utile ; en deçà, on
+         * rognerait sur la seule chose qui compte, la finesse des chiffres.
+         */
+        private const val COTE_UTILE_MIN = 2200
         private val formatIso = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
         private val formatAffichage = SimpleDateFormat("d MMMM yyyy", Locale.FRANCE)
     }
