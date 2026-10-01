@@ -33,6 +33,7 @@ deploiement/*.apk
 # l'application déjà installée : sauvegardez-la hors du dépôt.
 android/cle-release.jks
 android/keystore.properties
+deploiement/cle-android-base64.txt
 
 # Projet Android
 android/.gradle/

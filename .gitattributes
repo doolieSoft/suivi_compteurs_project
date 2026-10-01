@@ -9,6 +9,10 @@
 *.xlsx binary
 *.apk binary
 *.zip binary
+# Le wrapper Gradle : converti en texte, il serait corrompu et la compilation
+# échouerait sur le serveur d'intégration.
+*.jar binary
+gradle/wrapper/gradle-wrapper.jar binary
 
 # Bibliothèque tierce minifiée : inutile de l'afficher dans les différences.
 suivi/static/suivi/chart.umd.min.js linguist-vendored -diff

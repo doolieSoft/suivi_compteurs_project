@@ -25,8 +25,13 @@ android {
         // Android 8.0. En deçà, ni canaux de notification ni icônes adaptatives.
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        // Surchargeables depuis la ligne de commande, ce dont se sert la
+        // publication automatique : l'étiquette Git donne le nom de version, et
+        // le numéro d'exécution du workflow fournit un entier toujours
+        // croissant — Android refuse d'installer un versionCode qui recule.
+        //   ./gradlew assembleRelease -PsuiviVersionCode=7 -PsuiviVersionName=1.3
+        versionCode = (findProperty("suiviVersionCode") as String?)?.toInt() ?: 1
+        versionName = (findProperty("suiviVersionName") as String?) ?: "1.0"
         resourceConfigurations += listOf("fr")
     }
 

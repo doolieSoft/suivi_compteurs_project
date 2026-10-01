@@ -1,0 +1,113 @@
+name: Publier l'application Android
+
+# Pousser une étiquette « v… » suffit à produire la publication :
+#
+#     git tag v1.1 && git push origin v1.1
+#
+# Le déclenchement manuel reste possible depuis l'onglet Actions, utile pour
+# rejouer une publication qui aurait échoué.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  # Nécessaire pour créer la publication et y attacher l'APK.
+  contents: write
+
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+        with:
+          # Historique complet : les notes de version sont déduites des commits
+          # écoulés depuis l'étiquette précédente.
+          fetch-depth: 0
+
+      - name: Installer Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Mettre Gradle en cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Restituer la clé de signature
+        env:
+          CLE_BASE64: ${{ secrets.CLE_ANDROID_BASE64 }}
+          MOT_DE_PASSE: ${{ secrets.CLE_ANDROID_MOTDEPASSE }}
+          ALIAS: ${{ secrets.CLE_ANDROID_ALIAS }}
+        run: |
+          if [ -z "$CLE_BASE64" ]; then
+            echo "::error::Le secret CLE_ANDROID_BASE64 est absent."
+            echo "Sans lui, la compilation retomberait sur la clé de débogage"
+            echo "et produirait un APK qui ne pourrait pas mettre à jour"
+            echo "l'application déjà installée."
+            exit 1
+          fi
+          printf '%s' "$CLE_BASE64" | base64 -d > android/cle-release.jks
+          cat > android/keystore.properties <<FIN
+          motDePasseDepot=$MOT_DE_PASSE
+          alias=$ALIAS
+          motDePasseCle=$MOT_DE_PASSE
+          FIN
+
+      - name: Déterminer la version
+        id: version
+        run: |
+          # L'étiquette donne le nom lisible, sans son « v » initial.
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            NOM="${GITHUB_REF_NAME#v}"
+          else
+            NOM="0.0-essai"
+          fi
+          echo "nom=$NOM" >> "$GITHUB_OUTPUT"
+          # Le numéro d'exécution est un entier toujours croissant : Android
+          # refuse d'installer un versionCode inférieur ou égal au précédent.
+          echo "code=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          echo "Version $NOM (code ${{ github.run_number }})"
+
+      - name: Lancer les tests
+        working-directory: android
+        run: ./gradlew testDebugUnitTest --console=plain
+
+      - name: Construire l'APK signé
+        working-directory: android
+        run: |
+          ./gradlew assembleRelease --console=plain \
+            -PsuiviVersionCode=${{ steps.version.outputs.code }} \
+            -PsuiviVersionName=${{ steps.version.outputs.nom }}
+
+      - name: Vérifier la signature
+        run: |
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort | tail -1)
+          "$APKSIGNER" verify --print-certs "$APK" | tee signature.txt
+          # Garde-fou : si le secret avait été mal restitué, la compilation
+          # serait passée sans bruit sur la clé de débogage.
+          if grep -q "CN=Android Debug" signature.txt; then
+            echo "::error::APK signé avec la clé de débogage, publication annulée."
+            exit 1
+          fi
+          cp "$APK" suivi-compteurs.apk
+
+      - name: Publier
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ETIQUETTE="${{ github.ref_name }}"
+          if [ "${{ github.ref_type }}" != "tag" ]; then
+            ETIQUETTE="essai-${{ github.run_number }}"
+            git tag "$ETIQUETTE" && git push origin "$ETIQUETTE"
+          fi
+          gh release create "$ETIQUETTE" suivi-compteurs.apk \
+            --title "$ETIQUETTE" \
+            --generate-notes
+
+      - name: Effacer la clé
+        if: always()
+        run: rm -f android/cle-release.jks android/keystore.properties

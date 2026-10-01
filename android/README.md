@@ -27,9 +27,12 @@ Requis : JDK 17 ou plus, et le SDK Android (plateforme 35, build-tools 35+).
 
 ```bash
 cd android
-gradle assembleDebug          # ou ./gradlew si vous ajoutez le wrapper
-gradle testDebugUnitTest
+./gradlew assembleDebug
+./gradlew testDebugUnitTest
 ```
+
+Le wrapper télécharge lui-même la version de Gradle attendue : rien à
+installer au préalable.
 
 L'APK sort dans `app/build/outputs/apk/debug/app-debug.apk` (~48 Mo, dont
 l'essentiel est le modèle de reconnaissance de texte).
@@ -39,54 +42,70 @@ machine.
 
 ## Publier une version sur GitHub
 
-### 1. Construire l'APK signé
+### La façon normale : pousser une étiquette
+
+```bash
+git tag v1.1
+git push origin v1.1
+```
+
+C'est tout. GitHub Actions lance les tests, construit l'APK signé, le vérifie
+et crée la publication avec l'APK attaché et des notes déduites des commits.
+Comptez cinq minutes ; le déroulement est visible dans l'onglet **Actions**.
+
+Rien à numéroter à la main :
+
+| | D'où elle vient |
+|---|---|
+| `versionName` | l'étiquette, sans son « v » — `v1.1` donne `1.1` |
+| `versionCode` | le numéro d'exécution du workflow, toujours croissant |
+
+Android refuse d'installer un `versionCode` inférieur ou égal à celui déjà
+posé : le lier au numéro d'exécution écarte définitivement cette erreur.
+
+Le workflow se déclenche aussi à la main depuis l'onglet **Actions**, utile
+pour rejouer une publication qui aurait échoué.
+
+### Préparer les secrets, une fois pour toutes
+
+La clé de signature ne peut pas vivre dans le dépôt. Le workflow la reçoit par
+les secrets, à déposer sur
+<https://github.com/doolieSoft/suivi_compteurs_project/settings/secrets/actions> :
+
+| Secret | Valeur |
+|---|---|
+| `CLE_ANDROID_BASE64` | tout le contenu de `deploiement/cle-android-base64.txt` |
+| `CLE_ANDROID_MOTDEPASSE` | la ligne `motDePasseDepot` de `android/keystore.properties` |
+| `CLE_ANDROID_ALIAS` | `suivi-compteurs` |
+
+Ces trois valeurs sont sur votre PC et **hors du dépôt**. GitHub les chiffre et
+ne les réaffiche jamais ; elles n'apparaissent pas non plus dans les journaux
+d'exécution.
+
+Si `CLE_ANDROID_BASE64` manque, le workflow **s'arrête** au lieu de continuer.
+C'est délibéré : sans la clé, la compilation retomberait silencieusement sur
+celle de débogage et produirait un APK incapable de mettre à jour
+l'application installée. Une vérification de signature, après la construction,
+refuse d'ailleurs de publier un APK portant `CN=Android Debug`.
+
+### Construire à la main, si besoin
 
 ```bash
 cd android
-gradle assembleRelease
+./gradlew assembleRelease
 ```
 
-Le fichier sort dans `app/build/outputs/apk/release/app-release.apk`.
+Le fichier sort dans `app/build/outputs/apk/release/app-release.apk`, signé
+avec `cle-release.jks` dont le mot de passe est dans `keystore.properties`.
 
-La signature vient de `cle-release.jks`, dont le mot de passe est dans
-`keystore.properties`. **Ces deux fichiers ne sont pas versionnés, et doivent
-être sauvegardés ailleurs.** Les perdre interdit définitivement toute mise à
-jour de l'application déjà installée : Android refuse une signature différente,
-il faudrait désinstaller — donc perdre les relevés en attente et les réglages.
+**Sauvegardez ces deux fichiers ailleurs que sur ce PC.** Les perdre interdit
+définitivement toute mise à jour de l'application déjà installée : Android
+refuse une signature différente, il faudrait désinstaller — donc perdre les
+relevés en attente et les réglages.
 
-Sans ces fichiers, la compilation retombe sur la clé de débogage. C'est
-volontaire : le dépôt reste constructible par qui le clone, sans pouvoir
-publier par mégarde un APK mal signé.
-
-### 2. Numéroter la version
-
-Dans `app/build.gradle.kts`, avant chaque publication :
-
-```kotlin
-versionCode = 2          // entier, strictement croissant : Android s'en sert
-versionName = "1.1"      // ce que l'utilisateur lit
-```
-
-Android refuse d'installer un `versionCode` inférieur ou égal à celui en place.
-
-### 3. Créer la publication
-
-Sur <https://github.com/doolieSoft/suivi_compteurs_project/releases/new> :
-
-| Champ | Valeur |
-|---|---|
-| **Choose a tag** | `v1.1` → *Create new tag on publish* |
-| **Release title** | `v1.1` |
-| **Describe this release** | ce qui change, en quelques lignes |
-| **Attach binaries** | glissez `app-release.apk`, renommé `suivi-compteurs.apk` |
-
-Puis *Publish release*. Le lien du README pointe sur `/releases/latest` : il
-mène toujours à la dernière publication, sans avoir à le modifier.
-
-> **Automatisation possible.** Un workflow GitHub Actions peut construire et
-> attacher l'APK à chaque étiquette poussée. Il faut alors déposer la clé dans
-> les secrets du dépôt, encodée en base64. Dites-le-moi si vous voulez que je
-> le mette en place.
+Sans eux, la compilation retombe sur la clé de débogage. C'est volontaire : le
+dépôt reste constructible par qui le clone, sans pouvoir publier par mégarde un
+APK mal signé.
 
 ## Installer sur un téléphone
 
