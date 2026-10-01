@@ -42,6 +42,7 @@ class AccesAnonymeTest(TestCase):
             reverse("suivi:tableau_de_bord"),
             reverse("suivi:comparaison"),
             reverse("suivi:previsions"),
+            reverse("suivi:previsions_rejeu"),
             reverse("suivi:climat"),
             reverse("suivi:releve_liste"),
             reverse("suivi:releve_creer"),

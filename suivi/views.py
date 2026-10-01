@@ -408,6 +408,34 @@ def previsions(request):
     )
 
 
+def previsions_rejeu(request):
+    """Prévisions d'une année passée, rejouées puis confrontées au total réel."""
+    maisons = list(Maison.objects.select_related("station").all())
+    annees = pv.annees_rejouables(maisons)
+    try:
+        annee = int(request.GET.get("annee", ""))
+    except ValueError:
+        annee = None
+    if annee not in annees:
+        annee = annees[0] if annees else None
+
+    rejeux = []
+    if annee is not None:
+        for maison in maisons:
+            rejeux.extend(pv.rejouer(maison, annee))
+
+    return render(
+        request,
+        "suivi/previsions_rejeu.html",
+        {
+            "rubrique": "previsions",
+            "annee": annee,
+            "annees": annees,
+            "rejeux": rejeux,
+        },
+    )
+
+
 # ---------------------------------------------------------------------------
 # Climat
 # ---------------------------------------------------------------------------

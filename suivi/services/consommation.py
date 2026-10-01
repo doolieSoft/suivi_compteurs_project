@@ -94,15 +94,23 @@ class Periode:
             jour += UN_JOUR
 
 
-def periodes(compteurs: Sequence[Compteur]) -> list[Periode]:
+def periodes(
+    compteurs: Sequence[Compteur], *, jusqua: dt.date | None = None
+) -> list[Periode]:
     """Périodes de consommation d'une ligne de compteurs.
 
     Les écarts d'index ne sont jamais calculés d'un compteur à l'autre : lors
     d'un remplacement, la période à cheval est simplement absente.
+
+    ``jusqua`` écarte les relevés postérieurs à cette date : on retrouve ainsi
+    ce que l'application savait ce jour-là, pour rejouer une prévision passée.
     """
     resultat: list[Periode] = []
     for compteur in compteurs:
-        releves = list(compteur.releves.order_by("date").values_list("date", "index"))
+        qs = compteur.releves.order_by("date")
+        if jusqua is not None:
+            qs = qs.filter(date__lte=jusqua)
+        releves = list(qs.values_list("date", "index"))
         for (date_avant, index_avant), (date_apres, index_apres) in zip(
             releves, releves[1:]
         ):
@@ -305,9 +313,10 @@ def ventiler(
     *,
     station=None,
     modele: ModeleThermique | None = None,
+    jusqua: dt.date | None = None,
 ) -> SerieConso:
     """Répartit les écarts d'index sur les jours qu'ils couvrent."""
-    liste_periodes = periodes(compteurs)
+    liste_periodes = periodes(compteurs, jusqua=jusqua)
     if not liste_periodes:
         return SerieConso()
 
@@ -409,7 +418,9 @@ class Ligne:
         return f"{self.maison.nom} – {self.libelle_energie}"
 
 
-def lignes_de(maison: Maison, *, energie: str | None = None) -> list[Ligne]:
+def lignes_de(
+    maison: Maison, *, energie: str | None = None, jusqua: dt.date | None = None
+) -> list[Ligne]:
     """Construit les lignes analysables d'une maison."""
     qs = maison.compteurs.all().order_by("energie", "plage", "date_pose", "id")
     if energie:
@@ -424,7 +435,7 @@ def lignes_de(maison: Maison, *, energie: str | None = None) -> list[Ligne]:
     for (energie_code, plage), compteurs in sorted(
         groupes.items(), key=lambda kv: (ordre.get(kv[0][0], 9), kv[0][1])
     ):
-        serie = ventiler(compteurs, station=maison.station)
+        serie = ventiler(compteurs, station=maison.station, jusqua=jusqua)
         resultat.append(
             Ligne(
                 maison=maison,
@@ -437,8 +448,10 @@ def lignes_de(maison: Maison, *, energie: str | None = None) -> list[Ligne]:
     return resultat
 
 
-def ligne_unique(maison: Maison, energie: str, plage: str) -> Ligne | None:
-    for ligne in lignes_de(maison, energie=energie):
+def ligne_unique(
+    maison: Maison, energie: str, plage: str, *, jusqua: dt.date | None = None
+) -> Ligne | None:
+    for ligne in lignes_de(maison, energie=energie, jusqua=jusqua):
         if ligne.plage == plage:
             return ligne
     return None

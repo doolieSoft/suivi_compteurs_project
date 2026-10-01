@@ -19,6 +19,7 @@ urlpatterns = [
     path("deconnexion/", vues_auth.LogoutView.as_view(), name="deconnexion"),
     path("comparaison/", views.comparaison, name="comparaison"),
     path("previsions/", views.previsions, name="previsions"),
+    path("previsions/rejeu/", views.previsions_rejeu, name="previsions_rejeu"),
     path("climat/", views.climat, name="climat"),
     path("climat/synchroniser/", views.climat_synchroniser, name="climat_synchroniser"),
     path("releves/", views.releve_liste, name="releve_liste"),

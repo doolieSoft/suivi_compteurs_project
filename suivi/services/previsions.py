@@ -18,6 +18,8 @@ import calendar
 import datetime as dt
 from dataclasses import dataclass
 
+from suivi.models import Maison, Releve
+from suivi.services import consommation as cs
 from suivi.services import degres_jours as dj_service
 from suivi.services.consommation import Ligne
 
@@ -268,3 +270,117 @@ def comparer_a_annee_precedente(
         dj=dj,
         dj_precedent=dj_precedent,
     )
+
+
+# ---------------------------------------------------------------------------
+# Rejeu : ce que la prévision aurait annoncé, comparé à ce qui s'est passé
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class PointRejeu:
+    """Prévision telle qu'elle aurait été affichée à la date ``coupe``."""
+
+    coupe: dt.date
+    prevision: Prevision
+    reel: float
+
+    @property
+    def ecart_pct(self) -> float | None:
+        if not self.reel:
+            return None
+        return 100.0 * (self.prevision.total_prevu - self.reel) / self.reel
+
+    @property
+    def dans_fourchette(self) -> bool | None:
+        p = self.prevision
+        if p.borne_basse is None or p.borne_haute is None:
+            return None
+        return p.borne_basse <= self.reel <= p.borne_haute
+
+
+@dataclass
+class Rejeu:
+    ligne: Ligne
+    annee: int
+    reel: float
+    jours_reels: int
+    points: list[PointRejeu]
+
+    @property
+    def ecart_moyen_pct(self) -> float | None:
+        """Moyenne des écarts absolus : les erreurs ne se compensent pas."""
+        ecarts = [abs(p.ecart_pct) for p in self.points if p.ecart_pct is not None]
+        return sum(ecarts) / len(ecarts) if ecarts else None
+
+
+def _annee_complete(ligne: Ligne, annee: int) -> bool:
+    total_jours = 366 if calendar.isleap(annee) else 365
+    return ligne.serie.jours_couverts_par_annee().get(annee, 0) >= total_jours * 0.9
+
+
+def annees_rejouables(maisons) -> list[int]:
+    """Années civiles pour lesquelles un total réel existe, la plus récente d'abord."""
+    annees: set[int] = set()
+    for maison in maisons:
+        for ligne in cs.lignes_de(maison):
+            for annee in ligne.serie.par_annee():
+                if _annee_complete(ligne, annee):
+                    annees.add(annee)
+    return sorted(annees, reverse=True)
+
+
+def rejouer(maison: Maison, annee: int) -> list[Rejeu]:
+    """Refait la prévision de ``annee`` à chacune de ses dates de relevé.
+
+    À chaque date, tout ce qui est postérieur est masqué : les relevés, donc le
+    modèle thermique et les profils saisonniers qui en découlent, ainsi que la
+    normale climatique. Le total réel, lui, vient de l'historique complet.
+    """
+    resultat: list[Rejeu] = []
+    normales_par_coupe: dict[dt.date, dict[tuple[int, int], float]] = {}
+
+    for ligne in cs.lignes_de(maison):
+        if not _annee_complete(ligne, annee):
+            continue
+        reel = ligne.serie.par_annee()[annee]
+        coupes = sorted(
+            set(
+                Releve.objects.filter(
+                    compteur__in=ligne.compteurs, date__year=annee
+                ).values_list("date", flat=True)
+            )
+        )
+
+        points: list[PointRejeu] = []
+        for coupe in coupes:
+            ligne_a_date = cs.ligne_unique(
+                maison, ligne.energie, ligne.plage, jusqua=coupe
+            )
+            if ligne_a_date is None:
+                continue
+            if coupe not in normales_par_coupe:
+                normales_par_coupe[coupe] = dj_service.dj_normaux_par_jour_calendaire(
+                    maison.station, jusqua=coupe
+                )
+            prevision = prevoir(
+                ligne_a_date,
+                annee=annee,
+                aujourdhui=coupe,
+                normales=normales_par_coupe[coupe],
+            )
+            if prevision is None or prevision.jours_restants == 0:
+                continue
+            points.append(PointRejeu(coupe=coupe, prevision=prevision, reel=reel))
+
+        if points:
+            resultat.append(
+                Rejeu(
+                    ligne=ligne,
+                    annee=annee,
+                    reel=reel,
+                    jours_reels=ligne.serie.jours_couverts_par_annee()[annee],
+                    points=points,
+                )
+            )
+    return resultat

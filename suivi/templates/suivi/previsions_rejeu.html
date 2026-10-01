@@ -1,0 +1,101 @@
+{% extends "suivi/base.html" %}
+{% load suivi_extras %}
+
+{% block titre %}Justesse des prévisions{% if annee %} {{ annee }}{% endif %} — Suivi des compteurs{% endblock %}
+
+{% block contenu %}
+<div class="entete-page">
+  <h1>Justesse des prévisions{% if annee %} {{ annee }}{% endif %}</h1>
+  <p class="sous-titre">
+    Ce que la page <a href="{% url 'suivi:previsions' %}">Prévisions</a> aurait annoncé
+    à chaque relevé de l'année, comparé à la consommation réellement mesurée.
+  </p>
+</div>
+
+{% if annees %}
+<div class="carte">
+  <form method="get" class="filtres">
+    <div>
+      <label for="f-annee">Année</label>
+      <select name="annee" id="f-annee">
+        {% for a in annees %}
+          <option value="{{ a }}" {% if a == annee %}selected{% endif %}>{{ a }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="min-width:auto">
+      <button type="submit" class="bouton discret">Rejouer</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+{% for r in rejeux %}
+<div class="carte">
+  <h2>
+    <span class="pastille {{ r.ligne.energie|classe_energie }}" aria-hidden="true"></span>
+    <a href="{{ r.ligne.get_absolute_url }}">{{ r.ligne.libelle }}</a>
+  </h2>
+  <p class="sous-titre">
+    Réel {{ r.annee }} : <strong>{{ r.reel|nb:0 }} {{ r.ligne.unite }}</strong>
+    <span class="faible">({{ r.jours_reels }} jours couverts)</span>
+    — écart moyen des prévisions : <strong>{{ r.ecart_moyen_pct|nb:1 }} %</strong>
+  </p>
+  <div class="tableau-conteneur">
+    <table>
+      <thead>
+        <tr>
+          <th class="texte">Comme si on était le</th>
+          <th>Relevé</th>
+          <th>Total prévu</th>
+          <th>Fourchette</th>
+          <th>Écart au réel</th>
+          <th class="texte">Réel dans la fourchette</th>
+          <th class="texte">Méthode</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pt in r.points %}
+        {% with p=pt.prevision %}
+        <tr>
+          <td class="texte">{{ pt.coupe|date:"j F Y" }}</td>
+          <td>{{ p.realise|nb:0 }}<br>
+              <span class="faible" style="font-size:12px">{{ p.jours_realises }} jours</span></td>
+          <td><strong>{{ p.total_prevu|nb:0 }}</strong> <span class="faible">{{ r.ligne.unite }}</span></td>
+          <td class="faible">{% if p.borne_basse is not None %}{{ p.borne_basse|nb:0 }} – {{ p.borne_haute|nb:0 }}{% else %}—{% endif %}</td>
+          <td><span class="delta stable">{{ pt.ecart_pct|pourcent }}</span></td>
+          <td class="texte">
+            {% if pt.dans_fourchette is None %}—
+            {% elif pt.dans_fourchette %}<span class="etiquette">oui</span>
+            {% else %}<span class="etiquette"><strong>non</strong></span>{% endif %}
+          </td>
+          <td class="texte faible">{{ p.methode }}</td>
+        </tr>
+        {% endwith %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% empty %}
+<div class="carte">
+  <p class="note">
+    {% if annee %}Aucune prévision à rejouer pour {{ annee }}.
+    {% else %}Aucune année complète à rejouer pour l'instant.{% endif %}
+  </p>
+</div>
+{% endfor %}
+
+{% if rejeux %}
+<div class="carte">
+  <h2>Comment lire cette page</h2>
+  <p class="note">
+    À chaque date, les relevés postérieurs sont masqués : le modèle thermique, les
+    profils saisonniers et la normale climatique sont recalculés avec ce qui était
+    connu ce jour-là. Un écart positif signifie que la prévision était trop haute.
+    Le total réel provient de tous les relevés disponibles aujourd'hui ; les jours
+    de fin d'année situés entre deux relevés y sont répartis par ventilation.
+  </p>
+</div>
+{% endif %}
+{% endblock %}
