@@ -12,6 +12,7 @@ import tempfile
 from pathlib import Path
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_not_required
 from django.contrib.staticfiles.finders import find
 from django.core.management import call_command
 from django.db.models import Count, Max, Min
@@ -569,6 +570,7 @@ def importer(request):
 # ---------------------------------------------------------------------------
 
 
+@login_not_required
 def manifeste(request):
     """Décrit l'application pour qu'Android propose de l'installer.
 
@@ -636,6 +638,7 @@ def _version_ressources(noms: list[str]) -> str:
     return empreinte.hexdigest()[:12]
 
 
+@login_not_required
 def service_worker(request):
     """Sert le service worker depuis la racine, seule portée qui couvre tout le site.
 
@@ -659,6 +662,7 @@ def service_worker(request):
     return reponse
 
 
+@login_not_required
 def hors_ligne(request):
     """Page affichée quand le serveur est injoignable et la page non mise en cache."""
     return render(request, "suivi/hors_ligne.html", {"rubrique": ""})

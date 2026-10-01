@@ -1,6 +1,7 @@
 package be.suivicompteurs.app.ocr
 
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.pow
 
@@ -55,10 +56,17 @@ object SelecteurIndex {
      */
     private const val PROGRESSION_PLANCHER = 100.0
 
+    /**
+     * @param incrementMax progression au-delà de laquelle la lecture devient
+     *   douteuse, calculée à partir des jours écoulés et du débit journalier
+     *   déjà observé. Quand elle est inconnue, on retombe sur une règle
+     *   grossière proportionnelle à l'index, bien plus permissive.
+     */
     fun choisir(
         lignes: List<String>,
         dernierIndex: Double?,
         decimales: Int,
+        incrementMax: Double? = null,
     ): Proposition? {
         val suites = suitesDeChiffres(lignes)
         if (suites.isEmpty()) return null
@@ -78,38 +86,36 @@ object SelecteurIndex {
             )
         }
 
-        val borne = max(dernierIndex * PROGRESSION_SUSPECTE, PROGRESSION_PLANCHER)
-        val vraisemblables = candidats.filter {
-            it.valeur >= dernierIndex && it.valeur - dernierIndex <= borne
-        }
+        val progressions = candidats.filter { it.valeur >= dernierIndex }
 
-        if (vraisemblables.isNotEmpty()) {
-            // La plus complète d'abord ; à nombre de chiffres égal, la plus proche.
-            val choix = vraisemblables.maxWith(
-                compareBy({ it.brut.length }, { -(it.valeur - dernierIndex) })
-            )
+        if (progressions.isNotEmpty()) {
+            // Classement en deux temps, et l'ordre importe :
+            //
+            //   1. la plus petite PARTIE ENTIÈRE, car un index ne bondit pas —
+            //      entre 24978,737 et le relevé suivant, les chiffres noirs
+            //      restent 24978 ou passent à 24979, jamais à 27364 ;
+            //   2. à partie entière égale, la lecture la plus complète, pour
+            //      préférer 24978,97 à 24978 tout court.
+            //
+            // L'inverse — le plus long d'abord — faisait gagner le numéro de
+            // série imprimé sur le compteur : huit chiffres contre sept.
+            val choix = progressions.sortedWith(
+                compareBy({ floor(it.valeur) }, { -it.brut.length })
+            ).first()
+
             val ecart = choix.valeur - dernierIndex
+            val borne = incrementMax
+                ?: max(dernierIndex * PROGRESSION_SUSPECTE, PROGRESSION_PLANCHER)
+            val suspecte = ecart > borne
             return Proposition(
                 valeur = choix.valeur,
                 brut = choix.brut,
-                confiance = 0.85,
-                explication = "Soit ${format(ecart)} depuis le dernier relevé.",
-            )
-        }
-
-        // Rien de vraisemblable : il reste peut-être des lectures supérieures au
-        // dernier index, mais toutes exigent un bond démesuré. On retient la
-        // moins extravagante, en le disant.
-        val excessive = candidats
-            .filter { it.valeur >= dernierIndex }
-            .minByOrNull { it.valeur - dernierIndex }
-        if (excessive != null) {
-            return Proposition(
-                valeur = excessive.valeur,
-                brut = excessive.brut,
-                confiance = 0.3,
-                explication = "Progression inhabituelle de " +
-                    "${format(excessive.valeur - dernierIndex)} : à confirmer.",
+                confiance = if (suspecte) 0.3 else 0.85,
+                explication = if (suspecte) {
+                    "Progression inhabituelle de ${format(ecart)} : à confirmer."
+                } else {
+                    "Soit ${format(ecart)} depuis le dernier relevé."
+                },
             )
         }
 

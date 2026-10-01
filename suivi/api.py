@@ -16,6 +16,7 @@ import json
 from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_not_required
 from django.core.cache import cache
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import Count, Max, Sum
@@ -53,6 +54,23 @@ def _json_erreur(exc: ErreurApi) -> JsonResponse:
 # ---------------------------------------------------------------------------
 
 
+# Plancher du débit journalier : un compteur neuf, ou relevé une seule fois,
+# n'offre pas encore d'historique exploitable.
+DEBIT_JOURNALIER_PLANCHER = 1.0
+
+
+def _debit_journalier_max(compteur: Compteur) -> float:
+    """Consommation journalière la plus forte observée sur ce compteur."""
+    from .services import consommation as cs
+
+    periodes = cs.periodes([compteur])
+    debits = [p.volume_journalier for p in periodes if p.nb_jours > 0 and p.volume > 0]
+    if not debits:
+        return DEBIT_JOURNALIER_PLANCHER
+    return round(max(max(debits), DEBIT_JOURNALIER_PLANCHER), 3)
+
+
+@login_not_required
 @require_GET
 def etat(request: HttpRequest) -> JsonResponse:
     """Liste des compteurs actifs, avec leur dernier index connu.
@@ -92,6 +110,11 @@ def etat(request: HttpRequest) -> JsonResponse:
                 "decimales": 3 if compteur.energie != Energie.ELECTRICITE else 1,
                 "dernier_index": float(dernier.index) if dernier else None,
                 "dernier_releve": dernier.date.isoformat() if dernier else None,
+                # Débit journalier le plus fort jamais relevé sur ce compteur.
+                # Le téléphone s'en sert pour borner ce qu'une lecture
+                # automatique peut proposer : sans cette borne, le numéro de
+                # série imprimé sur la plaque passe pour un index crédible.
+                "conso_journaliere_max": _debit_journalier_max(compteur),
             }
         )
 
@@ -157,6 +180,7 @@ def _champ_decimal(valeur, nom: str, *, obligatoire: bool = True) -> Decimal | N
 
 
 @csrf_exempt
+@login_not_required
 @require_POST
 def creer_releve(request: HttpRequest) -> JsonResponse:
     """Enregistre un relevé envoyé par le téléphone.
@@ -287,6 +311,7 @@ def _signature_donnees() -> str:
     return "|".join(str(v) for v in (*releves.values(), *degres.values()))
 
 
+@login_not_required
 @require_GET
 def instantane(request: HttpRequest) -> JsonResponse:
     """Photographie de l'analyse, destinée à être conservée sur le téléphone.
@@ -401,6 +426,7 @@ MAX_RELEVES_PAR_ENVOI = 200
 
 
 @csrf_exempt
+@login_not_required
 @require_POST
 def synchroniser(request: HttpRequest) -> JsonResponse:
     """Reçoit en un seul appel les relevés accumulés hors ligne.

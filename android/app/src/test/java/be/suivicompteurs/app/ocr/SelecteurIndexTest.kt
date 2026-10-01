@@ -148,3 +148,89 @@ class SelecteurIndexTest {
 
     private fun gazLiersonsExact() = 24978.737
 }
+
+/**
+ * Cas reconstitués d'après une photo réelle du compteur gaz des Liserons :
+ * un Elster BK-G6 de 2010, dont la plaque porte un numéro de série en gros
+ * caractères à côté d'un code-barres, un numéro d'agrément, un millésime et
+ * plusieurs débits — autant de suites de chiffres parmi lesquelles l'index
+ * n'est ni la plus longue, ni la plus visible.
+ */
+class SelecteurIndexCompteurReelTest {
+
+    /** Ce que la reconnaissance de texte voit sur la plaque, dans le désordre. */
+    private val plaqueBkG6 = listOf(
+        "elster",
+        "BK-G6",
+        "G6  2010",
+        "Qmax 10 m³/h",
+        "D087",
+        "Qmin 0,06 m³/h",
+        "122.43",
+        "V 4 dm³",
+        "Pmax 0,2bar",
+        "cogegaz",
+        "27364770",                       // numéro de série, près du code-barres
+        "S3 Pmax T2 = 100 mbar",
+        "DIN EN 1359:2007",
+        "2 4 9 7 8 , 9 7",                // l'index : chiffres noirs puis rouges
+        "m3",
+        "D02527364770   1 imp = 0,01m³",
+    )
+
+    @Test
+    fun `retient l'index et non le numero de serie`() {
+        // Le piège : « 27364770 » compte huit chiffres contre sept pour
+        // l'index, et se lit 27 364,770 — soit une progression plausible en
+        // apparence. Seule la partie entière le démasque : 27364 contre 24978.
+        val proposition = SelecteurIndex.choisir(plaqueBkG6, 24978.737, 3)
+        assertNotNull(proposition)
+        assertEquals(24978.97, proposition!!.valeur, 0.001)
+        assertTrue(
+            "une lecture cohérente doit inspirer confiance",
+            proposition.confiance >= 0.8,
+        )
+    }
+
+    @Test
+    fun `resiste a l'ordre dans lequel les lignes sont lues`() {
+        // ML Kit ne garantit pas l'ordre : le résultat ne doit pas en dépendre.
+        val proposition = SelecteurIndex.choisir(plaqueBkG6.reversed(), 24978.737, 3)
+        assertNotNull(proposition)
+        assertEquals(24978.97, proposition!!.valeur, 0.001)
+    }
+
+    @Test
+    fun `suit le compteur quand la partie entiere avance`() {
+        // Relevé suivant : les chiffres noirs sont passés à 24979.
+        val lignes = plaqueBkG6.map { if (it.startsWith("2 4 9 7 8")) "24979,120" else it }
+        val proposition = SelecteurIndex.choisir(lignes, 24978.970, 3)
+        assertNotNull(proposition)
+        assertEquals(24979.120, proposition!!.valeur, 0.001)
+    }
+
+    @Test
+    fun `ne se laisse pas prendre par le millesime ni par l'agrement`() {
+        // « 2010 », « 122.43 », « 1359:2007 » : tous sous le dernier index une
+        // fois la virgule posée, ou bien de partie entière plus grande.
+        val proposition = SelecteurIndex.choisir(plaqueBkG6, 24978.737, 3)
+        assertNotNull(proposition)
+        assertTrue(proposition!!.brut.startsWith("24978"))
+    }
+
+    @Test
+    fun `le numero de serie seul ne devient pas un index credible`() {
+        // Si les chiffres de l'index échappent à la lecture, ce qui reste ne
+        // doit surtout pas passer pour un relevé valide.
+        val sansIndex = plaqueBkG6.filterNot { it.startsWith("2 4 9 7 8") }
+        // Trente jours à 13,2 m³/jour, marge doublée : environ 800 m³. Le
+        // numéro de série en exigerait 2 386.
+        val proposition = SelecteurIndex.choisir(sansIndex, 24978.737, 3, 800.0)
+        assertNotNull(proposition)
+        assertTrue(
+            "une progression de plusieurs milliers de m³ doit être signalée",
+            proposition!!.confiance <= 0.3,
+        )
+        assertTrue(proposition.explication.contains("inhabituelle"))
+    }
+}

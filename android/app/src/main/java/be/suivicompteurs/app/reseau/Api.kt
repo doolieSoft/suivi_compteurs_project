@@ -89,6 +89,7 @@ class Api(private val reglages: Reglages) {
                     else o.getDouble("dernier_index"),
                     dernierReleve = if (o.isNull("dernier_releve")) null
                     else o.getString("dernier_releve"),
+                    consoJournaliereMax = o.optDouble("conso_journaliere_max", 1.0),
                 )
             }
         }

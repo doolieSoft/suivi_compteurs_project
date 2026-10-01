@@ -48,6 +48,7 @@ class SaisieActivity : AppCompatActivity() {
     private lateinit var vues: ActivitySaisieBinding
     private var compteur: CompteurLocal? = null
     private var dernierIndexConnu: Double? = null
+    private var derniereDate: Long? = null
     private var photo: File? = null
     private var proposition: Proposition? = null
     private var dateChoisie: Date = Date()
@@ -100,6 +101,11 @@ class SaisieActivity : AppCompatActivity() {
             // compte des relevés déjà saisis mais pas encore transmis.
             val local = base.releves().dernierIndexLocal(compteurId)
             dernierIndexConnu = listOfNotNull(local, trouve.dernierIndex).maxOrNull()
+
+            val dateLocale = base.releves().dernierReleveLocal(compteurId)?.date
+            derniereDate = listOfNotNull(dateLocale, trouve.dernierReleve)
+                .mapNotNull { runCatching { formatIso.parse(it)?.time }.getOrNull() }
+                .maxOrNull()
 
             vues.titre.text = trouve.libelle
             vues.rappelIndex.text = dernierIndexConnu?.let {
@@ -182,7 +188,12 @@ class SaisieActivity : AppCompatActivity() {
             vues.apercuPhoto.visibility = View.VISIBLE
 
             val lecture = image?.let {
-                lecteur.lire(it, dernierIndexConnu, compteur?.decimales ?: 3)
+                lecteur.lire(
+                    it,
+                    dernierIndexConnu,
+                    compteur?.decimales ?: 3,
+                    progressionPlausibleMax(),
+                )
             }
             proposition = lecture
             vues.boutonDeclencher.isEnabled = true
@@ -205,6 +216,27 @@ class SaisieActivity : AppCompatActivity() {
                 vues.champIndex.selectAll()
             }
         }
+    }
+
+    /**
+     * Progression que l'index peut raisonnablement avoir faite depuis le
+     * dernier relevé.
+     *
+     * C'est ce qui distingue l'index du numéro de série imprimé sur la plaque :
+     * les deux se lisent comme des nombres crédibles, mais l'un seul respecte
+     * le rythme du compteur. La marge est large — un coup de froid peut
+     * dépasser le record observé — car cette borne ne sert qu'à nuancer la
+     * confiance affichée, jamais à écarter une lecture d'office.
+     */
+    private fun progressionPlausibleMax(): Double? {
+        val compteur = compteur ?: return null
+        val debit = compteur.consoJournaliereMax
+        if (debit <= 0) return null
+
+        val depuis = derniereDate ?: return null
+        val jours = ((System.currentTimeMillis() - depuis) / 86_400_000L)
+            .coerceAtLeast(1L)
+        return jours * debit * MARGE_PROGRESSION + TOLERANCE_ABSOLUE
     }
 
     /**
@@ -309,6 +341,12 @@ class SaisieActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_COMPTEUR = "compteur"
+
+        /** Un hiver rigoureux peut dépasser le record déjà observé. */
+        private const val MARGE_PROGRESSION = 2.0
+
+        /** Évite de trouver suspecte une progression normale relevée le lendemain. */
+        private const val TOLERANCE_ABSOLUE = 5.0
         private val formatIso = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
         private val formatAffichage = SimpleDateFormat("d MMMM yyyy", Locale.FRANCE)
     }

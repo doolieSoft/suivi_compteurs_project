@@ -23,6 +23,15 @@
       <a href="{% url 'suivi:releve_liste' %}" {% if rubrique == 'releves' %}aria-current="page"{% endif %}>Relevés</a>
       <a href="{% url 'suivi:releve_creer' %}" {% if rubrique == 'saisie' %}aria-current="page"{% endif %}>Saisir</a>
       <a href="{% url 'admin:index' %}">Admin</a>
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'suivi:deconnexion' %}" style="display:inline">
+          {% csrf_token %}
+          <button type="submit" class="bouton discret"
+                  style="padding:6px 11px;font-size:14px;font-weight:400;border:0;background:none;color:var(--encre-2)">
+            Quitter
+          </button>
+        </form>
+      {% endif %}
     </nav>
   </div>
 </header>

@@ -8,6 +8,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
@@ -92,7 +94,7 @@ interface InstantaneDao {
 
 @Database(
     entities = [CompteurLocal::class, ReleveLocal::class, InstantaneLocal::class],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 abstract class BaseLocale : RoomDatabase() {
@@ -101,6 +103,22 @@ abstract class BaseLocale : RoomDatabase() {
     abstract fun instantane(): InstantaneDao
 
     companion object {
+        /**
+         * Ajout du débit journalier maximal.
+         *
+         * Une migration plutôt qu'une reconstruction : la table des relevés
+         * contient la file d'attente, et une saisie faite au fond d'une cave
+         * ne doit pas disparaître parce que le schéma a évolué.
+         */
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE compteurs ADD COLUMN consoJournaliereMax " +
+                        "REAL NOT NULL DEFAULT 1.0"
+                )
+            }
+        }
+
         @Volatile
         private var instance: BaseLocale? = null
 
@@ -110,7 +128,7 @@ abstract class BaseLocale : RoomDatabase() {
                     contexte.applicationContext,
                     BaseLocale::class.java,
                     "suivi-compteurs.db",
-                ).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
             }
     }
 }

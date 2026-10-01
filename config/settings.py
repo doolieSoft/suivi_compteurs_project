@@ -139,6 +139,10 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Exige une connexion pour TOUTE vue, sauf celles marquées
+    # « login_not_required ». L'inverse — protéger vue par vue — finit
+    # toujours par laisser passer celle qu'on a oublié de décorer.
+    "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -192,6 +196,18 @@ else:
             },
         }
     }
+
+# --- Accès ----------------------------------------------------------------
+
+LOGIN_URL = "suivi:connexion"
+LOGIN_REDIRECT_URL = "suivi:tableau_de_bord"
+LOGOUT_REDIRECT_URL = "suivi:connexion"
+
+# Un an, prolongé à chaque visite : l'application est consultée depuis un
+# téléphone, et redemander le mot de passe au pied d'un compteur serait une
+# vexation sans bénéfice — le vrai rempart est la longueur du mot de passe.
+SESSION_COOKIE_AGE = 365 * 24 * 3600
+SESSION_SAVE_EVERY_REQUEST = True
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

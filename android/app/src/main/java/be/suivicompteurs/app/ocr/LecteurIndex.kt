@@ -27,9 +27,10 @@ class LecteurIndex {
         image: Bitmap,
         dernierIndex: Double?,
         decimales: Int,
+        incrementMax: Double? = null,
     ): Proposition? {
         val lignes = reconnaitre(image) ?: return null
-        return SelecteurIndex.choisir(lignes, dernierIndex, decimales)
+        return SelecteurIndex.choisir(lignes, dernierIndex, decimales, incrementMax)
     }
 
     private suspend fun reconnaitre(image: Bitmap): List<String>? =

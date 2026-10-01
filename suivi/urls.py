@@ -1,3 +1,4 @@
+from django.contrib.auth import views as vues_auth
 from django.urls import path
 
 from . import api, views
@@ -6,6 +7,16 @@ app_name = "suivi"
 
 urlpatterns = [
     path("", views.tableau_de_bord, name="tableau_de_bord"),
+    # --- Accès ---------------------------------------------------------
+    path(
+        "connexion/",
+        vues_auth.LoginView.as_view(
+            template_name="suivi/connexion.html",
+            redirect_authenticated_user=True,
+        ),
+        name="connexion",
+    ),
+    path("deconnexion/", vues_auth.LogoutView.as_view(), name="deconnexion"),
     path("comparaison/", views.comparaison, name="comparaison"),
     path("previsions/", views.previsions, name="previsions"),
     path("climat/", views.climat, name="climat"),
