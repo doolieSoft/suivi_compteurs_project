@@ -14,7 +14,7 @@ import org.junit.Test
  */
 class SelecteurIndexTest {
 
-    private val gazLiserons = 24978.737
+    private val indexGazPrecedent = 24978.737
     private val decimalesGaz = 3
 
     @Test
@@ -26,7 +26,7 @@ class SelecteurIndexTest {
             "2011",
             "m3",
         )
-        val proposition = SelecteurIndex.choisir(lignes, gazLiserons, decimalesGaz)
+        val proposition = SelecteurIndex.choisir(lignes, indexGazPrecedent, decimalesGaz)
         assertNotNull(proposition)
         assertEquals(24981.625, proposition!!.valeur, 0.001)
         assertTrue(proposition.confiance >= 0.8)
@@ -36,7 +36,7 @@ class SelecteurIndexTest {
     fun `recompose un index reparti sur deux lignes`() {
         // Chiffres noirs sur une ligne, décimales rouges sur la suivante.
         val lignes = listOf("24981", "625")
-        val proposition = SelecteurIndex.choisir(lignes, gazLiserons, decimalesGaz)
+        val proposition = SelecteurIndex.choisir(lignes, indexGazPrecedent, decimalesGaz)
         assertNotNull(proposition)
         assertEquals(24981.625, proposition!!.valeur, 0.001)
     }
@@ -47,7 +47,7 @@ class SelecteurIndexTest {
         // au-dessus du dernier index. Seule la vraisemblance de la progression
         // permet de l'écarter — la comparaison brute ne suffit pas.
         val lignes = listOf("0815 4432")
-        val proposition = SelecteurIndex.choisir(lignes, gazLiserons, decimalesGaz)
+        val proposition = SelecteurIndex.choisir(lignes, indexGazPrecedent, decimalesGaz)
         assertNotNull(proposition)
         assertTrue(
             "une lecture invraisemblable doit être signalée",
@@ -61,7 +61,7 @@ class SelecteurIndexTest {
         // Les décimales rouges ont échappé à la lecture : quelle que soit la
         // position de la virgule, le résultat reste sous le dernier index.
         val lignes = listOf("24978")
-        val proposition = SelecteurIndex.choisir(lignes, gazLiserons, decimalesGaz)
+        val proposition = SelecteurIndex.choisir(lignes, indexGazPrecedent, decimalesGaz)
         assertNotNull(proposition)
         assertTrue(proposition!!.confiance < 0.2)
         assertTrue(proposition.explication.contains("corrigez", ignoreCase = true))
@@ -81,9 +81,9 @@ class SelecteurIndexTest {
     fun `signale une progression invraisemblable`() {
         // Un chiffre lu en trop multiplie l'index par dix.
         val lignes = listOf("249817")
-        val proposition = SelecteurIndex.choisir(lignes, gazLiserons, 0)
+        val proposition = SelecteurIndex.choisir(lignes, indexGazPrecedent, 0)
         assertNotNull(proposition)
-        assertTrue(proposition!!.valeur > gazLiserons * 1.5)
+        assertTrue(proposition!!.valeur > indexGazPrecedent * 1.5)
         assertTrue(proposition.confiance <= 0.4)
         // Six chiffres entiers au lieu de cinq : ce n'est pas un index de ce
         // compteur, et c'est plus juste à dire qu'une progression inhabituelle.
@@ -95,7 +95,7 @@ class SelecteurIndexTest {
         // Deux candidats plausibles : le plus proche gagne, car un compteur
         // progresse peu entre deux relevés.
         val lignes = listOf("24979", "31000")
-        val proposition = SelecteurIndex.choisir(lignes, gazLiserons, 0)
+        val proposition = SelecteurIndex.choisir(lignes, indexGazPrecedent, 0)
         assertNotNull(proposition)
         assertEquals(24979.0, proposition!!.valeur, 0.001)
     }
@@ -110,8 +110,8 @@ class SelecteurIndexTest {
 
     @Test
     fun `renvoie null quand aucun chiffre n'est lisible`() {
-        assertNull(SelecteurIndex.choisir(listOf("m3", "GAZ", "---"), gazLiserons, 3))
-        assertNull(SelecteurIndex.choisir(emptyList(), gazLiserons, 3))
+        assertNull(SelecteurIndex.choisir(listOf("m3", "GAZ", "---"), indexGazPrecedent, 3))
+        assertNull(SelecteurIndex.choisir(emptyList(), indexGazPrecedent, 3))
     }
 
     @Test
@@ -133,7 +133,7 @@ class SelecteurIndexTest {
     @Test
     fun `tolere les separateurs imprimes sur le compteur`() {
         val lignes = listOf("24.981,625")
-        val proposition = SelecteurIndex.choisir(lignes, gazLiserons, decimalesGaz)
+        val proposition = SelecteurIndex.choisir(lignes, indexGazPrecedent, decimalesGaz)
         assertNotNull(proposition)
         assertEquals(24981.625, proposition!!.valeur, 0.001)
     }
@@ -152,7 +152,7 @@ class SelecteurIndexTest {
 }
 
 /**
- * Cas reconstitués d'après une photo réelle du compteur gaz des Liserons :
+ * Cas reconstitués d'après la photo d'un compteur gaz réel :
  * un Elster BK-G6 de 2010, dont la plaque porte un numéro de série en gros
  * caractères à côté d'un code-barres, un numéro d'agrément, un millésime et
  * plusieurs débits — autant de suites de chiffres parmi lesquelles l'index

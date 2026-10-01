@@ -128,8 +128,8 @@ Deux automatismes évitent d'avoir à décrire les cas particuliers :
 
 - un index qui **recule** signale un remplacement de compteur : la série est
   découpée en deux `Compteur` distincts, ce qui empêche de calculer un écart
-  absurde à la charnière (le compteur d'eau des Liserons, passé de 851,1 m³ à
-  21,5 m³ en novembre 2023) ;
+  absurde à la charnière — c'est ce qui s'est produit sur un compteur d'eau
+  remplacé en cours de suivi, l'index passant de 851,1 m³ à 21,5 m³ ;
 - les annotations texte voisines d'un relevé (« index envoyé », « changement de
   douche ») deviennent des commentaires, et celles qui évoquent des travaux
   deviennent des **événements** tracés dans l'interface.
@@ -153,7 +153,7 @@ l'administration :
    ligne. C'est le cas d'« isolation du toit », à qui l'import attribue la date
    de la dernière ligne de la feuille Gaz. Chaque événement importé porte une
    description rappelant la cellule d'origine — corrigez la date au besoin.
-2. **Index 2014 et 2015 identiques** pour l'eau et le gaz de Collectivité : la
+2. **Index 2014 et 2015 identiques** pour l'eau et le gaz de l'ancienne maison : la
    consommation 2015 ressort donc à 0. L'application le signale comme « index
    inchangé », et exclut ce point de l'ajustement du modèle.
 3. **Tarifs.** La feuille « Prix par année » contient des *acomptes mensuels*,

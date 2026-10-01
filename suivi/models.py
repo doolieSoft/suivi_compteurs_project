@@ -211,7 +211,7 @@ class Compteur(models.Model):
 
 
 def chemin_photo(instance: "Releve", nom_fichier: str) -> str:
-    """Range les photos par maison et par année : media/compteurs/liserons/2026/…"""
+    """Range les photos par maison et par année : media/compteurs/<maison>/2026/…"""
     extension = Path(nom_fichier).suffix.lower() or ".jpg"
     return (
         f"compteurs/{instance.compteur.maison.slug}/{instance.date:%Y}/"

@@ -27,7 +27,7 @@ class AccesAnonymeTest(TestCase):
     def setUpTestData(cls):
         station = f.station()
         f.climat(station, dt.date(2024, 1, 1), dt.date(2024, 12, 31))
-        maison = f.maison(station, nom="Liserons")
+        maison = f.maison(station, nom="Maison d'essai")
         compteur = f.compteur(maison, Energie.GAZ)
         for rang, jour in enumerate(
             [dt.date(2024, 1, 1), dt.date(2024, 6, 1), dt.date(2024, 12, 1)]
@@ -142,7 +142,7 @@ class AccesApiTest(TestCase):
     def setUpTestData(cls):
         station = f.station()
         f.climat(station, dt.date(2024, 1, 1), dt.date(2024, 12, 31))
-        maison = f.maison(station, nom="Liserons")
+        maison = f.maison(station, nom="Maison d'essai")
         compteur = f.compteur(maison, Energie.GAZ)
         Releve.objects.create(
             compteur=compteur, date=dt.date(2024, 1, 1), index=Decimal("1000")
@@ -202,5 +202,5 @@ class ApplicationInstallableTest(TestCase):
         """Ouverts, donc ils ne doivent rien révéler des données."""
         for nom in ("suivi:manifeste", "suivi:service_worker"):
             contenu = self.client.get(reverse(nom)).content.decode()
-            for indice in ("m³", "kWh", "Liserons", "relevé"):
+            for indice in ("m³", "kWh", "Maison d'essai", "relevé"):
                 self.assertNotIn(indice, contenu, f"{nom} divulgue « {indice} »")

@@ -10,6 +10,8 @@ import datetime as dt
 import math
 from decimal import Decimal
 
+from django.utils.text import slugify
+
 from suivi.models import (
     Compteur,
     DegreJour,
@@ -68,7 +70,10 @@ def climat(st: StationMeteo, debut: dt.date, fin: dt.date) -> dict[dt.date, floa
 
 def maison(st: StationMeteo | None = None, nom: str = "Essai") -> Maison:
     return Maison.objects.create(
-        nom=nom, slug=nom.lower().replace(" ", "-"), station=st, nb_facades=4
+        # slugify plutôt qu'un remplacement d'espaces : il écarte apostrophes et
+        # accents, qu'un segment d'URL « slug » refuse. Un nom de maison comme
+        # « Maison d'essai » rendait sinon toutes les URL irréversibles.
+        nom=nom, slug=slugify(nom), station=st, nb_facades=4
     )
 
 
