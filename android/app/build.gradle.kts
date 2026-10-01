@@ -1,8 +1,20 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
 }
+
+// Coordonnées de la clé de publication. Le fichier n'est pas versionné : sans
+// lui — sur un clone neuf, ou dans une intégration continue mal configurée —
+// on retombe sur la clé de débogage, ce qui permet de compiler sans pouvoir
+// publier par mégarde un APK signé avec la mauvaise clé.
+val fichierCle = rootProject.file("keystore.properties")
+val cle = Properties().apply {
+    if (fichierCle.exists()) fichierCle.inputStream().use { load(it) }
+}
+val clePresente = fichierCle.exists() && rootProject.file("cle-release.jks").exists()
 
 android {
     namespace = "be.suivicompteurs.app"
@@ -18,12 +30,25 @@ android {
         resourceConfigurations += listOf("fr")
     }
 
+    signingConfigs {
+        if (clePresente) {
+            create("publication") {
+                storeFile = rootProject.file("cle-release.jks")
+                storePassword = cle.getProperty("motDePasseDepot")
+                keyAlias = cle.getProperty("alias")
+                keyPassword = cle.getProperty("motDePasseCle")
+            }
+        }
+    }
+
     buildTypes {
         release {
             // Le modèle ML Kit et Room n'aiment pas l'obfuscation par défaut ;
             // l'enjeu est nul pour une application personnelle.
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(
+                if (clePresente) "publication" else "debug"
+            )
         }
     }
 

@@ -6,6 +6,26 @@ graphiques, une prévision de fin d'année et une comparaison inter-années
 **corrigée des degrés-jours**, afin qu'un hiver rigoureux ne soit pas confondu
 avec une dérive de consommation.
 
+## Télécharger l'application Android
+
+**[⬇ Dernière version](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest)**
+
+Le fichier `suivi-compteurs.apk` est attaché à chaque publication. Les releases
+stockent les binaires hors de l'historique Git : le dépôt reste léger, et
+chaque version garde son lien.
+
+> Le dépôt étant privé, ce lien ne fonctionne qu'une fois connecté à GitHub
+> avec un compte qui y a accès.
+
+Pour installer : ouvrez le fichier téléchargé depuis le gestionnaire de
+fichiers du téléphone, et autorisez l'installation depuis cette application
+quand Android le demande. Par USB, `adb install -r suivi-compteurs.apk` évite
+cette autorisation.
+
+Ce que l'application permet, serveur éteint : photographier un compteur, lire
+l'index automatiquement, l'enregistrer, et consulter la dernière analyse reçue.
+Détails dans [android/README.md](android/README.md).
+
 ## Démarrage
 
 ```bash

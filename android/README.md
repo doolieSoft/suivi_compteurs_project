@@ -37,6 +37,57 @@ l'essentiel est le modèle de reconnaissance de texte).
 `local.properties` indique où se trouve le SDK ; adaptez-le si vous changez de
 machine.
 
+## Publier une version sur GitHub
+
+### 1. Construire l'APK signé
+
+```bash
+cd android
+gradle assembleRelease
+```
+
+Le fichier sort dans `app/build/outputs/apk/release/app-release.apk`.
+
+La signature vient de `cle-release.jks`, dont le mot de passe est dans
+`keystore.properties`. **Ces deux fichiers ne sont pas versionnés, et doivent
+être sauvegardés ailleurs.** Les perdre interdit définitivement toute mise à
+jour de l'application déjà installée : Android refuse une signature différente,
+il faudrait désinstaller — donc perdre les relevés en attente et les réglages.
+
+Sans ces fichiers, la compilation retombe sur la clé de débogage. C'est
+volontaire : le dépôt reste constructible par qui le clone, sans pouvoir
+publier par mégarde un APK mal signé.
+
+### 2. Numéroter la version
+
+Dans `app/build.gradle.kts`, avant chaque publication :
+
+```kotlin
+versionCode = 2          // entier, strictement croissant : Android s'en sert
+versionName = "1.1"      // ce que l'utilisateur lit
+```
+
+Android refuse d'installer un `versionCode` inférieur ou égal à celui en place.
+
+### 3. Créer la publication
+
+Sur <https://github.com/doolieSoft/suivi_compteurs_project/releases/new> :
+
+| Champ | Valeur |
+|---|---|
+| **Choose a tag** | `v1.1` → *Create new tag on publish* |
+| **Release title** | `v1.1` |
+| **Describe this release** | ce qui change, en quelques lignes |
+| **Attach binaries** | glissez `app-release.apk`, renommé `suivi-compteurs.apk` |
+
+Puis *Publish release*. Le lien du README pointe sur `/releases/latest` : il
+mène toujours à la dernière publication, sans avoir à le modifier.
+
+> **Automatisation possible.** Un workflow GitHub Actions peut construire et
+> attacher l'APK à chaque étiquette poussée. Il faut alors déposer la clé dans
+> les secrets du dépôt, encodée en base64. Dites-le-moi si vous voulez que je
+> le mette en place.
+
 ## Installer sur un téléphone
 
 Le plus simple, par USB, **sans passer par « sources inconnues »** :

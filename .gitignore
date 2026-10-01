@@ -29,6 +29,11 @@ compteur.xlsx
 # reconstruit en une commande depuis les sources présentes dans android/.
 deploiement/*.apk
 
+# Clé de publication Android. La perdre interdit toute mise à jour de
+# l'application déjà installée : sauvegardez-la hors du dépôt.
+android/cle-release.jks
+android/keystore.properties
+
 # Projet Android
 android/.gradle/
 android/build/
