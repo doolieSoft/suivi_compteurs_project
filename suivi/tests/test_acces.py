@@ -180,6 +180,50 @@ class AccesApiTest(TestCase):
             Releve.objects.filter(date=dt.date(2024, 12, 15)).exists()
         )
 
+    def test_la_marque_annuelle_arrive_et_survit_a_l_envoi_de_la_photo(self):
+        """Le téléphone envoie l'index, puis repasse par la création pour la
+        photo : ce second appel ne doit pas effacer la marque."""
+        jour = dt.date(2024, 12, 20)
+        reponse = self.client.post(
+            reverse("suivi:api_synchroniser"),
+            data={
+                "releves": [
+                    {
+                        "reference": "abc",
+                        "compteur": self.compteur.pk,
+                        "date": jour.isoformat(),
+                        "index": 1270,
+                        "annuel": True,
+                    }
+                ]
+            },
+            content_type="application/json",
+            headers={"x-jeton": JETON},
+        )
+        self.assertEqual(reponse.json()["acceptes"], 1, reponse.content)
+        self.assertTrue(Releve.objects.get(date=jour).annuel)
+
+        # Une version de l'application antérieure à la case n'envoie rien.
+        self.client.post(
+            reverse("suivi:api_creer_releve"),
+            data={"compteur": self.compteur.pk, "date": jour.isoformat(), "index": "1270"},
+            headers={"x-jeton": JETON},
+        )
+        self.assertTrue(Releve.objects.get(date=jour).annuel)
+
+        # La forme écrite du multipart est comprise.
+        self.client.post(
+            reverse("suivi:api_creer_releve"),
+            data={
+                "compteur": self.compteur.pk,
+                "date": jour.isoformat(),
+                "index": "1270",
+                "annuel": "false",
+            },
+            headers={"x-jeton": JETON},
+        )
+        self.assertFalse(Releve.objects.get(date=jour).annuel)
+
     def test_l_envoi_d_un_releve_est_refuse_sans_jeton(self):
         reponse = self.client.post(
             reverse("suivi:api_creer_releve"),

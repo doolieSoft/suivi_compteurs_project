@@ -55,6 +55,11 @@
         {{ prevision.realise|nb:0 }} relevés sur {{ prevision.jours_realises }} jours,
         {{ prevision.estime_restant|nb:0 }} estimés sur {{ prevision.jours_restants }}.
       </div>
+      {% if prevision.sur_releve_annuel %}
+        <div class="tuile-detail">
+          du relevé annuel du {{ prevision.borne_depart|date:"d/m/Y" }} au {{ prevision.fin|date:"d/m/Y" }}
+        </div>
+      {% endif %}
       {% if prevision.borne_basse %}
         <div class="tuile-detail">fourchette {{ prevision.borne_basse|nb:0 }} – {{ prevision.borne_haute|nb:0 }}</div>
       {% endif %}

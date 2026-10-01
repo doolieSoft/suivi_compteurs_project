@@ -41,6 +41,35 @@
     <span class="faible">({{ r.jours_reels }} jours couverts)</span>
     — écart moyen des prévisions : <strong>{{ r.ecart_moyen_pct|nb:1 }} %</strong>
   </p>
+  {% if r.sur_releve_annuel %}
+  <ul class="faits">
+    <li>
+      <span class="quand">Période</span>
+      <span>du {{ r.borne_debut.date|date:"j F Y" }} au {{ r.fin|date:"j F Y" }}, d'un relevé annuel au suivant</span>
+    </li>
+    {% for libelle, b in r.bornes %}
+    <li>
+      <span class="quand">{{ libelle }}</span>
+      <span>
+        {% if b.releve is None %}
+          aucun relevé annuel proche du {{ b.date|date:"d/m/Y" }} : borne entièrement estimée
+        {% elif b.ecart_jours == 0 %}
+          relevé annuel du {{ b.releve|date:"d/m/Y" }}, pile sur la borne : rien d'estimé
+        {% else %}
+          relevé annuel du {{ b.releve|date:"d/m/Y" }},
+          {% if b.ecart_jours > 0 %}{{ b.ecart_jours }} jour{{ b.ecart_jours|pluralize }} après{% else %}{{ b.jours_avant }} jour{{ b.jours_avant|pluralize }} avant{% endif %}
+          la borne : {{ b.volume_estime|nb:1 }} {{ r.ligne.unite }} estimés pour combler l'écart
+        {% endif %}
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="note">
+    Année civile : aucun relevé n'est marqué « annuel » pour ce compteur, donc la
+    consommation autour du 1er janvier et du 31 décembre est estimée.
+  </p>
+  {% endif %}
   <div class="tableau-conteneur">
     <table>
       <thead>
@@ -93,8 +122,15 @@
     À chaque date, les relevés postérieurs sont masqués : le modèle thermique, les
     profils saisonniers et la normale climatique sont recalculés avec ce qui était
     connu ce jour-là. Un écart positif signifie que la prévision était trop haute.
-    Le total réel provient de tous les relevés disponibles aujourd'hui ; les jours
-    de fin d'année situés entre deux relevés y sont répartis par ventilation.
+  </p>
+  <p class="note">
+    Le total réel provient de tous les relevés disponibles aujourd'hui. Quand un
+    compteur a des relevés marqués « annuels », l'année court d'anniversaire en
+    anniversaire du dernier d'entre eux : toutes les années ont ainsi la même
+    longueur. Le relevé annuel ne tombant pas chaque année le même jour, les
+    quelques jours qui le séparent de la borne sont estimés par ventilation
+    (selon le froid pour le gaz, à parts égales sinon) ; le volume concerné est
+    indiqué pour chaque borne.
   </p>
 </div>
 {% endif %}

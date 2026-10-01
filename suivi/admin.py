@@ -33,7 +33,7 @@ class MaisonAdmin(admin.ModelAdmin):
 class ReleveInline(admin.TabularInline):
     model = Releve
     extra = 1
-    fields = ("date", "index", "source", "commentaire")
+    fields = ("date", "index", "source", "annuel", "commentaire")
     ordering = ("-date",)
 
 
@@ -56,8 +56,8 @@ class CompteurAdmin(admin.ModelAdmin):
 
 @admin.register(Releve)
 class ReleveAdmin(admin.ModelAdmin):
-    list_display = ("date", "compteur", "index", "source", "commentaire")
-    list_filter = ("compteur__maison", "compteur__energie", "source")
+    list_display = ("date", "compteur", "index", "source", "annuel", "commentaire")
+    list_filter = ("compteur__maison", "compteur__energie", "source", "annuel")
     date_hierarchy = "date"
     search_fields = ("commentaire",)
     autocomplete_fields = ()

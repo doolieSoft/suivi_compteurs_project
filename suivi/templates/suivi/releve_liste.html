@@ -48,7 +48,7 @@
       <tbody>
         {% for r in releves %}
         <tr>
-          <td>{{ r.date|date:"d/m/Y" }}</td>
+          <td>{{ r.date|date:"d/m/Y" }}{% if r.annuel %} <span class="etiquette">annuel</span>{% endif %}</td>
           <td class="texte">
             <span class="pastille {{ r.compteur.energie|classe_energie }}" aria-hidden="true"></span>
             {{ r.compteur }}

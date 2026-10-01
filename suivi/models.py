@@ -231,6 +231,15 @@ class Releve(models.Model):
         max_length=12, choices=SourceReleve.choices, default=SourceReleve.MANUEL
     )
     commentaire = models.CharField(max_length=200, blank=True)
+    annuel = models.BooleanField(
+        "relevé annuel",
+        default=False,
+        help_text=(
+            "À cocher pour le relevé qui clôt l'année. Les prévisions et les "
+            "comparaisons d'une année sur l'autre partent alors de cette date "
+            "plutôt que du 1er janvier."
+        ),
+    )
     photo = models.ImageField(
         "photo du compteur",
         upload_to=chemin_photo,

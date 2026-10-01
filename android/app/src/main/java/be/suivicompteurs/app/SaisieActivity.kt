@@ -482,6 +482,7 @@ class SaisieActivity : AppCompatActivity() {
                     index = valeur,
                     indexOcr = proposition?.valeur,
                     commentaire = vues.champCommentaire.text?.toString()?.trim().orEmpty(),
+                    annuel = vues.caseAnnuel.isChecked,
                     cheminPhoto = photo?.absolutePath,
                 )
             )

@@ -120,6 +120,7 @@ class Api(private val reglages: Reglages) {
                         put("index", releve.index)
                         releve.indexOcr?.let { put("index_ocr", it) }
                         put("commentaire", releve.commentaire)
+                        put("annuel", releve.annuel)
                         put("a_photo", releve.cheminPhoto != null)
                     }
                 )
@@ -155,6 +156,7 @@ class Api(private val reglages: Reglages) {
                 .addFormDataPart("date", releve.date)
                 .addFormDataPart("index", releve.index.toString())
                 .addFormDataPart("commentaire", releve.commentaire)
+                .addFormDataPart("annuel", releve.annuel.toString())
                 .apply { releve.indexOcr?.let { addFormDataPart("index_ocr", it.toString()) } }
                 .addFormDataPart(
                     "photo",

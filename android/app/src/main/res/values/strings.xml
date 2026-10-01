@@ -55,6 +55,8 @@
     <string name="index_en_recul">Inférieur au dernier index (%1$s). Un compteur ne recule pas.</string>
     <string name="date_du_releve">Date du relevé</string>
     <string name="commentaire">Commentaire (facultatif)</string>
+    <string name="releve_annuel">Relevé annuel</string>
+    <string name="releve_annuel_aide">À cocher pour le relevé qui clôt l\'année : les prévisions partiront de cette date.</string>
     <string name="enregistrer">Enregistrer</string>
     <string name="releve_enregistre">Relevé enregistré</string>
     <string name="releve_enregistre_avec_ecart">Relevé enregistré : %1$s %2$s depuis le précédent</string>

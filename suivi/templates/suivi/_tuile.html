@@ -8,7 +8,7 @@
       {{ prevision.total_prevu|nb:0 }}<span class="tuile-unite"> {{ ligne.unite }}</span>
     </div>
     <div class="tuile-detail">
-      prévu en {{ prevision.annee }} · {{ prevision.realise|nb:0 }} {{ ligne.unite }} relevés
+      {% if prevision.sur_releve_annuel %}prévu d'ici le {{ prevision.fin|date:"j F Y" }}{% else %}prévu en {{ prevision.annee }}{% endif %} · {{ prevision.realise|nb:0 }} {{ ligne.unite }} relevés
       ({{ prevision.avancement_pct|nb:0 }} % de l'année)
     </div>
     {% if prevision.evolution_pct is not None %}

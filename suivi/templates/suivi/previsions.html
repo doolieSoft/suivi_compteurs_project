@@ -7,7 +7,9 @@
 <div class="entete-page">
   <h1>Prévisions {{ annee }}</h1>
   <p class="sous-titre">
-    Projection au 31 décembre, au {{ aujourdhui|date:"j F Y" }}.
+    Projection à la fin de l'année de chaque compteur, au {{ aujourdhui|date:"j F Y" }}.
+    L'année court d'un relevé annuel au suivant, ou du 1er janvier au 31 décembre
+    tant qu'aucun relevé n'est marqué « annuel ».
   </p>
 </div>
 
@@ -32,7 +34,11 @@
         <tr>
           <td class="texte">
             <span class="pastille {{ l.ligne.energie|classe_energie }}" aria-hidden="true"></span>
-            <a href="{{ l.ligne.get_absolute_url }}">{{ l.ligne.libelle }}</a>
+            <a href="{{ l.ligne.get_absolute_url }}">{{ l.ligne.libelle }}</a><br>
+            <span class="faible" style="font-size:12px">
+              {% if p.sur_releve_annuel %}du relevé annuel du {{ p.borne_depart|date:"d/m/Y" }} au {{ p.fin|date:"d/m/Y" }}
+              {% else %}année civile {{ p.annee }}{% endif %}
+            </span>
           </td>
           <td>{{ p.realise|nb:0 }} <span class="faible">{{ l.ligne.unite }}</span><br>
               <span class="faible" style="font-size:12px">{{ p.jours_realises }} jours</span></td>

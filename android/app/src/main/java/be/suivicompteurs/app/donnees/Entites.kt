@@ -51,6 +51,8 @@ data class ReleveLocal(
     /** Valeur lue par l'OCR avant correction, conservée pour juger sa fiabilité. */
     val indexOcr: Double? = null,
     val commentaire: String = "",
+    /** Relevé qui clôt l'année : le serveur en fait la borne des prévisions. */
+    val annuel: Boolean = false,
     val cheminPhoto: String? = null,
     val envoye: Boolean = false,
     val photoEnvoyee: Boolean = false,

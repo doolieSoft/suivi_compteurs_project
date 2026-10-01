@@ -165,6 +165,24 @@ def _reduire_photo(fichier: UploadedFile):
     return ContentFile(tampon.read(), name="photo.jpg")
 
 
+def _champ_booleen(valeur) -> bool:
+    """Le JSON envoie un booléen, le multipart sa forme écrite."""
+    if isinstance(valeur, bool):
+        return valeur
+    return str(valeur).strip().lower() in ("1", "true", "vrai", "oui", "on")
+
+
+def _marque_annuelle(donnees) -> dict:
+    """Champ « annuel » à enregistrer, seulement s'il a été transmis.
+
+    L'envoi d'une photo repasse par la création du relevé : sans cette
+    précaution, une ancienne version de l'application effacerait la marque.
+    """
+    if "annuel" not in donnees:
+        return {}
+    return {"annuel": _champ_booleen(donnees.get("annuel"))}
+
+
 def _champ_decimal(valeur, nom: str, *, obligatoire: bool = True) -> Decimal | None:
     if valeur in (None, ""):
         if obligatoire:
@@ -256,6 +274,7 @@ def creer_releve(request: HttpRequest) -> JsonResponse:
                 "source": SourceReleve.MANUEL,
                 "commentaire": str(donnees.get("commentaire", ""))[:200],
                 "index_lu_automatiquement": index_ocr,
+                **_marque_annuelle(donnees),
             },
         )
         if photo is not None:
@@ -307,8 +326,15 @@ def _signature_donnees() -> str:
     releves = Releve.objects.aggregate(
         nombre=Count("id"), somme=Sum("index"), dernier=Max("date")
     )
+    # Marquer un relevé « annuel » déplace les bornes des prévisions sans
+    # toucher à aucun index.
+    annuels = Releve.objects.filter(annuel=True).aggregate(
+        nombre=Count("id"), dernier=Max("date")
+    )
     degres = DegreJour.objects.aggregate(nombre=Count("id"), dernier=Max("date"))
-    return "|".join(str(v) for v in (*releves.values(), *degres.values()))
+    return "|".join(
+        str(v) for v in (*releves.values(), *annuels.values(), *degres.values())
+    )
 
 
 @login_not_required
@@ -520,6 +546,7 @@ def _enregistrer_une_entree(entree: dict) -> dict:
             "source": SourceReleve.MANUEL,
             "commentaire": str(entree.get("commentaire", ""))[:200],
             "index_lu_automatiquement": index_ocr,
+            **_marque_annuelle(entree),
         },
     )
     return {"id": releve.pk, "cree": cree, "attend_photo": bool(entree.get("a_photo"))}

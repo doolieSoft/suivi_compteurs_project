@@ -159,6 +159,98 @@ class RejeuTest(TestCase):
         self.assertContains(reponse, "Justesse des prévisions 2023")
 
 
+class ReleveAnnuelTest(TestCase):
+    """Un relevé marqué « annuel » devient la borne de l'année."""
+
+    def setUp(self):
+        from suivi.models import Releve
+
+        self.station = f.station()
+        self.djs = f.climat(self.station, dt.date(2019, 1, 1), dt.date(2024, 12, 31))
+        self.maison = f.maison(self.station)
+        self.compteur = f.compteur(self.maison, Energie.GAZ)
+        self.conso = {j: BASE_VRAIE + K_VRAI * dj for j, dj in self.djs.items()}
+        dates = [dt.date(2019, 1, 1)]
+        while dates[-1] + dt.timedelta(days=30) <= dt.date(2024, 12, 31):
+            dates.append(dates[-1] + dt.timedelta(days=30))
+        # Le relevé annuel ne tombe pas le même jour d'une année à l'autre.
+        self.annuels = [dt.date(2022, 3, 10), dt.date(2023, 3, 15), dt.date(2024, 3, 15)]
+        f.releves_depuis_consommation(
+            self.compteur, self.conso, sorted(set(dates) | set(self.annuels))
+        )
+        Releve.objects.filter(date__in=self.annuels).update(annuel=True)
+        self.ligne = cs.ligne_unique(self.maison, Energie.GAZ, Plage.UNIQUE)
+
+    def _vrai(self, debut, fin):
+        return sum(v for j, v in self.conso.items() if debut <= j <= fin)
+
+    def test_la_prevision_part_du_dernier_releve_annuel(self):
+        prevision = pv.prevoir(self.ligne, aujourdhui=dt.date(2024, 9, 1))
+        self.assertTrue(prevision.sur_releve_annuel)
+        self.assertEqual(prevision.borne_depart, dt.date(2024, 3, 15))
+        self.assertEqual(prevision.fin, dt.date(2025, 3, 15))
+        self.assertEqual(prevision.annee, 2024)
+        # La référence couvre les mêmes dates, un an plus tôt.
+        self.assertEqual(prevision.reference_annee, 2023)
+        self.assertAlmostEqual(
+            prevision.reference / self._vrai(dt.date(2023, 3, 16), dt.date(2024, 3, 15)),
+            1.0,
+            delta=0.01,
+        )
+
+    def test_sans_releve_annuel_l_annee_reste_civile(self):
+        from suivi.models import Releve
+
+        Releve.objects.update(annuel=False)
+        prevision = pv.prevoir(self.ligne, aujourdhui=dt.date(2024, 9, 1))
+        self.assertFalse(prevision.sur_releve_annuel)
+        self.assertEqual(prevision.debut, dt.date(2024, 1, 1))
+        self.assertEqual(prevision.fin, dt.date(2024, 12, 31))
+
+    def test_le_jour_du_releve_annuel_ouvre_une_periode_vide(self):
+        from suivi.models import Releve
+
+        Releve.objects.filter(date__gt=dt.date(2024, 3, 15)).delete()
+        ligne = cs.ligne_unique(self.maison, Energie.GAZ, Plage.UNIQUE)
+        prevision = pv.prevoir(ligne, aujourdhui=dt.date(2024, 3, 15))
+        self.assertEqual(prevision.realise, 0.0)
+        self.assertEqual(prevision.jours_restants, 365)
+        vrai = self._vrai(dt.date(2023, 3, 16), dt.date(2024, 3, 15))
+        self.assertAlmostEqual(prevision.total_prevu / vrai, 1.0, delta=0.08)
+
+    def test_le_rejeu_mesure_l_ecart_entre_releve_et_borne(self):
+        """Borne au 15 mars ; le relevé annuel de 2022 date du 10."""
+        rejeux = {r.annee: r for r in pv.rejouer(self.maison, 2022)}
+        rejeu = rejeux[2022]
+        self.assertEqual((rejeu.debut, rejeu.fin), (dt.date(2022, 3, 16), dt.date(2023, 3, 15)))
+        self.assertAlmostEqual(
+            rejeu.reel / self._vrai(rejeu.debut, rejeu.fin), 1.0, delta=0.01
+        )
+
+        self.assertEqual(rejeu.borne_debut.releve, dt.date(2022, 3, 10))
+        self.assertEqual(rejeu.borne_debut.ecart_jours, -5)
+        self.assertAlmostEqual(
+            rejeu.borne_debut.volume_estime
+            / self._vrai(dt.date(2022, 3, 11), dt.date(2022, 3, 15)),
+            1.0,
+            delta=0.05,
+        )
+        # Le relevé de 2023 tombe pile sur la borne : rien à estimer.
+        self.assertEqual(rejeu.borne_fin.ecart_jours, 0)
+        self.assertEqual(rejeu.borne_fin.volume_estime, 0.0)
+
+    def test_toutes_les_periodes_ont_la_meme_longueur(self):
+        for annee in (2021, 2022):
+            (rejeu,) = pv.rejouer(self.maison, annee)
+            self.assertEqual((rejeu.fin - rejeu.debut).days + 1, 365)
+        self.assertNotIn(2024, pv.annees_rejouables([self.maison]))
+
+    def test_le_formulaire_propose_la_case(self):
+        from suivi.forms import ReleveForm
+
+        self.assertIn("annuel", ReleveForm().fields)
+
+
 class ComparaisonGlissanteTest(TestCase):
     def setUp(self):
         self.station = f.station()

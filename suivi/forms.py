@@ -10,7 +10,7 @@ class DateInput(forms.DateInput):
 class ReleveForm(forms.ModelForm):
     class Meta:
         model = Releve
-        fields = ["compteur", "date", "index", "source", "commentaire"]
+        fields = ["compteur", "date", "index", "source", "commentaire", "annuel"]
         widgets = {
             "date": DateInput(),
             "index": forms.NumberInput(attrs={"step": "0.001", "inputmode": "decimal"}),

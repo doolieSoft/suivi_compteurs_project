@@ -94,7 +94,7 @@ interface InstantaneDao {
 
 @Database(
     entities = [CompteurLocal::class, ReleveLocal::class, InstantaneLocal::class],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class BaseLocale : RoomDatabase() {
@@ -119,6 +119,15 @@ abstract class BaseLocale : RoomDatabase() {
             }
         }
 
+        /** Ajout de la marque « relevé annuel ». */
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE releves ADD COLUMN annuel INTEGER NOT NULL DEFAULT 0"
+                )
+            }
+        }
+
         @Volatile
         private var instance: BaseLocale? = null
 
@@ -128,7 +137,7 @@ abstract class BaseLocale : RoomDatabase() {
                     contexte.applicationContext,
                     BaseLocale::class.java,
                     "suivi-compteurs.db",
-                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
             }
     }
 }
