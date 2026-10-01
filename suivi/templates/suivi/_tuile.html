@@ -1,0 +1,37 @@
+{% load suivi_extras %}
+{% with ligne=r.ligne prevision=r.prevision %}
+<a class="tuile {{ ligne.energie|classe_energie }}" href="{{ ligne.get_absolute_url }}">
+  <div class="tuile-titre">{{ ligne.libelle_energie }}</div>
+
+  {% if prevision %}
+    <div class="tuile-valeur">
+      {{ prevision.total_prevu|nb:0 }}<span class="tuile-unite"> {{ ligne.unite }}</span>
+    </div>
+    <div class="tuile-detail">
+      prévu en {{ prevision.annee }} · {{ prevision.realise|nb:0 }} {{ ligne.unite }} relevés
+      ({{ prevision.avancement_pct|nb:0 }} % de l'année)
+    </div>
+    {% if prevision.evolution_pct is not None %}
+      <div class="tuile-detail">
+        <span class="delta {{ prevision.evolution_pct|classe_delta }}">
+          <span aria-hidden="true">{{ prevision.evolution_pct|fleche_delta }}</span>
+          {{ prevision.evolution_pct|pourcent }}
+        </span>
+        vs {{ prevision.reference_annee }}
+        {% if prevision.evolution_normalisee_pct is not None %}
+          · {{ prevision.evolution_normalisee_pct|pourcent }} à climat égal
+        {% endif %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="tuile-valeur">—</div>
+    <div class="tuile-detail">pas de relevé sur l'année en cours</div>
+  {% endif %}
+
+  {% if r.anomalies %}
+    <div class="tuile-detail" style="margin-top:8px">
+      <span class="etiquette">⚠ {{ r.anomalies|length }} point{{ r.anomalies|length|pluralize }} à vérifier</span>
+    </div>
+  {% endif %}
+</a>
+{% endwith %}

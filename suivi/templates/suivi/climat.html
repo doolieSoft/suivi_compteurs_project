@@ -1,0 +1,90 @@
+{% extends "suivi/base.html" %}
+{% load suivi_extras %}
+
+{% block titre %}Climat — Suivi des compteurs{% endblock %}
+
+{% block contenu %}
+<div class="entete-page">
+  <h1>Degrés-jours</h1>
+  <p class="sous-titre">
+    Un degré-jour vaut <em>base − température moyenne du jour</em>, borné à zéro.
+    Cumulé sur une année, il mesure la quantité de froid à compenser par le chauffage :
+    c'est ce qui permet de comparer un hiver à un autre.
+  </p>
+</div>
+
+{% for d in donnees %}
+<div class="carte">
+  <h2>{{ d.station.nom }}</h2>
+  <p class="legende-carte">
+    Base {{ d.station.base_dj }} °C · {{ d.station.jours }} jours en base
+    {% if d.station.premier %}du {{ d.station.premier|date:"d/m/Y" }} au {{ d.station.dernier|date:"d/m/Y" }}{% endif %}
+    · normale sur dix ans : {{ d.normale|nb:0 }} degrés-jours par an.
+  </p>
+
+  <div class="zone-graphique">
+    <canvas id="{{ d.id_canvas }}"></canvas>
+  </div>
+  {{ d.graphique|json_script:d.id_donnees }}
+
+  <div class="tableau-conteneur" style="margin-top:18px">
+    <table>
+      <thead>
+        <tr><th>Année</th><th>Jours</th><th>Degrés-jours</th><th>Écart à la normale</th><th class="texte">Caractère</th></tr>
+      </thead>
+      <tbody>
+        {% for a in d.annuels %}
+        <tr {% if not a.complet %}class="partielle"{% endif %}>
+          <td>{{ a.annee }}{% if not a.complet %} <span class="etiquette">en cours</span>{% endif %}</td>
+          <td class="faible">{{ a.jours }}</td>
+          <td>{{ a.dj|nb:0 }}</td>
+          {# Écart climatique neutre : une année froide n'est ni bonne ni mauvaise. #}
+          <td>
+            {% if a.ecart is not None %}
+              <span class="delta stable">
+                <span aria-hidden="true">{{ a.ecart|fleche_delta }}</span> {{ a.ecart|pourcent }}
+              </span>
+            {% else %}—{% endif %}
+          </td>
+          <td class="texte faible">
+            {% if not a.complet %}année incomplète, non comparable
+            {% elif a.ecart > 5 %}nettement plus froide que la normale
+            {% elif a.ecart > 1 %}un peu plus froide
+            {% elif a.ecart < -5 %}nettement plus douce
+            {% elif a.ecart < -1 %}un peu plus douce
+            {% else %}conforme à la normale{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <form method="post" action="{% url 'suivi:climat_synchroniser' %}" class="barre-actions">
+    {% csrf_token %}
+    <button type="submit" class="bouton discret">Mettre à jour depuis Open-Meteo</button>
+    <span class="aide">Récupère les températures manquantes et recalcule les degrés-jours.</span>
+  </form>
+</div>
+{% empty %}
+<div class="carte"><div class="vide">Aucune station météo enregistrée.</div></div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  {% for d in donnees %}
+  (function () {
+    var donnees = Suivi.donneesDe("{{ d.id_donnees }}");
+    Suivi.barresSimples(document.getElementById("{{ d.id_canvas }}"), {
+      labels: donnees.labels,
+      valeurs: donnees.valeurs,
+      unite: "degrés-jours",
+      libelle: "Degrés-jours de l'année",
+      reference: donnees.normale,
+      libelleReference: "Normale des dix dernières années"
+    });
+  })();
+  {% endfor %}
+</script>
+{% endblock %}

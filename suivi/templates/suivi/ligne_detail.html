@@ -1,0 +1,301 @@
+{% extends "suivi/base.html" %}
+{% load suivi_extras %}
+
+{% block titre %}{{ ligne.libelle_energie }} — {{ maison.nom }}{% endblock %}
+
+{% block contenu %}
+<div class="entete-page">
+  <div class="fil">
+    <a href="{% url 'suivi:tableau_de_bord' %}">Tableau de bord</a> ›
+    <a href="{{ maison.get_absolute_url }}">{{ maison.nom }}</a> ›
+    {{ ligne.libelle_energie }}
+  </div>
+  <h1>
+    <span class="pastille {{ ligne.energie|classe_energie }}" aria-hidden="true"></span>
+    {{ ligne.libelle_energie }}
+  </h1>
+  <p class="sous-titre">
+    {{ maison.nom }} · relevés en {{ ligne.unite }}
+    {% if serie.premier_jour %}· du {{ serie.premier_jour|date:"d/m/Y" }} au {{ serie.dernier_jour|date:"d/m/Y" }}{% endif %}
+    · {{ ligne.compteurs|length }} compteur{{ ligne.compteurs|length|pluralize }}
+  </p>
+  <div class="barre-actions" style="margin-top:0">
+    {% for autre in autres_lignes %}
+      <a class="etiquette" href="{{ autre.get_absolute_url }}" style="text-decoration:none">
+        <span class="pastille {{ autre.energie|classe_energie }}" aria-hidden="true"></span>{{ autre.libelle_energie }}
+      </a>
+    {% endfor %}
+    {% with dernier=ligne.compteurs|last %}
+      <a class="bouton discret" href="{% url 'suivi:releve_creer' %}?compteur={{ dernier.pk }}">Saisir un relevé</a>
+    {% endwith %}
+  </div>
+</div>
+
+{% if anomalies %}
+<div class="carte">
+  <h2>Points à vérifier</h2>
+  <ul class="faits">
+    {% for a in anomalies %}
+      <li class="anomalie {{ a.niveau }}">
+        <span class="marqueur" aria-hidden="true">{% if a.niveau == 'alerte' %}⚠{% else %}○{% endif %}</span>
+        <span class="quand">{{ a.debut|date:"d/m/Y" }}</span>
+        <span>{{ a.message }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<div class="tuiles">
+  {% if prevision %}
+    <div class="tuile {{ ligne.energie|classe_energie }}">
+      <div class="tuile-titre">Prévision {{ prevision.annee }}</div>
+      <div class="tuile-valeur">{{ prevision.total_prevu|nb:0 }}<span class="tuile-unite"> {{ ligne.unite }}</span></div>
+      <div class="tuile-detail">
+        {{ prevision.realise|nb:0 }} relevés sur {{ prevision.jours_realises }} jours,
+        {{ prevision.estime_restant|nb:0 }} estimés sur {{ prevision.jours_restants }}.
+      </div>
+      {% if prevision.borne_basse %}
+        <div class="tuile-detail">fourchette {{ prevision.borne_basse|nb:0 }} – {{ prevision.borne_haute|nb:0 }}</div>
+      {% endif %}
+    </div>
+
+    {% if prevision.evolution_pct is not None %}
+    <div class="tuile">
+      <div class="tuile-titre">Évolution vs {{ prevision.reference_annee }}</div>
+      <div class="tuile-valeur delta {{ prevision.evolution_pct|classe_delta }}">
+        <span aria-hidden="true">{{ prevision.evolution_pct|fleche_delta }}</span> {{ prevision.evolution_pct|pourcent }}
+      </div>
+      <div class="tuile-detail">{{ prevision.reference_annee }} : {{ prevision.reference|nb:0 }} {{ ligne.unite }}</div>
+      {% if prevision.evolution_normalisee_pct is not None %}
+        <div class="tuile-detail">
+          {{ prevision.evolution_normalisee_pct|pourcent }} une fois le climat neutralisé
+        </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  {% endif %}
+
+  {% if comparaison %}
+  <div class="tuile">
+    <div class="tuile-titre">Cumul au {{ comparaison.jusqua|date:"j F" }}</div>
+    <div class="tuile-valeur">{{ comparaison.valeur|nb:0 }}<span class="tuile-unite"> {{ ligne.unite }}</span></div>
+    <div class="tuile-detail">
+      <span class="delta {{ comparaison.evolution_pct|classe_delta }}">
+        <span aria-hidden="true">{{ comparaison.evolution_pct|fleche_delta }}</span> {{ comparaison.evolution_pct|pourcent }}
+      </span>
+      vs {{ comparaison.valeur_precedente|nb:0 }} en {{ comparaison.annee_precedente }}
+    </div>
+    <div class="tuile-detail">
+      climat : {{ comparaison.dj|nb:0 }} DJ contre {{ comparaison.dj_precedent|nb:0 }}
+      ({{ comparaison.evolution_dj_pct|pourcent }})
+    </div>
+  </div>
+  {% endif %}
+
+  {% if modele.fiable %}
+  <div class="tuile">
+    <div class="tuile-titre">Sensibilité au froid</div>
+    <div class="tuile-valeur">{{ modele.k|nb:3 }}<span class="tuile-unite"> {{ ligne.unite }}/DJ</span></div>
+    <div class="tuile-detail">
+      plus {{ modele.base|nb:2 }} {{ ligne.unite }}/jour indépendants de la météo
+      (eau chaude, cuisson, veilles)
+    </div>
+    <div class="tuile-detail">
+      qualité de l'ajustement R² = {{ modele.r2|nb:2 }} sur {{ modele.nb_periodes }} périodes
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{# ------------------------------------------------------------------ #}
+
+<div class="carte">
+  <h2>Consommation par année</h2>
+  <p class="legende-carte">
+    {% if modele.fiable %}
+      La série orange retire l'effet du climat : chaque année est ramenée à un hiver
+      moyen, ce qui la rend directement comparable aux autres.
+    {% else %}
+      La correction climatique n'est pas appliquée ici : sur cette énergie, la
+      consommation ne suit pas assez nettement les degrés-jours pour qu'un ajustement
+      soit honnête.
+    {% endif %}
+  </p>
+  <div class="zone-graphique">
+    <canvas id="g-annuel"></canvas>
+  </div>
+  {{ graphique_annuel|json_script:"d-annuel" }}
+
+  <div class="tableau-conteneur" style="margin-top:18px">
+    <table>
+      <thead>
+        <tr>
+          <th>Année</th>
+          <th>Consommation</th>
+          {% if modele.fiable %}<th>À climat égal</th>{% endif %}
+          <th>Degrés-jours</th>
+          <th>Écart au climat normal</th>
+          <th>Couverture</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in annees %}
+        <tr {% if not a.complete %}class="partielle"{% endif %}>
+          <td>{{ a.annee }}{% if not a.complete %} <span class="etiquette">partielle</span>{% endif %}</td>
+          <td>{{ a.consommation|nb:1 }} {{ ligne.unite }}</td>
+          {% if modele.fiable %}
+            <td>{% if a.consommation_normalisee %}{{ a.consommation_normalisee|nb:1 }} {{ ligne.unite }}{% else %}—{% endif %}</td>
+          {% endif %}
+          <td>{{ a.dj_reel|nb:0 }}</td>
+          <td class="faible">{{ a.ecart_climatique_pct|pourcent }}</td>
+          <td class="faible">{{ a.jours_couverts }} j ({{ a.couverture_pct|nb:0 }} %)</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{# ------------------------------------------------------------------ #}
+
+<div class="carte">
+  <h2>Cumul depuis le 1<sup>er</sup> janvier</h2>
+  <p class="legende-carte">
+    Une courbe par année. Leur écartement en fin de parcours donne la tendance ;
+    leur pente, l'intensité de consommation du moment.
+  </p>
+  <div class="zone-graphique haute">
+    <canvas id="g-cumul"></canvas>
+  </div>
+  {{ cumuls|json_script:"d-cumul" }}
+</div>
+
+<div class="carte">
+  <h2>Consommation mensuelle</h2>
+  <p class="legende-carte">
+    Obtenue en répartissant chaque écart d'index sur les jours qu'il couvre —
+    {% if modele.fiable %}au prorata des degrés-jours, ce qui restitue la saisonnalité
+    même entre deux relevés très espacés.{% else %}au prorata du temps écoulé, faute
+    de lien mesurable avec la météo.{% endif %}
+  </p>
+  <div class="zone-graphique">
+    <canvas id="g-mensuel"></canvas>
+  </div>
+  {{ mensuel|json_script:"d-mensuel" }}
+</div>
+
+{% if signature %}
+<div class="carte">
+  <h2>Signature énergétique</h2>
+  <p class="legende-carte">
+    Chaque point est une période entre deux relevés : en abscisse la rigueur du climat,
+    en ordonnée la consommation journalière.
+    {% if modele.fiable %}
+      La droite ajustée traverse le nuage ; son ordonnée à l'origine
+      ({{ modele.base|nb:2 }} {{ ligne.unite }}/jour) est la consommation qui subsiste
+      quand il ne fait pas froid, et sa pente ({{ modele.k|nb:3 }} {{ ligne.unite }}/DJ)
+      le coût thermique du bâtiment.
+    {% else %}
+      Aucune droite n'est tracée : les points ne s'alignent pas assez pour qu'un
+      modèle soit crédible.
+    {% endif %}
+  </p>
+  <div class="zone-graphique">
+    <canvas id="g-signature"></canvas>
+  </div>
+  {{ signature|json_script:"d-signature" }}
+</div>
+{% endif %}
+
+<div class="carte">
+  <h2>Index relevés</h2>
+  <p class="legende-carte">
+    La donnée brute, telle qu'inscrite au compteur. Une rupture verticale correspond
+    à un remplacement de compteur, jamais à une consommation.
+  </p>
+  <div class="zone-graphique">
+    <canvas id="g-index"></canvas>
+  </div>
+  {{ index|json_script:"d-index" }}
+</div>
+
+{% if couts %}
+<div class="carte">
+  <h2>Coût</h2>
+  <div class="tableau-conteneur">
+    <table>
+      <thead>
+        <tr>
+          <th>Année</th><th>Consommation</th><th>Part variable</th>
+          <th>Abonnement</th><th>Total</th><th>Prix moyen</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in couts %}
+        <tr>
+          <td>{{ c.annee }}{% if not c.complet %} <span class="etiquette">tarif partiel</span>{% endif %}</td>
+          <td>{{ c.consommation|nb:1 }} {{ ligne.unite }}</td>
+          <td>{{ c.cout_variable|nb:2 }} €</td>
+          <td>{{ c.cout_abonnement|nb:2 }} €</td>
+          <td><strong>{{ c.total|nb:2 }} €</strong></td>
+          <td class="faible">{% if c.prix_moyen %}{{ c.prix_moyen|nb:4 }} €/{{ ligne.unite }}{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="note">
+    Les tarifs repris du classeur sont des acomptes mensuels. Renseignez le prix
+    unitaire de chaque contrat dans <a href="{% url 'admin:suivi_tarif_changelist' %}">l'administration</a>
+    pour que la part variable cesse d'être nulle.
+  </p>
+</div>
+{% endif %}
+
+{% if evenements %}
+<div class="carte">
+  <h2>Événements</h2>
+  <ul class="faits">
+    {% for e in evenements %}
+      <li><span class="quand">{{ e.date|date:"d/m/Y" }}</span><span>{{ e.libelle }}</span></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  var UNITE = "{{ ligne.unite }}";
+
+  var annuel = Suivi.donneesDe("d-annuel");
+  annuel.unite = UNITE;
+  Suivi.barresGroupees(document.getElementById("g-annuel"), annuel);
+
+  var cumul = Suivi.donneesDe("d-cumul");
+  cumul.unite = UNITE;
+  Suivi.cumulsAnnuels(document.getElementById("g-cumul"), cumul);
+
+  var mensuel = Suivi.donneesDe("d-mensuel");
+  Suivi.barresSimples(document.getElementById("g-mensuel"), {
+    labels: mensuel.labels,
+    valeurs: mensuel.valeurs,
+    unite: UNITE,
+    libelle: "Consommation du mois",
+    couleur: "{{ ligne.energie|classe_energie }}",
+    etiquettesSelectives: true
+  });
+
+  {% if signature %}
+  var signature = Suivi.donneesDe("d-signature");
+  signature.unite = UNITE;
+  Suivi.signature(document.getElementById("g-signature"), signature);
+  {% endif %}
+
+  Suivi.index(document.getElementById("g-index"), {
+    series: Suivi.donneesDe("d-index"),
+    unite: UNITE
+  });
+</script>
+{% endblock %}

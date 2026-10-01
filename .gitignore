@@ -1,0 +1,36 @@
+.venv/
+.outils/
+__pycache__/
+*.py[cod]
+*.log
+
+# Base locale, secrets et fichiers produits
+db.sqlite3
+.env
+deploiement/env.*
+!deploiement/env.exemple
+staticfiles/
+media/
+donnees*.json
+sauvegarde*.json
+deploiement/*.zip
+
+# Données personnelles : douze ans de consommation. Elles n'ont pas leur place
+# dans un dépôt, surtout public. Le classeur reste sur votre PC, et le serveur
+# reçoit les données une fois, par « exporter_donnees » puis « loaddata ».
+compteur.xlsx
+~$*.xlsx
+
+# L'APK pèse 49 Mo : un dépôt n'est pas un entrepôt de binaires. Il se
+# reconstruit en une commande depuis les sources présentes dans android/.
+deploiement/*.apk
+
+# Projet Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+
+.idea/
+.vscode/

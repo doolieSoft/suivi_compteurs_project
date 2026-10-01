@@ -1,0 +1,76 @@
+{% extends "suivi/base.html" %}
+{% load suivi_extras %}
+
+{% block titre %}Tableau de bord — Suivi des compteurs{% endblock %}
+
+{% block contenu %}
+<div class="entete-page">
+  <h1>Tableau de bord</h1>
+  <p class="sous-titre">
+    Consommations relevées et projection au 31 décembre {{ annee }},
+    arrêtées au {{ aujourdhui|date:"j F Y" }}.
+  </p>
+</div>
+
+{% for bloc in blocs %}
+  <h2>
+    <a href="{{ bloc.maison.get_absolute_url }}" style="color:inherit;text-decoration:none">{{ bloc.maison.nom }}</a>
+    {% if bloc.maison.libelle_facades %}<span class="etiquette">{{ bloc.maison.libelle_facades }}</span>{% endif %}
+    {% if not bloc.maison.est_actuelle %}<span class="etiquette">quittée en {{ bloc.maison.date_sortie|date:"F Y" }}</span>{% endif %}
+  </h2>
+
+  <div class="tuiles">
+    {% for r in bloc.resumes %}{% include "suivi/_tuile.html" %}{% endfor %}
+  </div>
+{% endfor %}
+
+<h2 style="margin-top:34px">Consommation par année — {{ maison_actuelle.nom }}</h2>
+<p class="legende-carte">
+  En orange, la consommation corrigée des degrés-jours : c'est elle qu'il faut
+  comparer d'une année à l'autre, puisqu'elle neutralise la rigueur de l'hiver.
+  Elle n'apparaît que lorsque la consommation dépend réellement du climat.
+</p>
+
+<div class="grille-2">
+  {% for g in graphiques %}
+    <div class="carte">
+      <h3>
+        <span class="pastille {{ g.classe }}" aria-hidden="true"></span>
+        <a href="{{ g.url }}" style="color:inherit;text-decoration:none">{{ g.titre }}</a>
+        <span class="etiquette">{{ g.unite }}</span>
+      </h3>
+      <div class="zone-graphique">
+        <canvas id="{{ g.id_canvas }}"></canvas>
+      </div>
+      {{ g.donnees|json_script:g.id_donnees }}
+    </div>
+  {% endfor %}
+</div>
+
+<div class="carte">
+  <h2>Comment lire ces chiffres</h2>
+  <ul class="faits">
+    <li><span class="quand">Prévision</span>
+      <span>Le réalisé n'est jamais réécrit : seuls les jours non encore relevés sont
+      estimés, à partir des degrés-jours normaux de la saison quand la consommation
+      y est sensible, sinon à partir du profil saisonnier des années passées.</span></li>
+    <li><span class="quand">Climat égal</span>
+      <span>Une correction de la forme <em>+ k × (DJ normal − DJ réel)</em> ramène chaque
+      année à un hiver moyen. Un hiver rigoureux voit donc sa consommation revue à la baisse.</span></li>
+    <li><span class="quand">Années partielles</span>
+      <span>Les années sans couverture complète sont signalées : leur total n'est pas
+      comparable tel quel à celui d'une année pleine.</span></li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  [{% for g in graphiques %}["{{ g.id_canvas }}", "{{ g.id_donnees }}", "{{ g.unite }}"]{% if not forloop.last %},{% endif %}{% endfor %}]
+    .forEach(function (t) {
+      var donnees = Suivi.donneesDe(t[1]);
+      donnees.unite = t[2];
+      Suivi.barresGroupees(document.getElementById(t[0]), donnees);
+    });
+</script>
+{% endblock %}

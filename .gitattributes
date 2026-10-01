@@ -1,0 +1,14 @@
+# Normalise les fins de ligne : le PC est sous Windows, le serveur sous Linux.
+# Sans cette règle, chaque aller-retour produirait des différences parasites
+# touchant des fichiers entiers.
+* text=auto eol=lf
+
+# Fichiers binaires : Git ne doit y toucher sous aucun prétexte.
+*.png binary
+*.jpg binary
+*.xlsx binary
+*.apk binary
+*.zip binary
+
+# Bibliothèque tierce minifiée : inutile de l'afficher dans les différences.
+suivi/static/suivi/chart.umd.min.js linguist-vendored -diff

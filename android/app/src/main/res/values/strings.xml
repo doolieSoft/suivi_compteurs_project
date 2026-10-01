@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Compteurs</string>
+
+    <!-- Accueil -->
+    <string name="accueil_non_configure">Indiquez l\'adresse du serveur et le jeton pour récupérer vos compteurs.</string>
+    <string name="accueil_aucun_compteur">Aucun compteur. Lancez une synchronisation.</string>
+    <string name="jamais_synchronise">Jamais synchronisé</string>
+    <string name="derniere_synchro">Synchronisé le %1$s</string>
+    <string name="index_avec_unite">%1$s %2$s</string>
+    <string name="aucun_index">Aucun relevé</string>
+    <string name="releve_du">relevé du %1$s</string>
+    <string name="reglages">Réglages</string>
+    <string name="consulter">Consulter</string>
+    <string name="synchroniser">Synchroniser</string>
+    <string name="tirer_pour_synchroniser">Tirez vers le bas pour synchroniser</string>
+
+    <plurals name="releves_en_attente">
+        <item quantity="one">%1$d relevé en attente d\'envoi</item>
+        <item quantity="other">%1$d relevés en attente d\'envoi</item>
+    </plurals>
+    <plurals name="synchro_envoyes">
+        <item quantity="one">%1$d relevé transmis</item>
+        <item quantity="other">%1$d relevés transmis</item>
+    </plurals>
+    <plurals name="synchro_refuses">
+        <item quantity="one">%1$d transmis, %2$d refusé par le serveur</item>
+        <item quantity="other">%1$d transmis, %2$d refusés par le serveur</item>
+    </plurals>
+    <string name="synchro_a_jour">Tout est à jour</string>
+    <string name="synchro_hors_ligne">Serveur injoignable. Vos relevés sont conservés et partiront plus tard.</string>
+    <string name="synchro_echec">La synchronisation a échoué</string>
+
+    <!-- Saisie -->
+    <string name="titre_saisie">Nouveau relevé</string>
+    <string name="compteur_introuvable">Compteur introuvable</string>
+    <string name="dernier_index">Dernier index connu : %1$s %2$s</string>
+    <string name="cadrer_le_compteur">Cadrez les chiffres du compteur</string>
+    <string name="declencher">Photographier</string>
+    <string name="reprendre">Reprendre la photo</string>
+    <string name="sans_photo">Saisir sans photo</string>
+    <string name="photo_echouee">La photo n\'a pas pu être prise</string>
+    <string name="camera_refusee">Appareil photo indisponible : saisissez l\'index à la main.</string>
+    <string name="ocr_en_cours">Lecture de l\'index…</string>
+    <string name="ocr_echec">Aucun chiffre reconnu. Saisissez l\'index à la main.</string>
+    <string name="ocr_resultat">Lu sur la photo : %1$s. %2$s</string>
+    <string name="index_releve">Index relevé</string>
+    <string name="index_obligatoire">Saisissez un index</string>
+    <string name="index_en_recul">Inférieur au dernier index (%1$s). Un compteur ne recule pas.</string>
+    <string name="date_du_releve">Date du relevé</string>
+    <string name="commentaire">Commentaire (facultatif)</string>
+    <string name="enregistrer">Enregistrer</string>
+    <string name="releve_enregistre">Relevé enregistré</string>
+    <string name="releve_enregistre_avec_ecart">Relevé enregistré : %1$s %2$s depuis le précédent</string>
+
+    <!-- Consultation -->
+    <string name="titre_consultation">Graphiques et prévisions</string>
+    <string name="serveur_injoignable">Serveur injoignable — voici le dernier état connu.</string>
+    <string name="aucun_instantane">Aucune donnée n\'a encore été récupérée du serveur.</string>
+    <string name="instantane_illisible">Les données conservées sont illisibles.</string>
+    <string name="instantane_du">Situation au %1$s</string>
+    <string name="instantane_prevu">prévu cette année :</string>
+    <string name="instantane_vs">vs %1$d</string>
+    <string name="instantane_climat_egal">% à climat égal</string>
+
+    <!-- Réglages -->
+    <string name="titre_reglages">Réglages</string>
+    <string name="adresse_serveur">Adresse du serveur</string>
+    <string name="adresse_aide">Par exemple 192.168.0.10 — le port 8000 est ajouté automatiquement.</string>
+    <string name="jeton">Jeton</string>
+    <string name="jeton_aide">Recopié depuis JETON_API dans config/settings.py.</string>
+    <string name="tester_connexion">Tester la connexion</string>
+    <string name="test_en_cours">Connexion en cours…</string>
+    <string name="test_echec">Échec : %1$s</string>
+    <plurals name="test_reussi">
+        <item quantity="one">Connexion établie, %1$d compteur trouvé.</item>
+        <item quantity="other">Connexion établie, %1$d compteurs trouvés.</item>
+    </plurals>
+    <string name="reglages_incomplets">Renseignez l\'adresse et le jeton.</string>
+    <string name="rappel_titre_reglage">Me rappeler de relever</string>
+    <string name="rappel_intervalle">Tous les combien de jours ?</string>
+    <string name="notifications_refusees">Sans autorisation de notifier, le rappel ne peut pas fonctionner.</string>
+
+    <!-- Rappels -->
+    <string name="canal_rappels">Rappels de relevé</string>
+    <string name="canal_rappels_description">Notification périodique invitant à relever les compteurs.</string>
+    <string name="rappel_titre">Relevé des compteurs</string>
+    <string name="rappel_texte">Il est temps de noter vos index.</string>
+</resources>

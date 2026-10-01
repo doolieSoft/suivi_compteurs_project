@@ -1,0 +1,40 @@
+{% extends "suivi/base.html" %}
+
+{% block titre %}{{ titre }} — Suivi des compteurs{% endblock %}
+
+{% block contenu %}
+<div class="entete-page">
+  <div class="fil"><a href="{% url 'suivi:releve_liste' %}">Relevés</a> › {{ titre }}</div>
+  <h1>{{ titre }}</h1>
+  <p class="sous-titre">
+    Saisissez l'index tel qu'il apparaît au compteur. La consommation en est déduite :
+    inutile de calculer quoi que ce soit.
+  </p>
+</div>
+
+<div class="carte" style="max-width:560px">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="barre-actions">
+      <button type="submit" class="bouton">Enregistrer</button>
+      <a class="bouton discret" href="{% url 'suivi:releve_liste' %}">Retour à la liste</a>
+    </div>
+  </form>
+</div>
+
+{% if releve %}
+<div class="carte" style="max-width:560px">
+  <h2>Supprimer</h2>
+  <p class="legende-carte">
+    Le relevé du {{ releve.date|date:"d/m/Y" }} sera retiré définitivement, et les
+    consommations de la période recalculées à partir des relevés voisins.
+  </p>
+  <form method="post" action="{% url 'suivi:releve_supprimer' releve.pk %}"
+        onsubmit="return confirm('Supprimer définitivement ce relevé ?')">
+    {% csrf_token %}
+    <button type="submit" class="bouton danger">Supprimer ce relevé</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}
