@@ -26,13 +26,17 @@ android {
         // Android 8.0. En deçà, ni canaux de notification ni icônes adaptatives.
         minSdk = 26
         targetSdk = 36
-        // Surchargeables depuis la ligne de commande, ce dont se sert la
-        // publication automatique : l'étiquette Git donne le nom de version, et
-        // le numéro d'exécution du workflow fournit un entier toujours
-        // croissant — Android refuse d'installer un versionCode qui recule.
-        //   ./gradlew assembleRelease -PsuiviVersionCode=7 -PsuiviVersionName=1.3
-        versionCode = (findProperty("suiviVersionCode") as String?)?.toInt() ?: 1
-        versionName = (findProperty("suiviVersionName") as String?) ?: "1.0"
+        // À relever avant chaque étiquette : versionCode toujours croissant
+        // (Android refuse d'installer un numéro qui recule), versionName égal à
+        // l'étiquette sans son « v ». F-Droid lit ces deux lignes pour repérer
+        // les nouvelles versions ; la publication automatique refuse une
+        // étiquette qui ne correspond pas.
+        versionCode = 108
+        versionName = "1.2.4"
+        // Surchargeables pour un essai :
+        //   ./gradlew assembleCompletRelease -PsuiviVersionCode=7 -PsuiviVersionName=1.3
+        (findProperty("suiviVersionCode") as String?)?.let { versionCode = it.toInt() }
+        (findProperty("suiviVersionName") as String?)?.let { versionName = it }
         // Lien « Soutenir le développement », fourni à la compilation : la
         // version GitHub le reçoit, celle du Play Store non — Google n'y admet
         // pas de paiement hors de son propre système. Vide : pas de bouton.

@@ -51,26 +51,33 @@ machine.
 
 ## Publier une version sur GitHub
 
-### La façon normale : pousser une étiquette
+### La façon normale : numéroter, puis pousser une étiquette
+
+Dans `app/build.gradle.kts`, relever `versionCode` (+1) et `versionName`, puis :
 
 ```bash
-git tag v1.1
-git push origin v1.1
+git commit -am "Version 1.3"
+git tag v1.3
+git push origin main v1.3
 ```
 
-C'est tout. GitHub Actions lance les tests, construit l'APK signé, le vérifie
+GitHub Actions lance les tests, construit l'APK signé, le vérifie
 et crée la publication avec l'APK attaché et des notes déduites des commits.
 Comptez cinq minutes ; le déroulement est visible dans l'onglet **Actions**.
 
-Rien à numéroter à la main :
+Les numéros ne sont écrits qu'à un endroit, `app/build.gradle.kts` :
 
-| | D'où elle vient |
+| | Règle |
 |---|---|
-| `versionName` | l'étiquette, sans son « v » — `v1.1` donne `1.1` |
-| `versionCode` | le numéro d'exécution du workflow, toujours croissant |
+| `versionName` | l'étiquette sans son « v » : `v1.3` donne `1.3` |
+| `versionCode` | +1 à chaque version : Android refuse d'installer un numéro qui recule |
 
-Android refuse d'installer un `versionCode` inférieur ou égal à celui déjà
-posé : le lier au numéro d'exécution écarte définitivement cette erreur.
+F-Droid lit ces deux lignes pour repérer les nouvelles versions. Le workflow
+refuse une étiquette qui ne correspond pas à `versionName`, plutôt que de
+publier une version mal numérotée.
+
+Pour les notes de version affichées par F-Droid, ajouter un fichier
+`fastlane/metadata/android/<langue>/changelogs/<versionCode>.txt` par langue.
 
 Le workflow se déclenche aussi à la main depuis l'onglet **Actions**, utile
 pour rejouer une publication qui aurait échoué.

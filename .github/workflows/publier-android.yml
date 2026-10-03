@@ -63,18 +63,25 @@ jobs:
       - name: Déterminer la version
         id: version
         run: |
-          # L'étiquette donne le nom lisible, sans son « v » initial.
+          # Les numéros viennent de build.gradle.kts, où F-Droid les lit aussi :
+          # une seule source, que l'étiquette doit confirmer.
+          GRADLE=android/app/build.gradle.kts
+          CODE=$(sed -n 's/^ *versionCode = \([0-9][0-9]*\)$/\1/p' $GRADLE | head -1)
+          NOM_GRADLE=$(sed -n 's/^ *versionName = "\(.*\)"$/\1/p' $GRADLE | head -1)
+          if [ -z "$CODE" ] || [ -z "$NOM_GRADLE" ]; then
+            echo "::error::versionCode ou versionName introuvable dans $GRADLE."
+            exit 1
+          fi
           if [ "${{ github.ref_type }}" = "tag" ]; then
             NOM="${GITHUB_REF_NAME#v}"
+            if [ "$NOM" != "$NOM_GRADLE" ]; then
+              echo "::error::L'étiquette $GITHUB_REF_NAME ne correspond pas à versionName \"$NOM_GRADLE\" : relevez versionCode et versionName dans $GRADLE."
+              exit 1
+            fi
           else
-            NOM="0.0-essai"
+            NOM="$NOM_GRADLE-essai"
           fi
           echo "nom=$NOM" >> "$GITHUB_OUTPUT"
-          # Le numéro d'exécution est un entier toujours croissant : Android
-          # refuse d'installer un versionCode inférieur ou égal au précédent.
-          # Décalé de 100 : des versions d'essai, installées par câble, ont
-          # déjà porté les numéros 1 à 12.
-          CODE=$(( ${{ github.run_number }} + 100 ))
           echo "code=$CODE" >> "$GITHUB_OUTPUT"
           echo "Version $NOM (code $CODE)"
 

@@ -1,0 +1,2 @@
+• Nieuwe schakelaar "Meters af te lezen" bij een huis: een verlaten huis komt niet meer terug op het startscherm.
+• Eerste versie op F-Droid.

@@ -17,18 +17,19 @@ RepoType: git
 Repo: https://github.com/doolieSoft/suivi_compteurs_project.git
 
 Builds:
-  - versionName: 1.2.1
-    versionCode: 105
-    commit: v1.2.1
+  - versionName: 1.2.4
+    versionCode: 108
+    commit: v1.2.4
     subdir: android/app
     gradle:
       - libre
+    # La variante libre n'utilise pas ML Kit ; on retire jusqu'à sa mention,
+    # que l'analyse de F-Droid signalerait.
+    prebuild: sed -i -e '/com.google.mlkit/d' build.gradle.kts
     gradleprops:
-      - suiviVersionCode=105
-      - suiviVersionName=1.2.1
       - suiviLienDons=https://liberapay.com/doolieSoft/donate
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$
-CurrentVersion: 1.2.1
-CurrentVersionCode: 105
+CurrentVersion: 1.2.4
+CurrentVersionCode: 108

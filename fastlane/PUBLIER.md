@@ -64,7 +64,7 @@ L'API de Google ne sait pas créer une application, seulement la mettre à jour.
 
 ```bash
 cd android
-./gradlew bundleCompletRelease -PsuiviVersionCode=100 -PsuiviVersionName=1.2.1
+./gradlew bundleCompletRelease
 ```
 
 Envoyer `app/build/outputs/bundle/completRelease/app-complet-release.aab` dans
@@ -166,10 +166,9 @@ Store). Sans le secret, l'envoi au Play Store est simplement sauté.
 
 ## Numéros de version
 
-`versionCode` = numéro d'exécution du workflow + 100 : toujours croissant, et
-au-dessus des versions d'essai installées par câble (jusqu'à 14). Le premier
-envoi manuel (étape 4) doit utiliser un code supérieur à 14 et inférieur au
-prochain code du workflow : 100 convient.
+`versionCode` et `versionName` sont écrits dans `android/app/build.gradle.kts`,
+à relever avant chaque étiquette (voir `android/README.md`). Le Play Store
+refuse un `versionCode` déjà envoyé : +1 à chaque version suffit.
 
 ## À surveiller
 
