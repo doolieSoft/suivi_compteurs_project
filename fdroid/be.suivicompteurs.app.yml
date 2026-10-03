@@ -16,7 +16,7 @@ Repo: https://github.com/doolieSoft/suivi_compteurs_project.git
 Builds:
   - versionName: 1.2.5
     versionCode: 109
-    commit: v1.2.5
+    commit: 83fee98363b0c3a82e41ab4141278f35e5d6b0d3
     subdir: android/app
     gradle:
       - libre
