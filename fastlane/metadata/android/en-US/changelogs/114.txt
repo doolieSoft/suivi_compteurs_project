@@ -1,0 +1,4 @@
+• The house's town is saved, and exported to the Excel workbook.
+• Place your house by searching for its town, no latitude or longitude needed.
+• "View history and forecasts" button on the home screen.
+• Donations: one-time (Ko-fi) or monthly (Liberapay).

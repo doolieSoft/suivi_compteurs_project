@@ -1,0 +1,4 @@
+• La ville de la maison est enregistrée, et exportée dans le classeur Excel.
+• Placez votre maison en cherchant sa ville, sans latitude ni longitude.
+• Bouton « Consulter l'historique et les prévisions » sur l'accueil.
+• Dons : don unique (Ko-fi) ou soutien mensuel (Liberapay).

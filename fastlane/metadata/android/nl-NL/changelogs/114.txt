@@ -1,0 +1,4 @@
+• De gemeente van de woning wordt bewaard en naar de Excel-werkmap geëxporteerd.
+• Plaats je woning door haar gemeente te zoeken, zonder breedte- of lengtegraad.
+• Knop "Geschiedenis en voorspellingen bekijken" op het startscherm.
+• Giften: eenmalig (Ko-fi) of maandelijks (Liberapay).
