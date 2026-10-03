@@ -16,6 +16,7 @@ val cle = Properties().apply {
     if (fichierCle.exists()) fichierCle.inputStream().use { load(it) }
 }
 val clePresente = fichierCle.exists() && rootProject.file("cle-release.jks").exists()
+val signatureRelease = if (clePresente) "publication" else "debug"
 
 android {
     namespace = "be.suivicompteurs.app"
@@ -31,8 +32,8 @@ android {
         // l'étiquette sans son « v ». F-Droid lit ces deux lignes pour repérer
         // les nouvelles versions ; la publication automatique refuse une
         // étiquette qui ne correspond pas.
-        versionCode = 108
-        versionName = "1.2.4"
+        versionCode = 109
+        versionName = "1.2.5"
         // Surchargeables pour un essai :
         //   ./gradlew assembleCompletRelease -PsuiviVersionCode=7 -PsuiviVersionName=1.3
         (findProperty("suiviVersionCode") as String?)?.let { versionCode = it.toInt() }
@@ -70,9 +71,10 @@ android {
             // Le modèle ML Kit et Room n'aiment pas l'obfuscation par défaut ;
             // l'enjeu est nul pour une application personnelle.
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName(
-                if (clePresente) "publication" else "debug"
-            )
+            // Sur une ligne : F-Droid retire les lignes de signature avant de
+            // compiler, pour signer lui-même ; une instruction coupée en
+            // plusieurs lignes laisserait des morceaux orphelins.
+            signingConfig = signingConfigs.getByName(signatureRelease)
         }
     }
 
