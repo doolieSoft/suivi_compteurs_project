@@ -87,6 +87,7 @@ class AccesAnonymeTest(TestCase):
             "suivi:api_instantane",
             "suivi:api_synchroniser",
             "suivi:api_exporter",
+            "suivi:api_donnees",
         }
         resolveur = get_resolver()
         noms = {
@@ -167,6 +168,25 @@ class AccesApiTest(TestCase):
         self.assertEqual(reponse.status_code, 200)
         self.assertTrue(reponse["Content-Type"].startswith("application/vnd.openxml"))
         self.assertIn(".xlsx", reponse["Content-Disposition"])
+
+    def test_les_donnees_brutes_ne_sont_renvoyees_que_si_elles_ont_change(self):
+        url = reverse("suivi:api_donnees")
+        self.assertEqual(self.client.get(url).status_code, 401)
+
+        complet = self.client.get(url, headers={"x-jeton": JETON}).json()
+        self.assertFalse(complet["inchange"])
+        self.assertEqual(len(complet["releves"]), 2)
+        self.assertEqual(complet["releves"][0][1], "2024-01-01")
+        self.assertEqual(len(complet["degres_jours"]), 366)
+
+        version = complet["version"]
+        bref = self.client.get(url, {"version": version}, headers={"x-jeton": JETON}).json()
+        self.assertEqual(bref, {"version": version, "inchange": True})
+
+        # Marquer un relevé « annuel » ne change aucun index, mais bien la version.
+        Releve.objects.filter(date=dt.date(2024, 12, 1)).update(annuel=True)
+        apres = self.client.get(url, {"version": version}, headers={"x-jeton": JETON}).json()
+        self.assertFalse(apres["inchange"])
 
     def test_l_api_refuse_sans_jeton(self):
         for nom in ("suivi:api_etat", "suivi:api_instantane"):

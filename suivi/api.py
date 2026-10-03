@@ -578,3 +578,147 @@ def exporter(request: HttpRequest) -> HttpResponse:
         f'attachment; filename="suivi-compteurs-{dt.date.today():%Y-%m-%d}.xlsx"'
     )
     return reponse
+
+
+# ---------------------------------------------------------------------------
+# Données brutes : de quoi faire tourner le moteur de calcul du téléphone
+# ---------------------------------------------------------------------------
+
+
+def _version_donnees() -> str:
+    """Empreinte de tout ce que le téléphone recopie.
+
+    Plus large que celle de l'instantané : un tarif corrigé ou une maison
+    renommée changent aussi ce que le téléphone affiche.
+    """
+    import hashlib
+
+    from .models import Evenement, Maison, Tarif
+
+    compteurs = Compteur.objects.aggregate(nombre=Count("id"), dernier=Max("id"))
+    tarifs = list(Tarif.objects.order_by("pk").values_list())
+    maisons = list(Maison.objects.order_by("pk").values_list())
+    fiches = list(Compteur.objects.order_by("pk").values_list())
+    evenements = list(Evenement.objects.order_by("pk").values_list())
+    # Commentaires et sources changent sans toucher aux index.
+    annotations = list(
+        Releve.objects.exclude(commentaire="", source="MANUEL")
+        .order_by("pk")
+        .values_list("pk", "source", "commentaire")
+    )
+    brut = "|".join(
+        str(x)
+        for x in (_signature_donnees(), compteurs, tarifs, maisons, fiches, evenements, annotations)
+    )
+    return hashlib.sha256(brut.encode()).hexdigest()[:16]
+
+
+@login_not_required
+@require_GET
+def donnees(request: HttpRequest) -> JsonResponse:
+    """Relevés, compteurs, degrés-jours et tarifs, tels quels.
+
+    Le téléphone calcule lui-même consommations et prévisions : il lui faut
+    les données d'origine, pas un résultat figé. Il envoie la version qu'il
+    détient déjà ; si rien n'a changé, la réponse se limite à le confirmer.
+    """
+    try:
+        _verifier_jeton(request)
+    except ErreurApi as exc:
+        return _json_erreur(exc)
+
+    from .models import Evenement, Maison, Tarif
+
+    def _iso(jour):
+        return jour.isoformat() if jour else None
+
+    version = _version_donnees()
+    if request.GET.get("version") == version:
+        return JsonResponse({"version": version, "inchange": True})
+
+    maisons = list(Maison.objects.select_related("station").order_by("pk"))
+    stations = {m.station for m in maisons if m.station}
+    return JsonResponse(
+        {
+            "version": version,
+            "inchange": False,
+            "maisons": [
+                {
+                    "id": m.pk,
+                    "nom": m.nom,
+                    "actuelle": m.est_actuelle,
+                    "station": m.station_id,
+                    "adresse": m.adresse,
+                    "nb_facades": m.nb_facades,
+                    "surface": m.surface_m2,
+                    "date_entree": _iso(m.date_entree),
+                    "date_sortie": _iso(m.date_sortie),
+                    "notes": m.notes,
+                }
+                for m in maisons
+            ],
+            "stations": [
+                {
+                    "id": s.pk,
+                    "nom": s.nom,
+                    "latitude": float(s.latitude),
+                    "longitude": float(s.longitude),
+                    "base": float(s.base_dj),
+                }
+                for s in sorted(stations, key=lambda s: s.pk)
+            ],
+            "compteurs": [
+                {
+                    "id": c.pk,
+                    "maison": c.maison_id,
+                    "energie": c.energie,
+                    "plage": c.plage,
+                    "unite": c.unite,
+                    "libelle": c.libelle,
+                    "date_pose": _iso(c.date_pose),
+                    "numero": c.numero,
+                    "coef_kwh": float(c.coef_kwh),
+                    "date_depose": _iso(c.date_depose),
+                    "remplace": c.remplace_id,
+                }
+                for c in Compteur.objects.order_by("pk")
+            ],
+            # Listes compactes plutôt qu'objets : quelques milliers de lignes,
+            # inutile de répéter les noms de champs à chacune.
+            "releves": [
+                [compteur, jour.isoformat(), float(index), annuel, source, commentaire]
+                for compteur, jour, index, annuel, source, commentaire in Releve.objects.order_by(
+                    "compteur_id", "date"
+                ).values_list("compteur_id", "date", "index", "annuel", "source", "commentaire")
+            ],
+            "degres_jours": [
+                [station, jour.isoformat(), float(valeur)]
+                for station, jour, valeur in DegreJour.objects.order_by(
+                    "station_id", "date"
+                ).values_list("station_id", "date", "dj")
+            ],
+            "tarifs": [
+                {
+                    "maison": t.maison_id,
+                    "energie": t.energie,
+                    "debut": t.date_debut.isoformat(),
+                    "fin": t.date_fin.isoformat() if t.date_fin else None,
+                    "prix": float(t.prix_unitaire),
+                    "abonnement": float(t.abonnement_mensuel),
+                    "fournisseur": t.fournisseur,
+                    "notes": t.notes,
+                }
+                for t in Tarif.objects.order_by("date_debut", "maison_id")
+            ],
+            "evenements": [
+                {
+                    "maison": e.maison_id,
+                    "date": e.date.isoformat(),
+                    "energie": e.energie,
+                    "libelle": e.libelle,
+                    "description": e.description,
+                }
+                for e in Evenement.objects.order_by("date")
+            ],
+        }
+    )

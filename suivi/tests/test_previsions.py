@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import io
 
 from django.test import TestCase
 
@@ -249,6 +250,37 @@ class ReleveAnnuelTest(TestCase):
         from suivi.forms import ReleveForm
 
         self.assertIn("annuel", ReleveForm().fields)
+
+
+class ReferenceMoteurTest(TestCase):
+    """La référence du moteur Kotlin doit pouvoir être produite."""
+
+    def test_la_commande_ecrit_une_reference_lisible(self):
+        import json
+        import tempfile
+        from pathlib import Path
+
+        from django.core.management import call_command
+
+        station = f.station()
+        djs = f.climat(station, dt.date(2022, 1, 1), dt.date(2024, 12, 31))
+        maison = f.maison(station)
+        compteur = f.compteur(maison, Energie.GAZ)
+        conso = {j: BASE_VRAIE + K_VRAI * dj for j, dj in djs.items()}
+        dates = [dt.date(2022, 1, 1)]
+        while dates[-1] + dt.timedelta(days=30) <= dt.date(2024, 12, 31):
+            dates.append(dates[-1] + dt.timedelta(days=30))
+        f.releves_depuis_consommation(compteur, conso, dates)
+
+        chemin = Path(tempfile.mkdtemp()) / "reference.json"
+        call_command(
+            "reference_moteur", str(chemin), dates=["2024-06-30"], stdout=io.StringIO()
+        )
+        reference = json.loads(chemin.read_text(encoding="utf-8"))
+        (ligne,) = reference["maisons"][0]["lignes"]
+        self.assertTrue(ligne["modele"]["fiable"])
+        self.assertIn("2024-06-30", ligne["previsions"])
+        self.assertIn("2023", reference["maisons"][0]["rejeux"])
 
 
 class ComparaisonGlissanteTest(TestCase):
