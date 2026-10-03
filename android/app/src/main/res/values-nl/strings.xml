@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Meters</string>
+    <string name="app_name">Suivi compteurs</string>
 
     <!-- Startscherm -->
     <string name="index_avec_unite">%1$s %2$s</string>
@@ -64,7 +64,7 @@
 
     <!-- Overzicht, berekend op het toestel -->
     <string name="titre_tableau_de_bord">Voorspellingen</string>
-    <string name="tableau_vide">Geen gegevens op dit toestel. Importeer een Excel-werkmap via het menu van het startscherm, of synchroniseer met een bijgewerkte server.</string>
+    <string name="tableau_vide">Geen gegevens op dit toestel. Importeer een Excel-werkmap via het menu van het startscherm, of maak je woning en haar meters aan.</string>
     <string name="tiret">—</string>
     <string name="valeur_unite">%1$s %2$s</string>
     <string name="pourcent">%1$s %%</string>
@@ -127,7 +127,7 @@
     <string name="canal_rappels_description">Periodieke melding om de meters op te nemen.</string>
     <string name="rappel_titre">Meteropname</string>
     <string name="rappel_texte">Tijd om je meterstanden te noteren.</string>
-    <string name="accueil_vide">Welkom! Importeer om te beginnen een Excel-werkmap die uit de app of de website is geëxporteerd, of maak je woning en haar meters aan.</string>
+    <string name="accueil_vide">Welkom! Importeer om te beginnen een Excel-werkmap die uit de app is geëxporteerd, of maak je woning en haar meters aan.</string>
     <string name="creer_maison">Mijn woning aanmaken</string>
     <string name="mettre_a_jour_meteo">Weer bijwerken</string>
     <string name="donnees_sur_appareil">Je gegevens blijven op dit toestel</string>

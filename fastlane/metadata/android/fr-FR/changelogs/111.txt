@@ -1,0 +1,3 @@
+• L'application s'appelle désormais « Suivi compteurs ».
+• Nouvel interrupteur « Compteurs à relever » sur la fiche d'une maison : une maison quittée ne revient plus à l'accueil.
+• Première version sur F-Droid.

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Meters</string>
+    <string name="app_name">Suivi compteurs</string>
 
     <!-- Home -->
     <string name="index_avec_unite">%1$s %2$s</string>
@@ -64,7 +64,7 @@
 
     <!-- Dashboard, computed on the device -->
     <string name="titre_tableau_de_bord">Forecasts</string>
-    <string name="tableau_vide">No data on this device. Import an Excel workbook from the home screen menu, or synchronise with an up-to-date server.</string>
+    <string name="tableau_vide">No data on this device. Import an Excel workbook from the home screen menu, or create your house and its meters.</string>
     <string name="tiret">—</string>
     <string name="valeur_unite">%1$s %2$s</string>
     <string name="pourcent">%1$s %%</string>
@@ -127,7 +127,7 @@
     <string name="canal_rappels_description">Periodic notification inviting you to read the meters.</string>
     <string name="rappel_titre">Meter reading</string>
     <string name="rappel_texte">Time to note your meter readings.</string>
-    <string name="accueil_vide">Welcome! To get started, import an Excel workbook exported from the app or the website, or create your house and its meters.</string>
+    <string name="accueil_vide">Welcome! To get started, import an Excel workbook exported from the app, or create your house and its meters.</string>
     <string name="creer_maison">Create my house</string>
     <string name="mettre_a_jour_meteo">Update the weather</string>
     <string name="donnees_sur_appareil">Your data stays on this device</string>

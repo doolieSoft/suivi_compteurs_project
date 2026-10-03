@@ -41,7 +41,7 @@ personnel.
 
 | Champ | Valeur |
 |---|---|
-| Nom | Compteurs – eau, gaz, élec |
+| Nom | Suivi compteurs |
 | Langue par défaut | Français (France) – fr-FR |
 | Application ou jeu | Application |
 | Gratuite ou payante | Gratuite |

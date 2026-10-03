@@ -1,4 +1,4 @@
-# Compteurs
+# Suivi compteurs
 
 Application Android de suivi des compteurs d'eau, de gaz, d'électricité et de
 mazout. Elle produit des graphiques, une prévision de l'année et une

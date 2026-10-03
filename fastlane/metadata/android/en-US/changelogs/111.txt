@@ -1,0 +1,3 @@
+• The app is now called "Suivi compteurs".
+• New "Meters to read" switch on a house: a house you have left no longer comes back to the home screen.
+• First release on F-Droid.

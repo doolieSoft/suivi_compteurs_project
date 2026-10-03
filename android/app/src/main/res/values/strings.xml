@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Compteurs</string>
+    <string name="app_name">Suivi compteurs</string>
 
     <!-- Accueil -->
     <string name="index_avec_unite">%1$s %2$s</string>
@@ -64,7 +64,7 @@
 
     <!-- Tableau de bord, calculé sur l'appareil -->
     <string name="titre_tableau_de_bord">Prévisions</string>
-    <string name="tableau_vide">Aucune donnée sur l\'appareil. Importez un classeur Excel depuis le menu de l\'écran d\'accueil, ou synchronisez avec un serveur à jour.</string>
+    <string name="tableau_vide">Aucune donnée sur l\'appareil. Importez un classeur Excel depuis le menu de l\'écran d\'accueil, ou créez votre maison et ses compteurs.</string>
     <string name="tiret">—</string>
     <string name="valeur_unite">%1$s %2$s</string>
     <string name="pourcent">%1$s %%</string>
@@ -127,7 +127,7 @@
     <string name="canal_rappels_description">Notification périodique invitant à relever les compteurs.</string>
     <string name="rappel_titre">Relevé des compteurs</string>
     <string name="rappel_texte">Il est temps de noter vos index.</string>
-    <string name="accueil_vide">Bienvenue ! Pour commencer, importez un classeur Excel exporté de l\'application ou du site, ou créez votre maison et ses compteurs.</string>
+    <string name="accueil_vide">Bienvenue ! Pour commencer, importez un classeur Excel exporté de l\'application, ou créez votre maison et ses compteurs.</string>
     <string name="creer_maison">Créer ma maison</string>
     <string name="mettre_a_jour_meteo">Mettre à jour la météo</string>
     <string name="donnees_sur_appareil">Vos données restent sur cet appareil</string>
