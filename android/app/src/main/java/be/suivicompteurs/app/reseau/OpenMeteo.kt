@@ -71,11 +71,31 @@ class OpenMeteo {
         }
     }
 
+    /**
+     * Lieux portant ce nom, pour placer une maison sans connaître ses
+     * coordonnées : « Liège » rend Liège (Wallonie, Belgique) et ses homonymes.
+     */
+    suspend fun chercherLieux(nom: String, langue: String): Resultat<List<Lieu>> = withContext(Dispatchers.IO) {
+        if (nom.isBlank()) return@withContext Resultat.Succes(emptyList())
+        try {
+            val url = GEOCODAGE.toHttpUrl().newBuilder()
+                .addQueryParameter("name", nom.trim())
+                .addQueryParameter("count", "8")
+                .addQueryParameter("language", langue)
+                .addQueryParameter("format", "json")
+                .build()
+            Resultat.Succes(lireLieux(appel(url.toString())))
+        } catch (e: Exception) {
+            Resultat.Echec(e.message ?: "Open-Meteo injoignable", horsLigne = true)
+        }
+    }
+
     private fun okhttp3.HttpUrl.Builder.communs(latitude: Double, longitude: Double) = apply {
         addQueryParameter("latitude", "%.5f".format(java.util.Locale.ROOT, latitude))
         addQueryParameter("longitude", "%.5f".format(java.util.Locale.ROOT, longitude))
         addQueryParameter("daily", "temperature_2m_mean")
-        addQueryParameter("timezone", "Europe/Brussels")
+        // Journées du fuseau de la maison, où qu'elle soit.
+        addQueryParameter("timezone", "auto")
     }
 
     private fun appel(url: String): String =
@@ -94,8 +114,23 @@ class OpenMeteo {
     }
 
     companion object {
+        /** Lieux de la réponse du géocodage ; aucun si le nom est inconnu. */
+        internal fun lireLieux(corps: String): List<Lieu> {
+            val resultats = JSONObject(corps).optJSONArray("results") ?: return emptyList()
+            return (0 until resultats.length()).map { resultats.getJSONObject(it) }.map { l ->
+                Lieu(
+                    nom = l.getString("name"),
+                    region = l.optString("admin1"),
+                    pays = l.optString("country"),
+                    latitude = l.getDouble("latitude"),
+                    longitude = l.getDouble("longitude"),
+                )
+            }
+        }
+
         private const val ARCHIVE = "https://archive-api.open-meteo.com/v1/archive"
         private const val PREVISION = "https://api.open-meteo.com/v1/forecast"
+        private const val GEOCODAGE = "https://geocoding-api.open-meteo.com/v1/search"
 
         /** Retard de publication de la réanalyse ERA5. */
         private const val DELAI_ARCHIVE_JOURS = 6L
@@ -103,4 +138,10 @@ class OpenMeteo {
         /** Profondeur maximale d'historique acceptée par l'adresse « forecast ». */
         private const val MAX_PAST_DAYS = 92L
     }
+}
+
+/** Un lieu trouvé par son nom. */
+data class Lieu(val nom: String, val region: String, val pays: String, val latitude: Double, val longitude: Double) {
+    /** « Liège, Wallonie, Belgique ». */
+    val libelle: String get() = listOf(nom, region, pays).filter { it.isNotBlank() }.distinct().joinToString(", ")
 }

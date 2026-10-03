@@ -14,6 +14,7 @@
     <string name="graphique_mensuel">Monthly consumption (%1$s)</string>
     <string name="graphique_signature">Energy signature</string>
     <string name="periodes_entre_releves">Periods between readings</string>
+    <string name="releves_annee">Readings %1$d</string>
     <string name="modele_ajuste">Model</string>
     <string name="modele_resume">Horizontally, degree days per day; vertically, consumption per day. Base %1$s per day, %2$s per degree day, R² %3$s; heating accounts for about %4$s %% of consumption.</string>
     <string name="modele_non_fiable">Horizontally, degree days per day; vertically, consumption per day. The link with the weather is not clear enough for a reliable model.</string>

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import be.suivicompteurs.app.R
@@ -113,6 +115,7 @@ fun ChampTexte(
     numerique: Boolean = false,
     erreur: String? = null,
     lignes: Int = 1,
+    surRecherche: (() -> Unit)? = null,
 ) {
     OutlinedTextField(
         value = valeur,
@@ -122,7 +125,12 @@ fun ChampTexte(
         minLines = lignes,
         isError = erreur != null,
         supportingText = erreur?.let { { Text(it) } },
-        keyboardOptions = if (numerique) KeyboardOptions(keyboardType = KeyboardType.Decimal) else KeyboardOptions.Default,
+        keyboardOptions = when {
+            numerique -> KeyboardOptions(keyboardType = KeyboardType.Decimal)
+            surRecherche != null -> KeyboardOptions(imeAction = ImeAction.Search)
+            else -> KeyboardOptions.Default
+        },
+        keyboardActions = KeyboardActions(onSearch = { surRecherche?.invoke() }),
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp),
     )
 }

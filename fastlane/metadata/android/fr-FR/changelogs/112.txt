@@ -1,0 +1,4 @@
+• Placez votre maison en cherchant sa ville, sans latitude ni longitude.
+• Bouton « Consulter l'historique et les prévisions » sur l'accueil.
+• Premier lancement plus simple : on commence par créer sa maison.
+• Graphique du cumul : relevés de l'année marqués, année passée mise en avant.

@@ -48,9 +48,16 @@ private class DetailLigne(
     val evenements: List<EvenementLocal>,
 )
 
-/** Teintes des années passées : de plus en plus pâles en remontant le temps. */
-private fun teinte(base: Color, rang: Int, total: Int): Color =
-    if (rang == total - 1) base else Couleurs.encre3.copy(alpha = 0.25f + 0.6f * rang / total.coerceAtLeast(1))
+/**
+ * L'année en cours dans la couleur de l'énergie, l'année passée — la
+ * comparaison qu'on fait d'abord — dans la même couleur atténuée, les
+ * précédentes en gris discret.
+ */
+private fun teinte(base: Color, rang: Int, total: Int): Color = when (rang) {
+    total - 1 -> base
+    total - 2 -> base.copy(alpha = 0.45f)
+    else -> Couleurs.encre3.copy(alpha = 0.3f)
+}
 
 @Composable
 fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> Unit) {
@@ -127,15 +134,31 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
         if (tracees.isNotEmpty()) {
             Carte(stringResource(R.string.graphique_cumul)) {
                 val mois = DateTimeFormatter.ofPattern("MMM")
+                // Les relevés de l'année en cours, sur sa courbe : entre deux, la
+                // consommation est répartie (selon le froid, ou uniformément),
+                // d'où des segments droits qu'il faut pouvoir situer.
+                val enCours = tracees.last()
+                val cumulEnCours = ligne.serie.cumulAnnuel(enCours).toMap()
+                val datesReleves = ligne.compteurs.flatMap { c -> c.releves.map { it.date } }
+                    .filter { it.year == enCours }.distinct().sorted()
+                val pointsReleves = datesReleves.mapNotNull { d -> cumulEnCours[d]?.let { d.dayOfYear.toDouble() to it } }
                 GraphiqueXY(
                     series = tracees.mapIndexed { rang, annee ->
                         Serie(
                             nom = annee.toString(),
                             couleur = teinte(couleur, rang, tracees.size),
                             points = ligne.serie.cumulAnnuel(annee).map { (j, v) -> j.dayOfYear.toDouble() to v },
-                            epaisseur = if (rang == tracees.size - 1) 4f else 2.5f,
+                            epaisseur = when (rang) {
+                                tracees.size - 1 -> 4f
+                                tracees.size - 2 -> 3.5f
+                                else -> 2f
+                            },
                         )
-                    },
+                    } + listOfNotNull(
+                        pointsReleves.takeIf { it.isNotEmpty() }?.let {
+                            Serie(stringResource(R.string.releves_annee, enCours), Couleurs.encre, it, Trace.POINTS)
+                        },
+                    ),
                     etiquetteX = { LocalDate.ofYearDay(2001, it.toInt().coerceIn(1, 365)).format(mois) },
                     etiquetteY = nombre,
                     xMin = 1.0, xMax = 366.0,

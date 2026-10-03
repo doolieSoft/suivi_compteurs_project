@@ -1,0 +1,4 @@
+• Place your house by searching for its town, no latitude or longitude needed.
+• "View history and forecasts" button on the home screen.
+• Simpler first launch: start by creating your house.
+• Cumulative chart: this year's readings marked, last year highlighted.

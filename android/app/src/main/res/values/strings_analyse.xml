@@ -14,6 +14,7 @@
     <string name="graphique_mensuel">Consommation mensuelle (%1$s)</string>
     <string name="graphique_signature">Signature énergétique</string>
     <string name="periodes_entre_releves">Périodes entre relevés</string>
+    <string name="releves_annee">Relevés %1$d</string>
     <string name="modele_ajuste">Modèle</string>
     <string name="modele_resume">En abscisse les degrés-jours par jour, en ordonnée la consommation par jour. Base %1$s par jour, %2$s par degré-jour, R² %3$s ; le chauffage représente environ %4$s %% de la consommation.</string>
     <string name="modele_non_fiable">En abscisse les degrés-jours par jour, en ordonnée la consommation par jour. Le lien avec le climat n\'est pas assez net pour un modèle fiable.</string>

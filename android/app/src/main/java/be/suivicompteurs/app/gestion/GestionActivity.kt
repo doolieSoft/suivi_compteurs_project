@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -84,8 +85,17 @@ class GestionActivity : AppCompatActivity() {
                         )
                     }
                 }
+                // Premier lancement : droit au formulaire de la nouvelle maison,
+                // la liste (vide) restant derrière lui.
+                if (etat == null && intent.getBooleanExtra(NOUVELLE_MAISON, false)) {
+                    androidx.compose.runtime.LaunchedEffect(Unit) { nav.navigate("maison/0") }
+                }
             }
         }
+    }
+
+    companion object {
+        const val NOUVELLE_MAISON = "nouvelleMaison"
     }
 }
 
@@ -127,7 +137,8 @@ fun Cadre(
         },
         snackbarHost = { SnackbarHost(messages) },
     ) { marges ->
-        val modificateur = Modifier.fillMaxSize().padding(marges).padding(horizontal = 16.dp)
+        // imePadding : le contenu défile au-dessus du clavier au lieu d'être caché dessous.
+        val modificateur = Modifier.fillMaxSize().padding(marges).imePadding().padding(horizontal = 16.dp)
         Column(if (defilant) modificateur.verticalScroll(rememberScrollState()) else modificateur) {
             contenu()
         }

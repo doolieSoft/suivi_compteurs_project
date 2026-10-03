@@ -14,6 +14,7 @@
     <string name="graphique_mensuel">Maandelijks verbruik (%1$s)</string>
     <string name="graphique_signature">Energiesignatuur</string>
     <string name="periodes_entre_releves">Periodes tussen meterstanden</string>
+    <string name="releves_annee">Meterstanden %1$d</string>
     <string name="modele_ajuste">Model</string>
     <string name="modele_resume">Horizontaal de graaddagen per dag, verticaal het verbruik per dag. Basis %1$s per dag, %2$s per graaddag, R² %3$s; verwarming is goed voor ongeveer %4$s %% van het verbruik.</string>
     <string name="modele_non_fiable">Horizontaal de graaddagen per dag, verticaal het verbruik per dag. Het verband met het weer is niet duidelijk genoeg voor een betrouwbaar model.</string>

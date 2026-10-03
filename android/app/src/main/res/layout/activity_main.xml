@@ -59,24 +59,44 @@
                     android:textColor="@color/encre_2"
                     android:textSize="15sp" />
 
-                <!-- Premier lancement : partir d'un export, ou de zéro. -->
+                <!-- Premier lancement : créer sa maison. Reprendre une
+                     sauvegarde reste possible, mais en second : un nouvel
+                     utilisateur n'a pas de classeur. -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/boutonImporter"
+                    android:id="@+id/boutonCreer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="@string/importer" />
+                    android:text="@string/creer_maison" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/boutonCreer"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:id="@+id/boutonImporter"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/creer_maison" />
+                    android:layout_marginTop="24dp"
+                    android:text="@string/reprendre_sauvegarde" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/reprendre_sauvegarde_aide"
+                    android:textColor="@color/encre_3"
+                    android:textSize="13sp" />
             </LinearLayout>
         </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- L'analyse, à portée de main sous les compteurs (aussi dans le menu). -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/boutonConsulter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/consulter"
+        android:visibility="gone" />
 
     <TextView
         android:layout_width="match_parent"

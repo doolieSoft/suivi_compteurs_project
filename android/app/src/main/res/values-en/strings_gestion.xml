@@ -17,9 +17,14 @@
     <string name="compteurs_a_relever">Meters to read</string>
     <string name="compteurs_a_relever_aide">When off, this house\'s meters are no longer offered on the home screen. Their history stays in the analyses.</string>
     <string name="non_relevee">no longer read</string>
+    <string name="ville">Town or city</string>
+    <string name="chercher">Search</string>
+    <string name="lieu_introuvable">No place found for “%1$s”.</string>
+    <string name="lieu_hors_ligne">Search failed: no connection.</string>
+    <string name="coordonnees">%1$s; %2$s</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
-    <string name="position_aide">The location is used to fetch the local weather (degree days) from Open-Meteo. For example 50.6373 and 5.5795 for Liège.</string>
+    <string name="position_aide">Search for the house\'s town, or enter its position. It is used to fetch the local weather (degree days) from Open-Meteo.</string>
     <string name="notes">Notes</string>
     <string name="compteurs">Meters</string>
     <string name="ajouter">Add</string>

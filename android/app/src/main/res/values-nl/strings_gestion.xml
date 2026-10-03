@@ -17,9 +17,14 @@
     <string name="compteurs_a_relever">Meters af te lezen</string>
     <string name="compteurs_a_relever_aide">Uitgeschakeld worden de meters van dit huis niet meer op het startscherm voorgesteld. Hun geschiedenis blijft in de analyses.</string>
     <string name="non_relevee">niet meer afgelezen</string>
+    <string name="ville">Stad of gemeente</string>
+    <string name="chercher">Zoeken</string>
+    <string name="lieu_introuvable">Geen plaats gevonden voor ‘%1$s’.</string>
+    <string name="lieu_hors_ligne">Zoeken mislukt: geen verbinding.</string>
+    <string name="coordonnees">%1$s; %2$s</string>
     <string name="latitude">Breedtegraad</string>
     <string name="longitude">Lengtegraad</string>
-    <string name="position_aide">De ligging dient om het plaatselijke weer (graaddagen) bij Open-Meteo op te halen. Bijvoorbeeld 50,6373 en 5,5795 voor Luik.</string>
+    <string name="position_aide">Zoek de gemeente van de woning, of geef haar ligging. Die dient om het plaatselijke weer (graaddagen) bij Open-Meteo op te halen.</string>
     <string name="notes">Notities</string>
     <string name="compteurs">Meters</string>
     <string name="ajouter">Toevoegen</string>

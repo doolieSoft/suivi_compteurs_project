@@ -7,7 +7,7 @@
     <string name="aucun_index">Aucun relevé</string>
     <string name="releve_du">relevé du %1$s</string>
     <string name="reglages">Réglages</string>
-    <string name="consulter">Consulter</string>
+    <string name="consulter">Consulter l\'historique et les prévisions</string>
     <string name="exporter">Exporter en Excel</string>
     <string name="export_en_cours">Préparation du classeur…</string>
     <string name="export_reussi">Classeur enregistré.</string>
@@ -127,7 +127,9 @@
     <string name="canal_rappels_description">Notification périodique invitant à relever les compteurs.</string>
     <string name="rappel_titre">Relevé des compteurs</string>
     <string name="rappel_texte">Il est temps de noter vos index.</string>
-    <string name="accueil_vide">Bienvenue ! Pour commencer, importez un classeur Excel exporté de l\'application, ou créez votre maison et ses compteurs.</string>
+    <string name="accueil_vide">Bienvenue ! Pour commencer, créez votre maison et ses compteurs. Il suffira ensuite de relever les index de temps en temps.</string>
+    <string name="reprendre_sauvegarde">Importer un fichier Excel</string>
+    <string name="reprendre_sauvegarde_aide">Vous avez exporté vos données depuis une version précédente ou un autre téléphone ? Importez ce fichier pour les retrouver.</string>
     <string name="creer_maison">Créer ma maison</string>
     <string name="mettre_a_jour_meteo">Mettre à jour la météo</string>
     <string name="donnees_sur_appareil">Vos données restent sur cet appareil</string>

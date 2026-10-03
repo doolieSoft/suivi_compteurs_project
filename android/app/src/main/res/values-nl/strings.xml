@@ -7,7 +7,7 @@
     <string name="aucun_index">Geen meterstand</string>
     <string name="releve_du">opgenomen op %1$s</string>
     <string name="reglages">Instellingen</string>
-    <string name="consulter">Bekijken</string>
+    <string name="consulter">Geschiedenis en voorspellingen bekijken</string>
     <string name="exporter">Exporteren naar Excel</string>
     <string name="export_en_cours">Werkmap wordt voorbereid…</string>
     <string name="export_reussi">Werkmap opgeslagen.</string>
@@ -127,7 +127,9 @@
     <string name="canal_rappels_description">Periodieke melding om de meters op te nemen.</string>
     <string name="rappel_titre">Meteropname</string>
     <string name="rappel_texte">Tijd om je meterstanden te noteren.</string>
-    <string name="accueil_vide">Welkom! Importeer om te beginnen een Excel-werkmap die uit de app is geëxporteerd, of maak je woning en haar meters aan.</string>
+    <string name="accueil_vide">Welkom! Maak om te beginnen je woning en haar meters aan. Daarna lees je af en toe de meterstanden af.</string>
+    <string name="reprendre_sauvegarde">Een Excel-bestand importeren</string>
+    <string name="reprendre_sauvegarde_aide">Heb je je gegevens geëxporteerd uit een vorige versie of van een andere telefoon? Importeer dat bestand om ze terug te krijgen.</string>
     <string name="creer_maison">Mijn woning aanmaken</string>
     <string name="mettre_a_jour_meteo">Weer bijwerken</string>
     <string name="donnees_sur_appareil">Je gegevens blijven op dit toestel</string>

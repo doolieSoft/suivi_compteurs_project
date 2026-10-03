@@ -74,7 +74,8 @@ class MainActivity : AppCompatActivity() {
 
         vues.rafraichir.setOnRefreshListener { synchroniser(manuel = true) }
         vues.boutonImporter.setOnClickListener { importer() }
-        vues.boutonCreer.setOnClickListener { ouvrirGestion() }
+        vues.boutonConsulter.setOnClickListener { consulter() }
+        vues.boutonCreer.setOnClickListener { ouvrirGestion(nouvelleMaison = true) }
 
         observerDonnees()
         demanderNotificationsSiNecessaire()
@@ -111,6 +112,7 @@ class MainActivity : AppCompatActivity() {
         adaptateur.remplacer(compteurs)
         vues.listeVide.visibility = if (compteurs.isEmpty()) View.VISIBLE else View.GONE
         vues.liste.visibility = if (compteurs.isEmpty()) View.GONE else View.VISIBLE
+        vues.boutonConsulter.visibility = vues.liste.visibility
         vues.messageVide.setText(R.string.accueil_vide)
         vues.etat.text = if (reglages.derniereSynchro > 0) {
             getString(R.string.meteo_a_jour, momentSynchro())
@@ -189,8 +191,15 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, ReglagesActivity::class.java))
     }
 
-    private fun ouvrirGestion() {
-        startActivity(Intent(this, be.suivicompteurs.app.gestion.GestionActivity::class.java))
+    private fun consulter() {
+        startActivity(Intent(this, TableauDeBordActivity::class.java))
+    }
+
+    private fun ouvrirGestion(nouvelleMaison: Boolean = false) {
+        startActivity(
+            Intent(this, be.suivicompteurs.app.gestion.GestionActivity::class.java)
+                .putExtra(be.suivicompteurs.app.gestion.GestionActivity.NOUVELLE_MAISON, nouvelleMaison)
+        )
     }
 
     override fun onResume() {
@@ -260,9 +269,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_consulter -> {
-            startActivity(Intent(this, TableauDeBordActivity::class.java)); true
-        }
+        R.id.action_consulter -> { consulter(); true }
         R.id.action_synchroniser -> { synchroniser(manuel = true); true }
         R.id.action_exporter -> { exporter(); true }
         R.id.action_gerer -> { ouvrirGestion(); true }

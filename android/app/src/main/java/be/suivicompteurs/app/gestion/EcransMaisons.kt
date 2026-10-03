@@ -31,6 +31,9 @@ import be.suivicompteurs.app.donnees.MaisonLocale
 import be.suivicompteurs.app.donnees.TarifLocal
 import be.suivicompteurs.app.moteur.Energie
 import be.suivicompteurs.app.moteur.Plage
+import be.suivicompteurs.app.reseau.Lieu
+import be.suivicompteurs.app.reseau.OpenMeteo
+import be.suivicompteurs.app.reseau.Resultat
 import kotlinx.coroutines.launch
 
 @Composable
@@ -98,6 +101,10 @@ fun EcranMaison(
     var latitude by remember { mutableStateOf("") }
     var longitude by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
+    var ville by remember { mutableStateOf("") }
+    var lieux by remember { mutableStateOf<List<Lieu>>(emptyList()) }
+    var messageLieu by remember { mutableStateOf<String?>(null) }
+    var rechercheEnCours by remember { mutableStateOf(false) }
     var origine by remember { mutableStateOf<MaisonLocale?>(null) }
     var compteurs by remember { mutableStateOf<List<CompteurHistorique>>(emptyList()) }
     var tarifs by remember { mutableStateOf<List<TarifLocal>>(emptyList()) }
@@ -136,6 +143,29 @@ fun EcranMaison(
         ensuite(maisonId)
     }
 
+    // Placer la maison par le nom de sa ville : personne ne connaît ses
+    // coordonnées par cœur.
+    val introuvable = stringResource(R.string.lieu_introuvable, ville.trim())
+    val horsLigne = stringResource(R.string.lieu_hors_ligne)
+    val clavier = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
+    val focus = androidx.compose.ui.platform.LocalFocusManager.current
+    fun chercherLieu() = portee.launch {
+        // Le clavier cacherait les résultats.
+        clavier?.hide()
+        focus.clearFocus()
+        rechercheEnCours = true
+        messageLieu = null
+        val langue = contexte.resources.configuration.locales[0].language
+        when (val r = OpenMeteo().chercherLieux(ville, langue)) {
+            is Resultat.Succes -> {
+                lieux = r.valeur
+                if (r.valeur.isEmpty()) messageLieu = introuvable
+            }
+            is Resultat.Echec -> messageLieu = horsLigne
+        }
+        rechercheEnCours = false
+    }
+
     Cadre(
         titre = if (maisonId == 0L) stringResource(R.string.nouvelle_maison) else nom,
         surRetour = surRetour,
@@ -143,6 +173,33 @@ fun EcranMaison(
     ) {
         ChampTexte(stringResource(R.string.nom), nom, { nom = it }, erreur = if (erreurNom) stringResource(R.string.nom_obligatoire) else null)
         ChampTexte(stringResource(R.string.adresse), adresse, { adresse = it })
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ChampTexte(
+                stringResource(R.string.ville), ville,
+                { ville = it; lieux = emptyList(); messageLieu = null },
+                Modifier.weight(1f).padding(end = 8.dp),
+                surRecherche = { if (ville.isNotBlank()) chercherLieu() },
+            )
+            TextButton(enabled = ville.isNotBlank() && !rechercheEnCours, onClick = { chercherLieu() }) {
+                Text(stringResource(R.string.chercher))
+            }
+        }
+        lieux.forEach { l ->
+            LigneListe(
+                titre = l.libelle,
+                detail = stringResource(R.string.coordonnees, textes4(l.latitude), textes4(l.longitude)),
+                surAppui = {
+                    latitude = textes4(l.latitude); longitude = textes4(l.longitude)
+                    ville = l.libelle; lieux = emptyList()
+                },
+            )
+        }
+        messageLieu?.let { Text(it, style = androidx.compose.material3.MaterialTheme.typography.bodySmall, color = Couleurs.critique) }
+        Row {
+            ChampTexte(stringResource(R.string.latitude), latitude, { latitude = it }, Modifier.weight(1f).padding(end = 8.dp), numerique = true)
+            ChampTexte(stringResource(R.string.longitude), longitude, { longitude = it }, Modifier.weight(1f), numerique = true)
+        }
+        Text(stringResource(R.string.position_aide), style = androidx.compose.material3.MaterialTheme.typography.bodySmall, color = Couleurs.encre3)
         Row {
             ChampTexte(stringResource(R.string.facades), facades, { facades = it }, Modifier.weight(1f).padding(end = 8.dp), numerique = true)
             ChampTexte(stringResource(R.string.surface), surface, { surface = it }, Modifier.weight(1f), numerique = true)
@@ -155,11 +212,6 @@ fun EcranMaison(
             Switch(checked = relevee, onCheckedChange = { relevee = it; if (it) sortie = null })
         }
         Text(stringResource(R.string.compteurs_a_relever_aide), style = androidx.compose.material3.MaterialTheme.typography.bodySmall, color = Couleurs.encre3)
-        Row {
-            ChampTexte(stringResource(R.string.latitude), latitude, { latitude = it }, Modifier.weight(1f).padding(end = 8.dp), numerique = true)
-            ChampTexte(stringResource(R.string.longitude), longitude, { longitude = it }, Modifier.weight(1f), numerique = true)
-        }
-        Text(stringResource(R.string.position_aide), style = androidx.compose.material3.MaterialTheme.typography.bodySmall, color = Couleurs.encre3)
         ChampTexte(stringResource(R.string.notes), notes, { notes = it }, lignes = 3)
         Button(onClick = { enregistrer() }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             Text(stringResource(R.string.enregistrer))
@@ -324,3 +376,6 @@ fun DialogueEvenement(
         },
     )
 }
+
+/** Coordonnée à quatre décimales (une dizaine de mètres), point décimal. */
+private fun textes4(x: Double): String = "%.4f".format(java.util.Locale.ROOT, x)

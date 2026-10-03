@@ -17,9 +17,14 @@
     <string name="compteurs_a_relever">Compteurs à relever</string>
     <string name="compteurs_a_relever_aide">Éteint, les compteurs de cette maison ne sont plus proposés à l\'accueil. Leur historique reste dans les analyses.</string>
     <string name="non_relevee">plus relevée</string>
+    <string name="ville">Ville ou commune</string>
+    <string name="chercher">Chercher</string>
+    <string name="lieu_introuvable">Aucun lieu trouvé pour « %1$s ».</string>
+    <string name="lieu_hors_ligne">Recherche impossible : pas de connexion.</string>
+    <string name="coordonnees">%1$s ; %2$s</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
-    <string name="position_aide">La position sert à récupérer la météo locale (degrés-jours) sur Open-Meteo. Par exemple 50,6373 et 5,5795 pour Liège.</string>
+    <string name="position_aide">Cherchez la ville de la maison, ou donnez sa position. Elle sert à récupérer la météo locale (degrés-jours) sur Open-Meteo.</string>
     <string name="notes">Notes</string>
     <string name="compteurs">Compteurs</string>
     <string name="ajouter">Ajouter</string>
