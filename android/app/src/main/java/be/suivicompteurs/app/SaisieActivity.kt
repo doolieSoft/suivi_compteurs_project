@@ -136,7 +136,13 @@ class SaisieActivity : AppCompatActivity() {
             } ?: getString(R.string.aucun_index)
             vues.uniteChamp.text = trouve.unite
 
-            verifierPermissionCamera()
+            if (LecteurIndex.DISPONIBLE) {
+                verifierPermissionCamera()
+            } else {
+                // Variante libre : rien à photographier, le formulaire d'emblée.
+                vues.boutonReprendre.visibility = View.GONE
+                basculerSaisieManuelle()
+            }
         }
     }
 

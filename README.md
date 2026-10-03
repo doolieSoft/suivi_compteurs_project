@@ -278,3 +278,10 @@ Le plus simple est la page **Saisir**. Le formulaire refuse un index inférieur
 au relevé précédent ou supérieur au suivant — sauf s'il s'agit d'un compteur
 remplacé, auquel cas il faut d'abord créer le nouveau compteur dans
 l'administration, avec sa date de pose.
+
+## Licence
+
+© doolieSoft. Distribué sous licence GNU GPL version 3 ou ultérieure : voir
+[LICENSE](LICENSE). Vous pouvez utiliser, modifier et redistribuer
+ce logiciel, y compris le vendre, à condition de publier sous la même licence
+le code de toute version modifiée que vous distribuez.

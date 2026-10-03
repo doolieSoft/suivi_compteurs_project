@@ -80,14 +80,16 @@ jobs:
 
       - name: Lancer les tests
         working-directory: android
-        run: ./gradlew testDebugUnitTest --console=plain
+        # Les tests portent sur le code commun ; la variante libre doit au
+        # moins compiler.
+        run: ./gradlew testCompletDebugUnitTest assembleLibreDebug --console=plain
 
       - name: Construire l'APK signé
         working-directory: android
         run: |
           # Seule la version GitHub porte le lien de dons (variable LIEN_DONS
           # du dépôt) ; l'AAB du Play Store, construit ensuite, n'en a pas.
-          ./gradlew assembleRelease --console=plain \
+          ./gradlew assembleCompletRelease assembleLibreRelease --console=plain \
             -PsuiviVersionCode=${{ steps.version.outputs.code }} \
             -PsuiviVersionName=${{ steps.version.outputs.nom }} \
             -PsuiviLienDons="${{ vars.LIEN_DONS }}"
@@ -96,22 +98,26 @@ jobs:
         working-directory: android
         run: |
           # Le Play Store n'accepte que ce format ; mêmes numéros que l'APK.
-          ./gradlew bundleRelease --console=plain \
+          ./gradlew bundleCompletRelease --console=plain \
             -PsuiviVersionCode=${{ steps.version.outputs.code }} \
             -PsuiviVersionName=${{ steps.version.outputs.nom }}
 
       - name: Vérifier la signature
         run: |
-          APK=android/app/build/outputs/apk/release/app-release.apk
+          SORTIES=android/app/build/outputs/apk
           APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort | tail -1)
-          "$APKSIGNER" verify --print-certs "$APK" | tee signature.txt
-          # Garde-fou : si le secret avait été mal restitué, la compilation
-          # serait passée sans bruit sur la clé de débogage.
-          if grep -q "CN=Android Debug" signature.txt; then
-            echo "::error::APK signé avec la clé de débogage, publication annulée."
-            exit 1
-          fi
-          cp "$APK" suivi-compteurs.apk
+          for APK in $SORTIES/complet/release/app-complet-release.apk $SORTIES/libre/release/app-libre-release.apk; do
+            "$APKSIGNER" verify --print-certs "$APK" | tee signature.txt
+            # Garde-fou : si le secret avait été mal restitué, la compilation
+            # serait passée sans bruit sur la clé de débogage.
+            if grep -q "CN=Android Debug" signature.txt; then
+              echo "::error::$APK signé avec la clé de débogage, publication annulée."
+              exit 1
+            fi
+          done
+          cp $SORTIES/complet/release/app-complet-release.apk suivi-compteurs.apk
+          # Sans lecture automatique de l'index : aucun composant propriétaire.
+          cp $SORTIES/libre/release/app-libre-release.apk suivi-compteurs-libre.apk
 
       - name: Publier
         env:
@@ -122,7 +128,7 @@ jobs:
             ETIQUETTE="essai-${{ github.run_number }}"
             git tag "$ETIQUETTE" && git push origin "$ETIQUETTE"
           fi
-          gh release create "$ETIQUETTE" suivi-compteurs.apk \
+          gh release create "$ETIQUETTE" suivi-compteurs.apk suivi-compteurs-libre.apk \
             --title "$ETIQUETTE" \
             --generate-notes
 
@@ -141,7 +147,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: be.suivicompteurs.app
-          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          releaseFiles: android/app/build/outputs/bundle/completRelease/app-complet-release.aab
           releaseName: ${{ steps.version.outputs.nom }}
           track: ${{ vars.PLAY_PISTE || 'internal' }}
           status: ${{ vars.PLAY_STATUT || 'draft' }}

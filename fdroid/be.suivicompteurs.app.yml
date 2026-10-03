@@ -1,0 +1,34 @@
+# Recette F-Droid, à proposer par une demande de fusion sur
+# https://gitlab.com/fdroid/fdroiddata (fichier metadata/be.suivicompteurs.app.yml).
+# Voir fdroid/LISEZMOI.md.
+Categories:
+  - Money
+  - Science & Education
+License: GPL-3.0-or-later
+AuthorName: doolieSoft
+SourceCode: https://github.com/doolieSoft/suivi_compteurs_project
+IssueTracker: https://github.com/doolieSoft/suivi_compteurs_project/issues
+Changelog: https://github.com/doolieSoft/suivi_compteurs_project/releases
+# Liberapay: VOTRE_IDENTIFIANT
+
+AutoName: Compteurs
+
+RepoType: git
+Repo: https://github.com/doolieSoft/suivi_compteurs_project.git
+
+Builds:
+  - versionName: 1.2.1
+    versionCode: 105
+    commit: v1.2.1
+    subdir: android/app
+    gradle:
+      - libre
+    gradleprops:
+      - suiviVersionCode=105
+      - suiviVersionName=1.2.1
+      # - suiviLienDons=https://liberapay.com/VOTRE_IDENTIFIANT
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v[0-9.]+$
+CurrentVersion: 1.2.1
+CurrentVersionCode: 105

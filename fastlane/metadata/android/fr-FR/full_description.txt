@@ -24,5 +24,6 @@ ET AUSSI
 • Plusieurs maisons, remplacement de compteur, compteurs bi-horaires, tarifs et événements (isolation, travaux…).
 • Graphiques : cumul de l'année, consommation mensuelle, comparaison des années, climat.
 • Disponible en français, anglais et néerlandais.
+• Version F-Droid entièrement libre : sans lecture automatique, l'index se saisit à la main.
 
 Données météo : Open-Meteo.com (CC BY 4.0).

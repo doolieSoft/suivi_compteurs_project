@@ -107,4 +107,9 @@ class LecteurIndex {
         }
 
     fun fermer() = reconnaissance.close()
+
+    companion object {
+        /** Cette variante sait lire l'index sur une photo. */
+        const val DISPONIBLE = true
+    }
 }

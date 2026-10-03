@@ -8,9 +8,9 @@ faire, une fois pour toutes.
 ## Ce que contient ce dossier
 
 ```
-play/
+fastlane/
 ├── PUBLIER.md                    ce mémo
-└── metadata/                     une fiche par langue (format fastlane)
+└── metadata/android/             une fiche par langue, lue par fastlane et par F-Droid
     ├── fr-FR/   title.txt  short_description.txt  full_description.txt
     │            images/icon.png             512 × 512
     │            images/featureGraphic.png   1024 × 500
@@ -64,22 +64,25 @@ L'API de Google ne sait pas créer une application, seulement la mettre à jour.
 
 ```bash
 cd android
-./gradlew bundleRelease -PsuiviVersionCode=100 -PsuiviVersionName=1.2.1
+./gradlew bundleCompletRelease -PsuiviVersionCode=100 -PsuiviVersionName=1.2.1
 ```
 
-Envoyer `app/build/outputs/bundle/release/app-release.aab` dans
+Envoyer `app/build/outputs/bundle/completRelease/app-complet-release.aab` dans
 **Tests › Test interne › Créer une version**. Les versions suivantes partiront
 d'elles-mêmes (étape 8).
 
 ## 5. Fiche du Play Store
 
 **Présence sur le Play Store › Fiche principale** : copier les textes de
-`metadata/fr-FR/`, puis **Ajouter des traductions** pour `en-US` et `nl-NL`
+`metadata/android/fr-FR/`, puis **Ajouter des traductions** pour `en-US` et `nl-NL`
 avec les textes de leurs dossiers. Chaque langue a son icône, sa bannière et
 ses captures.
 
 - **Catégorie** : Outils (ou Maison et décoration).
 - **Adresse de contact** : celle de la politique de confidentialité.
+- **Site web** (Paramètres de la fiche › Coordonnées) : la page du projet,
+  <https://dooliesoft.github.io/suivi_compteurs_project/>. Les textes de la
+  fiche n'ont pas de champ pour elle : elle se saisit dans la Console.
 
 ## 6. Questionnaires (« Contenu de l'application »)
 

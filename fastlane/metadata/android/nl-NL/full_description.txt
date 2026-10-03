@@ -24,5 +24,6 @@ EN OOK
 • Meerdere woningen, vervanging van meters, dubbeltariefmeters, tarieven en gebeurtenissen (isolatie, werken…).
 • Grafieken: cumulatief sinds 1 januari, maandverbruik, jaarvergelijking, klimaat.
 • Beschikbaar in het Nederlands, Frans en Engels.
+• Volledig vrije F-Droid-versie: zonder automatisch lezen, de stand wordt met de hand ingevoerd.
 
 Weergegevens: Open-Meteo.com (CC BY 4.0).

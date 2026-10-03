@@ -40,6 +40,16 @@ android {
         buildConfigField("String", "LIEN_DONS", "\"" + lienDons.replace("\"", "") + "\"")
     }
 
+    // Deux variantes, identiques hormis la lecture automatique de l'index :
+    //  - « complet » (Play Store, GitHub) la fait avec ML Kit de Google ;
+    //  - « libre » (F-Droid) n'embarque aucun composant propriétaire : l'index
+    //    se tape à la main, et l'appareil photo n'est pas demandé.
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("complet") { dimension = "distribution" }
+        create("libre") { dimension = "distribution" }
+    }
+
     signingConfigs {
         if (clePresente) {
             create("publication") {
@@ -125,7 +135,7 @@ dependencies {
     implementation("androidx.camera:camera-view:$camerax")
 
     // Reconnaissance de texte : modèle embarqué dans l'APK, donc hors ligne.
-    implementation("com.google.mlkit:text-recognition:16.0.1")
+    "completImplementation"("com.google.mlkit:text-recognition:16.0.1")
 
     // Écrans en Compose.
     val compose = platform("androidx.compose:compose-bom:2024.10.01")

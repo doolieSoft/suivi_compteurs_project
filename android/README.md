@@ -35,15 +35,17 @@ Requis : JDK 17 ou plus, et le SDK Android (plateforme 35, build-tools 35+).
 
 ```bash
 cd android
-./gradlew assembleDebug
-./gradlew testDebugUnitTest
+./gradlew assembleCompletDebug      # avec lecture automatique de l'index (ML Kit)
+./gradlew assembleLibreDebug        # entièrement libre, saisie à la main (F-Droid)
+./gradlew testCompletDebugUnitTest
 ```
 
 Le wrapper télécharge lui-même la version de Gradle attendue : rien à
 installer au préalable.
 
-L'APK sort dans `app/build/outputs/apk/debug/app-debug.apk` (~48 Mo, dont
-l'essentiel est le modèle de reconnaissance de texte).
+Les APK sortent dans `app/build/outputs/apk/complet/debug/` (~50 Mo, dont
+l'essentiel est le modèle de reconnaissance de texte) et
+`app/build/outputs/apk/libre/debug/` (~11 Mo).
 
 `local.properties` indique où se trouve le SDK ; adaptez-le si vous changez de
 machine.
@@ -100,10 +102,10 @@ refuse d'ailleurs de publier un APK portant `CN=Android Debug`.
 
 ```bash
 cd android
-./gradlew assembleRelease
+./gradlew assembleCompletRelease assembleLibreRelease
 ```
 
-Le fichier sort dans `app/build/outputs/apk/release/app-release.apk`, signé
+Les fichiers sortent dans `app/build/outputs/apk/complet/release/` et `…/libre/release/`, signés
 avec `cle-release.jks` dont le mot de passe est dans `keystore.properties`.
 
 **Sauvegardez ces deux fichiers ailleurs que sur ce PC.** Les perdre interdit
@@ -122,7 +124,7 @@ Le plus simple, par USB, **sans passer par « sources inconnues »** :
 1. Sur le téléphone : *Paramètres* → *À propos* → tapoter 7 fois sur **Numéro de
    build**, puis *Options pour les développeurs* → **Débogage USB**.
 2. Brancher, autoriser l'ordinateur quand la fenêtre apparaît.
-3. `adb install -r app/build/outputs/apk/debug/app-debug.apk`
+3. `adb install -r app/build/outputs/apk/complet/debug/app-complet-debug.apk`
 
 Sinon, copiez `deploiement/suivi-compteurs.apk` sur le téléphone et ouvrez-le
 depuis un gestionnaire de fichiers — Android demandera alors l'autorisation
@@ -150,12 +152,13 @@ app/src/main/java/be/suivicompteurs/app/
 ├── gestion/                 maisons, compteurs, relevés, tarifs (Compose)
 ├── classeur/                lecture et écriture des classeurs Excel
 ├── donnees/                 base locale (Room)
-├── ocr/
-│   ├── LecteurIndex.kt      appel à ML Kit
-│   └── SelecteurIndex.kt    choix de l'index — la logique faillible, testée
+├── ocr/SelecteurIndex.kt    choix de l'index — la logique faillible, testée
 ├── reseau/OpenMeteo.kt      températures journalières
 ├── sync/Synchronisation.kt  mise à jour quotidienne de la météo
 └── rappel/Rappels.kt        notifications locales
+
+app/src/complet/…/ocr/LecteurIndex.kt   lecture de l'index avec ML Kit
+app/src/libre/…/ocr/LecteurIndex.kt     sans lecture : saisie à la main
 ```
 
 ## Parité avec le site
@@ -165,7 +168,7 @@ données réelles :
 
 ```bash
 python manage.py reference_moteur      # depuis la racine du projet
-cd android && ./gradlew testDebugUnitTest
+cd android && ./gradlew testCompletDebugUnitTest
 ```
 
 La commande fige ce que calcule le Python, ainsi qu'un export Excel, dans
@@ -207,3 +210,10 @@ sans que vous ayez vu la valeur.
   de cuve et livraisons, comme un réservoir de voiture, n'est pas encore géré.
 - Les noms des compteurs de l'écran d'accueil et le classeur Excel restent en
   français : le classeur doit pouvoir être relu par le site.
+
+## Licence
+
+© doolieSoft. Distribué sous licence GNU GPL version 3 ou ultérieure : voir
+[LICENSE](../LICENSE). Vous pouvez utiliser, modifier et redistribuer
+ce logiciel, y compris le vendre, à condition de publier sous la même licence
+le code de toute version modifiée que vous distribuez.
