@@ -49,6 +49,7 @@
   main .bouton { background: var(--accent); color: var(--accent-encre); font-size: 15px; }
   main .bouton.discret { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
   footer { color: var(--encre-2); font-size: 14px; padding: 40px 0 48px; }
+  .version { color: var(--encre-2); font-size: 15px; margin: -8px 0 14px; }
   footer a { color: var(--accent); }
   [data-langue] { display: none; }
   [data-langue].active { display: block; }
@@ -116,6 +117,7 @@
     </section>
     <section>
       <h2>Télécharger</h2>
+      <p class="version" data-version="fr" hidden></p>
       <div class="tableau">
         <div class="ligne"><p><strong>Google Play</strong>Mises à jour automatiques.</p><a class="bouton" href="https://play.google.com/store/apps/details?id=be.suivicompteurs.app">Google Play</a></div>
         <div class="ligne"><p><strong>APK complet</strong>Avec lecture automatique de l'index.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs.apk">suivi-compteurs.apk</a></div>
@@ -152,6 +154,7 @@
     </section>
     <section>
       <h2>Download</h2>
+      <p class="version" data-version="en" hidden></p>
       <div class="tableau">
         <div class="ligne"><p><strong>Google Play</strong>Automatic updates.</p><a class="bouton" href="https://play.google.com/store/apps/details?id=be.suivicompteurs.app">Google Play</a></div>
         <div class="ligne"><p><strong>Full APK</strong>With automatic reading of the index.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs.apk">suivi-compteurs.apk</a></div>
@@ -187,6 +190,7 @@
     </section>
     <section>
       <h2>Downloaden</h2>
+      <p class="version" data-version="nl" hidden></p>
       <div class="tableau">
         <div class="ligne"><p><strong>Google Play</strong>Automatische updates.</p><a class="bouton" href="https://play.google.com/store/apps/details?id=be.suivicompteurs.app">Google Play</a></div>
         <div class="ligne"><p><strong>Volledige APK</strong>Met automatisch lezen van de meterstand.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs.apk">suivi-compteurs.apk</a></div>
@@ -233,6 +237,25 @@
     });
     var demandee = location.hash.replace("#", "");
     choisir(demandee || (navigator.language || "fr").slice(0, 2));
+
+    // Numéro et date de la dernière version, lus chez GitHub : la page n'a
+    // pas à être republiée à chaque version. Sans réponse, rien ne s'affiche.
+    var libelles = { fr: "Dernière version", en: "Latest version", nl: "Laatste versie" };
+    fetch("https://api.github.com/repos/doolieSoft/suivi_compteurs_project/releases/latest")
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function (publication) {
+        var numero = String(publication.tag_name || "").replace(/^v/, "");
+        if (!numero) return;
+        var jour = new Date(publication.published_at);
+        document.querySelectorAll("[data-version]").forEach(function (el) {
+          var langue = el.getAttribute("data-version");
+          var date = isNaN(jour) ? "" : " · " + jour.toLocaleDateString(langue, { day: "numeric", month: "long", year: "numeric" });
+          el.textContent = libelles[langue] + " : " + numero + date;
+          if (langue !== "fr") el.textContent = el.textContent.replace(" : ", ": ");
+          el.hidden = false;
+        });
+      })
+      .catch(function () {});
   })();
 </script>
 <noscript><style>[data-langue="fr"] { display: block; }</style></noscript>
