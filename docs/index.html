@@ -49,6 +49,7 @@
   main .bouton { background: var(--accent); color: var(--accent-encre); font-size: 15px; }
   main .bouton.discret { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
   footer { color: var(--encre-2); font-size: 14px; padding: 40px 0 48px; }
+  .petit { color: var(--encre-2); font-size: 14px; }
   .version { color: var(--encre-2); font-size: 15px; margin: -8px 0 14px; }
   footer a { color: var(--accent); }
   [data-langue] { display: none; }
@@ -124,11 +125,14 @@
         <div class="ligne"><p><strong>APK libre</strong>Sans aucun composant propriétaire : l'index se saisit à la main.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk">suivi-compteurs-libre.apk</a></div>
       </div>
     </section>
-    <section>
+    <section id="soutenir-fr">
       <h2>Soutenir le projet</h2>
       <p>L'application est gratuite et le restera. Si elle vous est utile, un don libre aide à la faire vivre.</p>
-      <!-- Page de dons Liberapay. -->
-      <p><a class="bouton" href="https://liberapay.com/doolieSoft/donate">♥ Faire un don</a></p>
+      <div class="boutons">
+        <a class="bouton" href="https://ko-fi.com/dooliesoft">♥ Faire un don unique</a>
+        <a class="bouton discret" href="https://liberapay.com/doolieSoft/donate">Soutenir chaque mois</a>
+      </div>
+      <p class="petit">Don unique par carte ou PayPal sur Ko-fi ; soutien régulier sur Liberapay.</p>
     </section>
   </div>
 
@@ -161,10 +165,14 @@
         <div class="ligne"><p><strong>Free APK</strong>No proprietary component at all: the index is typed by hand.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk">suivi-compteurs-libre.apk</a></div>
       </div>
     </section>
-    <section>
+    <section id="soutenir-en">
       <h2>Support the project</h2>
       <p>The app is free and will stay free. If you find it useful, a donation of any amount helps keep it going.</p>
-      <p><a class="bouton" href="https://liberapay.com/doolieSoft/donate">♥ Donate</a></p>
+      <div class="boutons">
+        <a class="bouton" href="https://ko-fi.com/dooliesoft">♥ One-time donation</a>
+        <a class="bouton discret" href="https://liberapay.com/doolieSoft/donate">Support monthly</a>
+      </div>
+      <p class="petit">One-time donation by card or PayPal on Ko-fi; regular support on Liberapay.</p>
     </section>
   </div>
 
@@ -197,10 +205,14 @@
         <div class="ligne"><p><strong>Vrije APK</strong>Zonder enig propriëtair onderdeel: de stand wordt met de hand ingevoerd.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk">suivi-compteurs-libre.apk</a></div>
       </div>
     </section>
-    <section>
+    <section id="soutenir-nl">
       <h2>Het project steunen</h2>
       <p>De app is gratis en blijft gratis. Vind je ze nuttig, dan helpt een vrije gift om ze levend te houden.</p>
-      <p><a class="bouton" href="https://liberapay.com/doolieSoft/donate">♥ Doneren</a></p>
+      <div class="boutons">
+        <a class="bouton" href="https://ko-fi.com/dooliesoft">♥ Eenmalige gift</a>
+        <a class="bouton discret" href="https://liberapay.com/doolieSoft/donate">Maandelijks steunen</a>
+      </div>
+      <p class="petit">Eenmalige gift met kaart of PayPal via Ko-fi; regelmatige steun via Liberapay.</p>
     </section>
   </div>
 
@@ -216,6 +228,8 @@
 
 <script>
   // Langue : celle demandée dans l'adresse (#en), sinon celle du navigateur.
+  // « #soutenir », lien du bouton de dons de l'application, mène à la section
+  // des dons dans la langue du navigateur.
   (function () {
     var proposees = ["fr", "en", "nl"];
     function choisir(langue) {
@@ -236,7 +250,15 @@
       });
     });
     var demandee = location.hash.replace("#", "");
-    choisir(demandee || (navigator.language || "fr").slice(0, 2));
+    var navigateur = (navigator.language || "fr").slice(0, 2);
+    if (demandee === "soutenir") {
+      var langue = proposees.indexOf(navigateur) < 0 ? "fr" : navigateur;
+      choisir(langue);
+      var section = document.getElementById("soutenir-" + langue);
+      if (section) section.scrollIntoView();
+    } else {
+      choisir(demandee || navigateur);
+    }
 
     // Numéro et date de la dernière version, lus chez GitHub : la page n'a
     // pas à être republiée à chaque version. Sans réponse, rien ne s'affiche.

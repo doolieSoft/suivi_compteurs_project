@@ -10,7 +10,7 @@ téléphone. Seule la météo vient d'Internet, d'[Open-Meteo](https://open-mete
 
 **[Page du projet](https://dooliesoft.github.io/suivi_compteurs_project/)**
 · **[⬇ Dernière version](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest)**
-· **[♥ Faire un don](https://liberapay.com/doolieSoft/donate)**
+· **[♥ Faire un don](https://dooliesoft.github.io/suivi_compteurs_project/#soutenir)**
 
 ## Télécharger
 

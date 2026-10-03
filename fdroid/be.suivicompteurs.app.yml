@@ -7,6 +7,7 @@ SourceCode: https://github.com/doolieSoft/suivi_compteurs_project
 IssueTracker: https://github.com/doolieSoft/suivi_compteurs_project/issues
 Changelog: https://github.com/doolieSoft/suivi_compteurs_project/releases
 Liberapay: doolieSoft
+Donate: https://ko-fi.com/dooliesoft
 
 AutoName: Suivi compteurs
 
@@ -22,7 +23,7 @@ Builds:
       - libre
     prebuild: sed -i -e '/com.google.mlkit/d' build.gradle.kts
     gradleprops:
-      - suiviLienDons=https://liberapay.com/doolieSoft/donate
+      - suiviLienDons=https://dooliesoft.github.io/suivi_compteurs_project/#soutenir
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$
