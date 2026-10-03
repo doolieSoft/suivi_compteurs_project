@@ -5,9 +5,9 @@ de mazout. Toutes les données vivent sur le téléphone ; seule la météo
 (degrés-jours) vient d'Internet, d'Open-Meteo. Aucun compte, aucun serveur.
 
 Le moteur de calcul — ventilation des consommations, modèle thermique,
-correction climatique, prévisions, coûts — est un portage en Kotlin des services
-Python du site (`suivi/services/`). Les deux donnent les mêmes chiffres : voir
-« Parité avec le site » plus bas.
+correction climatique, prévisions, coûts — est expliqué dans le
+[README principal](../README.md). C'est le portage en Kotlin du moteur Python
+du site d'origine, retiré depuis : voir « Parité avec la référence » plus bas.
 
 ## Ce que fait l'application
 
@@ -20,9 +20,8 @@ Python du site (`suivi/services/`). Les deux donnent les mêmes chiffres : voir
 - comparaison des années, climat, justesse des prévisions passées ;
 - gestion des maisons, compteurs (remplacement compris), relevés, tarifs et
   événements ;
-- import et export Excel, au même format que le site : un classeur exporté de
-  l'un se réimporte dans l'autre. L'export, enregistré où l'on veut (Google
-  Drive compris), tient lieu de sauvegarde ;
+- import et export Excel : l'export, enregistré où l'on veut (Google Drive
+  compris), se réimporte tel quel et tient lieu de sauvegarde ;
 - rappels de relevé ;
 - interface en français, anglais et néerlandais.
 
@@ -31,7 +30,7 @@ une fois par jour, ou en tirant l'écran d'accueil vers le bas.
 
 ## Construire
 
-Requis : JDK 17 ou plus, et le SDK Android (plateforme 35, build-tools 35+).
+Requis : JDK 17 ou plus, et le SDK Android (plateforme 36, build-tools 35+).
 
 ```bash
 cd android
@@ -134,7 +133,7 @@ d'installer depuis cette application.
 
 L'écran d'accueil propose deux départs :
 
-- **Importer un classeur Excel** — un export de l'application ou du site, pour
+- **Importer un classeur Excel** — un export de l'application, pour
   reprendre un historique existant ;
 - **Créer ma maison** — puis ses compteurs, dans *Gérer maisons et compteurs*.
   La position de la maison (latitude, longitude) sert à récupérer sa météo.
@@ -147,7 +146,7 @@ app/src/main/java/be/suivicompteurs/app/
 ├── SaisieActivity.kt        appareil photo, OCR, formulaire
 ├── TableauDeBordActivity.kt prévisions de chaque énergie
 ├── ReglagesActivity.kt      rappels et langue
-├── moteur/                  calculs, portés du Python du site — sans Android
+├── moteur/                  calculs — sans Android
 ├── analyse/                 écrans d'analyse (Compose) et leurs graphiques
 ├── gestion/                 maisons, compteurs, relevés, tarifs (Compose)
 ├── classeur/                lecture et écriture des classeurs Excel
@@ -161,20 +160,18 @@ app/src/complet/…/ocr/LecteurIndex.kt   lecture de l'index avec ML Kit
 app/src/libre/…/ocr/LecteurIndex.kt     sans lecture : saisie à la main
 ```
 
-## Parité avec le site
+## Parité avec la référence
 
-Le moteur Kotlin doit rendre les mêmes chiffres que le moteur Python. Sur les
-données réelles :
+Le moteur Kotlin a été vérifié contre le moteur Python d'origine, à
+l'identique sur des milliers de valeurs. Avant le retrait du Python, ses
+résultats ont été figés sur des données fabriquées (aucune donnée personnelle) :
+`app/src/test/resources/export-synthetique.xlsx` en entrée,
+`reference-synthetique.json` en sortie.
 
-```bash
-python manage.py reference_moteur      # depuis la racine du projet
-cd android && ./gradlew testCompletDebugUnitTest
-```
-
-La commande fige ce que calcule le Python, ainsi qu'un export Excel, dans
-`android/app/build/` (non versionné : ce sont des relevés personnels). Les tests
-`ParitePythonTest` et `ImportClasseurTest` les relisent et exigent les mêmes
-valeurs au milliardième près. Sans ces fichiers, ces deux tests sont ignorés.
+`PariteReferenceTest` et `ImportClasseurTest` les relisent et exigent les mêmes
+valeurs au milliardième près. Une modification du moteur qui fait échouer ces
+tests change donc les chiffres : elle doit être délibérée, et la référence
+régénérée en connaissance de cause.
 
 ## Pourquoi le choix de l'index est séparé du reste
 
@@ -208,8 +205,8 @@ sans que vous ayez vu la valeur.
   du compteur.
 - **Mazout** : traité comme un compteur dont l'index monte. Le suivi par niveau
   de cuve et livraisons, comme un réservoir de voiture, n'est pas encore géré.
-- Les noms des compteurs de l'écran d'accueil et le classeur Excel restent en
-  français : le classeur doit pouvoir être relu par le site.
+- Le classeur Excel reste en français, quelle que soit la langue : son format
+  ne doit pas dépendre du téléphone qui l'a écrit.
 
 ## Licence
 

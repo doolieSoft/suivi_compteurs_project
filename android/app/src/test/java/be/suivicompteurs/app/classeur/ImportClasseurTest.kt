@@ -9,7 +9,6 @@ import be.suivicompteurs.app.moteur.Plage
 import be.suivicompteurs.app.moteur.Releve
 import be.suivicompteurs.app.moteur.lignes
 import be.suivicompteurs.app.moteur.prevoir
-import java.io.File
 import java.time.LocalDate
 import kotlin.math.abs
 import kotlin.math.max
@@ -18,7 +17,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
-import org.junit.Assume.assumeTrue
 import org.junit.Test
 
 /**
@@ -140,18 +138,15 @@ class ImportClasseurTest {
     }
 
     /**
-     * Chaîne complète sur les données réelles : export du serveur, import sur
-     * le téléphone, et mêmes chiffres que le moteur Python. Ignoré sans la
-     * référence, que produit `python manage.py reference_moteur`.
+     * Chaîne complète : import du classeur, puis mêmes chiffres que le moteur
+     * Python sur ces données (référence figée dans `reference-synthetique.json`).
      */
     @Test
-    fun `apres import les calculs sont ceux du serveur`() {
-        val classeur = System.getProperty("reference.classeur")?.let(::File)
-        val reference = System.getProperty("reference.moteur")?.let(::File)
-        assumeTrue(classeur?.exists() == true && reference?.exists() == true)
-
-        val h = ImportClasseur.importer(Classeur.lire(classeur!!.inputStream()), "reel").historique
-        val maisons = JSONObject(reference!!.readText()).getJSONArray("maisons")
+    fun `apres import les calculs sont ceux de la reference`() {
+        val ressources = javaClass.classLoader!!
+        val h = ImportClasseur.importer(Classeur.lire(ressources.getResourceAsStream("export-synthetique.xlsx")), "essai").historique
+        val reference = ressources.getResourceAsStream("reference-synthetique.json").bufferedReader().use { it.readText() }
+        val maisons = JSONObject(reference).getJSONArray("maisons")
         var comparees = 0
         for (i in 0 until maisons.length()) {
             val m = maisons.getJSONObject(i)
@@ -177,7 +172,7 @@ class ImportClasseurTest {
             }
         }
         assertTrue(comparees > 0)
-        println("Import du classeur réel : $comparees lignes identiques au serveur.")
+        println("Import du classeur : $comparees lignes identiques à la référence.")
     }
 
     private fun djsDe(h: Historique, stationId: Long?): Map<LocalDate, Double> =

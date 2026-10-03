@@ -153,17 +153,10 @@ dependencies {
 
     testImplementation("junit:junit:4.13.2")
     // org.json n'existe sur le PC qu'à l'état de bouchon : le vrai, pour lire
-    // la référence du test de parité avec le moteur Python.
+    // la référence du test de parité (src/test/resources).
     testImplementation("org.json:json:20240303")
 }
 
-// Référence du moteur Python, produite par « python manage.py reference_moteur ».
-val referenceMoteur = layout.buildDirectory.file("reference-moteur.json")
-val referenceClasseur = layout.buildDirectory.file("export-reference.xlsx")
 tasks.withType<Test>().configureEach {
-    systemProperty("reference.moteur", referenceMoteur.get().asFile.absolutePath)
-    systemProperty("reference.classeur", referenceClasseur.get().asFile.absolutePath)
-    // Relancer le test quand la référence change, même sans toucher au code.
-    inputs.property("referenceMoteur", referenceMoteur.get().asFile.let { if (it.exists()) it.lastModified() else 0L })
     testLogging { showStandardStreams = true }
 }

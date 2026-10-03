@@ -1,32 +1,25 @@
+# Outils locaux
 .venv/
 .outils/
 __pycache__/
-*.py[cod]
 *.log
+.idea/
+.vscode/
 
-# Base locale, secrets et fichiers produits
+# Données personnelles : elles n'ont pas leur place dans un dépôt public.
+# Restes du site d'origine, conservés sur le PC.
+compteur.xlsx
+~$*.xlsx
 db.sqlite3
-
-# Fichiers de configuration d'environnement, où qu'ils se trouvent : ils
-# portent les secrets. Le motif est volontairement large — un fichier déposé
-# à la racine plutôt que dans deploiement/ doit être couvert lui aussi.
-.env
-env.*
-!deploiement/env.exemple
-staticfiles/
 media/
 donnees*.json
 sauvegarde*.json
+.env
+env.*
 deploiement/*.zip
 
-# Données personnelles : douze ans de consommation. Elles n'ont pas leur place
-# dans un dépôt, surtout public. Le classeur reste sur votre PC, et le serveur
-# reçoit les données une fois, par « exporter_donnees » puis « loaddata ».
-compteur.xlsx
-~$*.xlsx
-
-# L'APK pèse 49 Mo : un dépôt n'est pas un entrepôt de binaires. Il se
-# reconstruit en une commande depuis les sources présentes dans android/.
+# L'APK pèse 50 Mo : un dépôt n'est pas un entrepôt de binaires. Il se
+# reconstruit en une commande, et chaque publication GitHub l'attache.
 deploiement/*.apk
 
 # Clé de publication Android. La perdre interdit toute mise à jour de
@@ -41,6 +34,3 @@ android/build/
 android/app/build/
 android/local.properties
 android/.idea/
-
-.idea/
-.vscode/

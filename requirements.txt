@@ -1,4 +1,0 @@
-Django>=5.2,<6
-openpyxl>=3.1
-requests>=2.31
-Pillow>=10

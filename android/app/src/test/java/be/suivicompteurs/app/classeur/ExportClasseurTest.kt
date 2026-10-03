@@ -2,7 +2,6 @@ package be.suivicompteurs.app.classeur
 
 import be.suivicompteurs.app.donnees.Historique
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -70,13 +69,5 @@ class ExportClasseurTest {
         assertEquals("maison-dessai", ExportClasseur.slugifier("Maison d'essai"))
         assertEquals("electricite", ExportClasseur.slugifier("Électricité"))
         assertEquals("heures-pleines", ExportClasseur.slugifier("Heures pleines"))
-    }
-
-    /** Dépose l'export dans le dossier de compilation, pour le relire avec le serveur. */
-    @Test
-    fun `l'export est ecrit pour verification par le serveur`() {
-        val dossier = System.getProperty("reference.moteur")?.let { File(it).parentFile } ?: return
-        dossier.mkdirs()
-        File(dossier, "export-telephone.xlsx").writeBytes(exporter(synthetique()))
     }
 }

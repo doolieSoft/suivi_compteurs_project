@@ -3,35 +3,31 @@ package be.suivicompteurs.app.moteur
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertTrue
-import org.junit.Assume.assumeTrue
 import org.junit.Test
-import java.io.File
 import java.time.LocalDate
 import kotlin.math.abs
 import kotlin.math.max
 
 /**
- * Le moteur Kotlin doit rendre les mêmes chiffres que le moteur Python.
+ * Le moteur Kotlin doit rendre les mêmes chiffres que le moteur Python dont
+ * il est le portage.
  *
- * La référence est produite sur les données réelles par
- * `python manage.py reference_moteur`, qui l'écrit dans le dossier de
- * compilation (non versionné : elle contient des relevés personnels). Sans
- * elle, le test est ignoré plutôt qu'échoué.
+ * `reference-synthetique.json` fige ce que calculait le Python sur les données
+ * fabriquées de `export-synthetique.xlsx`, avant son retrait du dépôt. Une
+ * modification du moteur qui change un chiffre doit donc être délibérée.
  *
  * Toutes les divergences sont collectées avant d'échouer : une liste complète
  * se corrige bien plus vite qu'une erreur à la fois.
  */
-class ParitePythonTest {
+class PariteReferenceTest {
 
     private val ecarts = mutableListOf<String>()
 
     @Test
     fun `le moteur Kotlin rend les memes chiffres que le moteur Python`() {
-        val chemin = System.getProperty("reference.moteur")
-        val fichier = chemin?.let(::File)
-        assumeTrue("Référence absente : lancez python manage.py reference_moteur", fichier?.exists() == true)
-
-        val racine = JSONObject(fichier!!.readText())
+        val texte = javaClass.classLoader!!.getResourceAsStream("reference-synthetique.json")
+            .bufferedReader().use { it.readText() }
+        val racine = JSONObject(texte)
         val maisons = racine.getJSONArray("maisons")
         var comparaisons = 0
         for (m in maisons.objets()) comparaisons += verifierMaison(m)
