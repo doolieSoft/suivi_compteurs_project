@@ -14,6 +14,9 @@
     <string name="surface">Surface chauffée (m²)</string>
     <string name="occupee_depuis_champ">Occupée depuis</string>
     <string name="occupee_jusqua_champ">Occupée jusqu\'au (vide si encore occupée)</string>
+    <string name="compteurs_a_relever">Compteurs à relever</string>
+    <string name="compteurs_a_relever_aide">Éteint, les compteurs de cette maison ne sont plus proposés à l\'accueil. Leur historique reste dans les analyses.</string>
+    <string name="non_relevee">plus relevée</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="position_aide">La position sert à récupérer la météo locale (degrés-jours) sur Open-Meteo. Par exemple 50,6373 et 5,5795 pour Liège.</string>

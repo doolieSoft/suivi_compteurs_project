@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -45,6 +47,7 @@ fun EcranMaisons(gestion: Gestion, surRetour: () -> Unit, surMaison: (Long) -> U
                     m.adresse.ifEmpty { null },
                     m.dateEntree?.let { stringResource(R.string.occupee_depuis, jour(it)) },
                     m.dateSortie?.let { stringResource(R.string.quittee_le, jour(it)) },
+                    if (!m.actuelle && m.dateSortie == null) stringResource(R.string.non_relevee) else null,
                 ).joinToString(" · "),
                 surAppui = { surMaison(m.id) },
             )
@@ -91,6 +94,7 @@ fun EcranMaison(
     var surface by remember { mutableStateOf("") }
     var entree by remember { mutableStateOf<String?>(null) }
     var sortie by remember { mutableStateOf<String?>(null) }
+    var relevee by remember { mutableStateOf(true) }
     var latitude by remember { mutableStateOf("") }
     var longitude by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
@@ -110,7 +114,7 @@ fun EcranMaison(
         if (origine == null) {
             nom = m.nom; adresse = m.adresse
             facades = m.nbFacades?.toString().orEmpty(); surface = m.surface?.toString().orEmpty()
-            entree = m.dateEntree; sortie = m.dateSortie; notes = m.notes
+            entree = m.dateEntree; sortie = m.dateSortie; relevee = m.actuelle; notes = m.notes
             gestion.station(m.stationId)?.let { latitude = it.latitude.toString(); longitude = it.longitude.toString() }
         }
         origine = m
@@ -125,6 +129,7 @@ fun EcranMaison(
         val m = (origine ?: MaisonLocale(0, "", true, null)).copy(
             nom = nom, adresse = adresse.trim(), nbFacades = facades.toIntOrNull(),
             surface = surface.toIntOrNull(), dateEntree = entree, dateSortie = sortie, notes = notes.trim(),
+            actuelle = relevee && sortie == null,
         )
         maisonId = gestion.enregistrerMaison(m, lireNombre(latitude), lireNombre(longitude))
         version++
@@ -143,7 +148,13 @@ fun EcranMaison(
             ChampTexte(stringResource(R.string.surface), surface, { surface = it }, Modifier.weight(1f), numerique = true)
         }
         ChampDate(stringResource(R.string.occupee_depuis_champ), entree, { entree = it }, facultatif = true)
-        ChampDate(stringResource(R.string.occupee_jusqua_champ), sortie, { sortie = it }, facultatif = true)
+        // Quitter la maison arrête ses relevés ; les reprendre, c'est l'occuper encore.
+        ChampDate(stringResource(R.string.occupee_jusqua_champ), sortie, { sortie = it; if (it != null) relevee = false }, facultatif = true)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.compteurs_a_relever), Modifier.weight(1f))
+            Switch(checked = relevee, onCheckedChange = { relevee = it; if (it) sortie = null })
+        }
+        Text(stringResource(R.string.compteurs_a_relever_aide), style = androidx.compose.material3.MaterialTheme.typography.bodySmall, color = Couleurs.encre3)
         Row {
             ChampTexte(stringResource(R.string.latitude), latitude, { latitude = it }, Modifier.weight(1f).padding(end = 8.dp), numerique = true)
             ChampTexte(stringResource(R.string.longitude), longitude, { longitude = it }, Modifier.weight(1f), numerique = true)

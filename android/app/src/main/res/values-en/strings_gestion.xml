@@ -14,6 +14,9 @@
     <string name="surface">Heated area (m²)</string>
     <string name="occupee_depuis_champ">Lived in since</string>
     <string name="occupee_jusqua_champ">Lived in until (empty if still lived in)</string>
+    <string name="compteurs_a_relever">Meters to read</string>
+    <string name="compteurs_a_relever_aide">When off, this house\'s meters are no longer offered on the home screen. Their history stays in the analyses.</string>
+    <string name="non_relevee">no longer read</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="position_aide">The location is used to fetch the local weather (degree days) from Open-Meteo. For example 50.6373 and 5.5795 for Liège.</string>

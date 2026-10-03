@@ -51,6 +51,17 @@ class ExportClasseurTest {
         assertTrue(avant.compteurs.any { it.remplaceId != null })
     }
 
+    /** Une maison qu'on ne relève plus, sans date de sortie connue, le reste après sauvegarde. */
+    @Test
+    fun `une maison plus relevee sans date de sortie le reste`() {
+        val avant = synthetique().let { h ->
+            h.copy(maisons = h.maisons.map { it.copy(actuelle = false, dateSortie = null) })
+        }
+        val apres = importer(exporter(avant).inputStream())
+        assertTrue(apres.historique.maisons.none { it.actuelle })
+        assertTrue(apres.compteursASaisir.isEmpty())
+    }
+
     @Test
     fun `la presentation est celle de l'export du serveur`() {
         val classeur = Classeur.lire(exporter(synthetique()).inputStream())

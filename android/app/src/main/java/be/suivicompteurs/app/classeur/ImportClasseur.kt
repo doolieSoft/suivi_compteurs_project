@@ -84,7 +84,8 @@ object ImportClasseur {
                 maisons[code] = MaisonLocale(
                     id = maisons.size + 1L,
                     nom = enTexte(l["Nom"]).ifEmpty { code },
-                    actuelle = sortie == null,
+                    // Colonne absente des classeurs plus anciens : la date de sortie décide.
+                    actuelle = sortie == null && enTexte(l["Compteurs à relever"]).lowercase() != "non",
                     stationId = station?.id,
                     adresse = enTexte(l["Adresse"]),
                     nbFacades = enNombre(l["Façades"])?.toInt(),

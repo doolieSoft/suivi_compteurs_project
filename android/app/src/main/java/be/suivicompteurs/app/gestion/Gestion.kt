@@ -84,7 +84,9 @@ class Gestion(contexte: Context) {
                 id = id,
                 nom = maison.nom.trim(),
                 stationId = stationId,
-                actuelle = maison.dateSortie == null,
+                // Une maison quittée n'est plus relevée ; une maison sans date de
+                // sortie peut l'être aussi, si on l'a dit (données anciennes).
+                actuelle = maison.actuelle && maison.dateSortie == null,
             )
         )
         rafraichirSaisie()
