@@ -9,8 +9,11 @@ avec une dérive de consommation.
 ## Télécharger l'application Android
 
 **[⬇ Dernière version](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest)**
+· **[Page du projet](https://dooliesoft.github.io/suivi_compteurs_project/)**
 
-Le fichier `suivi-compteurs.apk` est attaché à chaque publication. Les releases
+Deux fichiers sont attachés à chaque publication : `suivi-compteurs.apk`, avec
+lecture automatique de l'index, et `suivi-compteurs-libre.apk`, sans composant
+propriétaire, où l'index se saisit à la main. Les releases
 stockent les binaires hors de l'historique Git : le dépôt reste léger, et
 chaque version garde son lien.
 
