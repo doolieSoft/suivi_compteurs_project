@@ -139,4 +139,5 @@
     <string name="devise_actuelle">Currency: %1$s</string>
     <string name="devise_region">From the region (%1$s)</string>
     <string name="source_meteo">Weather data: Open-Meteo.com (CC BY 4.0)</string>
+    <string name="soutenir">♥ Support development (any amount)</string>
 </resources>

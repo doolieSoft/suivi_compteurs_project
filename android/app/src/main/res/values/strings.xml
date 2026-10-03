@@ -139,4 +139,5 @@
     <string name="devise_actuelle">Devise : %1$s</string>
     <string name="devise_region">Selon la région (%1$s)</string>
     <string name="source_meteo">Données météo : Open-Meteo.com (CC BY 4.0)</string>
+    <string name="soutenir">♥ Soutenir le développement (don libre)</string>
 </resources>

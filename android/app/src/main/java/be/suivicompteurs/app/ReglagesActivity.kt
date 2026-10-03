@@ -1,6 +1,8 @@
 package be.suivicompteurs.app
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -23,6 +25,19 @@ class ReglagesActivity : AppCompatActivity() {
      * pas le français doit pouvoir retrouver la sienne.
      */
     private val langues = listOf("" to null, "fr" to "Français", "en" to "English", "nl" to "Nederlands")
+
+    /**
+     * Lien de dons, présent dans la seule version publiée sur GitHub : le Play
+     * Store n'admet pas de paiement hors de son propre système.
+     */
+    private fun configurerDons() {
+        val lien = BuildConfig.LIEN_DONS
+        if (lien.isBlank()) return
+        vues.boutonDons.visibility = View.VISIBLE
+        vues.boutonDons.setOnClickListener {
+            runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(lien))) }
+        }
+    }
 
     /** Devise des tarifs : celle de la région, ou une autre au choix. */
     private fun configurerDevise() {
@@ -98,6 +113,7 @@ class ReglagesActivity : AppCompatActivity() {
         reglages = Reglages(this)
         configurerLangue()
         configurerDevise()
+        configurerDons()
         vues.interrupteurRappel.isChecked = reglages.rappelActif
         vues.champJours.setText(reglages.rappelJours.toString())
         majVisibiliteRappel()

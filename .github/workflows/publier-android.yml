@@ -85,15 +85,20 @@ jobs:
       - name: Construire l'APK signé
         working-directory: android
         run: |
+          # Seule la version GitHub porte le lien de dons (variable LIEN_DONS
+          # du dépôt) ; l'AAB du Play Store, construit ensuite, n'en a pas.
           ./gradlew assembleRelease --console=plain \
             -PsuiviVersionCode=${{ steps.version.outputs.code }} \
-            -PsuiviVersionName=${{ steps.version.outputs.nom }}
+            -PsuiviVersionName=${{ steps.version.outputs.nom }} \
+            -PsuiviLienDons="${{ vars.LIEN_DONS }}"
 
       - name: Construire l'AAB pour le Play Store
         working-directory: android
         run: |
           # Le Play Store n'accepte que ce format ; mêmes numéros que l'APK.
-          ./gradlew bundleRelease --console=plain             -PsuiviVersionCode=${{ steps.version.outputs.code }}             -PsuiviVersionName=${{ steps.version.outputs.nom }}
+          ./gradlew bundleRelease --console=plain \
+            -PsuiviVersionCode=${{ steps.version.outputs.code }} \
+            -PsuiviVersionName=${{ steps.version.outputs.nom }}
 
       - name: Vérifier la signature
         run: |

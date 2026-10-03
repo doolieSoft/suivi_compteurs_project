@@ -139,4 +139,5 @@
     <string name="devise_actuelle">Munt: %1$s</string>
     <string name="devise_region">Volgens de regio (%1$s)</string>
     <string name="source_meteo">Weergegevens: Open-Meteo.com (CC BY 4.0)</string>
+    <string name="soutenir">♥ Steun de ontwikkeling (vrije gift)</string>
 </resources>

@@ -80,6 +80,16 @@
                 android:layout_marginTop="28dp"
                 android:text="@string/enregistrer" />
 
+            <!-- Seulement dans la version GitHub, voir BuildConfig.LIEN_DONS. -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/boutonDons"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/soutenir"
+                android:visibility="gone" />
+
             <!-- Exigée par la licence CC BY 4.0 des données d'Open-Meteo. -->
             <TextView
                 android:layout_width="match_parent"

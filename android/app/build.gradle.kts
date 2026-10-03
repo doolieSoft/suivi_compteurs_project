@@ -33,6 +33,11 @@ android {
         //   ./gradlew assembleRelease -PsuiviVersionCode=7 -PsuiviVersionName=1.3
         versionCode = (findProperty("suiviVersionCode") as String?)?.toInt() ?: 1
         versionName = (findProperty("suiviVersionName") as String?) ?: "1.0"
+        // Lien « Soutenir le développement », fourni à la compilation : la
+        // version GitHub le reçoit, celle du Play Store non — Google n'y admet
+        // pas de paiement hors de son propre système. Vide : pas de bouton.
+        val lienDons = (findProperty("suiviLienDons") as String?).orEmpty()
+        buildConfigField("String", "LIEN_DONS", "\"" + lienDons.replace("\"", "") + "\"")
     }
 
     signingConfigs {
@@ -79,6 +84,7 @@ android {
         // Les nouveaux écrans (gestion des données, analyses) sont écrits en
         // Compose ; les anciens restent en vues classiques.
         compose = true
+        buildConfig = true
     }
 
     packaging {
