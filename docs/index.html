@@ -3,11 +3,238 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Compteurs</title>
-<meta http-equiv="refresh" content="0; url=confidentialite.html">
-<style>body { margin: 0; padding: 24px 16px; font: 16px/1.6 system-ui, sans-serif; background: #f9f9f7; color: #1b1b19; }</style>
+<title>Compteurs — eau, gaz, électricité</title>
+<meta name="description" content="Relevez vos compteurs d'eau, de gaz et d'électricité, et prévoyez votre consommation à climat égal. Gratuit, sans compte, vos données restent sur votre téléphone.">
+<style>
+  :root {
+    --encre: #1b1b19; --encre-2: #52514e; --fond: #f9f9f7; --carte: #ffffff;
+    --accent: #2a78d6; --accent-encre: #ffffff; --trait: #e6e5e0;
+    --eau: #2a78d6; --gaz: #eb6834; --elec: #eda100;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --encre: #ececea; --encre-2: #b5b4b0; --fond: #161615; --carte: #1f1f1e; --accent: #6ea8ef; --accent-encre: #0b0b0b; --trait: #333331; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fond); color: var(--encre); font: 17px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { background: #2a78d6; color: #fff; }
+  .large { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+  .entete { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; }
+  .marque { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; }
+  .compteur { display: inline-flex; gap: 3px; background: #fcfcfb; border-radius: 4px; padding: 4px 6px; }
+  .compteur i { width: 5px; height: 12px; background: #0b0b0b; display: block; }
+  .compteur i:last-child { background: #d03b3b; }
+  .langues { display: flex; gap: 6px; }
+  .langues button { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.5); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 14px; cursor: pointer; }
+  .langues button[aria-pressed="true"] { background: #fff; color: #2a78d6; border-color: #fff; }
+  .accroche { padding: 32px 0 44px; }
+  .accroche h1 { font-size: clamp(28px, 5vw, 42px); line-height: 1.2; margin: 0 0 12px; }
+  .accroche p { font-size: 19px; margin: 0 0 24px; max-width: 640px; opacity: .95; }
+  .boutons { display: flex; flex-wrap: wrap; gap: 10px; }
+  .bouton { display: inline-block; text-decoration: none; font-weight: 600; border-radius: 999px; padding: 10px 18px; }
+  header .bouton.plein { background: #fff; color: #2a78d6; }
+  header .bouton.contour { border: 1px solid rgba(255,255,255,.7); color: #fff; }
+  main section { padding: 40px 0 8px; }
+  h2 { font-size: 24px; margin: 0 0 16px; }
+  .points { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .point { background: var(--carte); border: 1px solid var(--trait); border-radius: 12px; padding: 16px 18px; }
+  .point h3 { font-size: 17px; margin: 0 0 6px; }
+  .point p { margin: 0; color: var(--encre-2); font-size: 15px; }
+  .captures { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; }
+  .captures img { width: 220px; height: auto; border-radius: 14px; border: 1px solid var(--trait); scroll-snap-align: start; flex: none; }
+  .tableau { background: var(--carte); border: 1px solid var(--trait); border-radius: 12px; overflow: hidden; }
+  .ligne { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 18px; border-top: 1px solid var(--trait); }
+  .ligne:first-child { border-top: none; }
+  .ligne p { margin: 0; color: var(--encre-2); font-size: 15px; }
+  .ligne strong { color: var(--encre); display: block; }
+  main .bouton { background: var(--accent); color: var(--accent-encre); font-size: 15px; }
+  main .bouton.discret { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  footer { color: var(--encre-2); font-size: 14px; padding: 40px 0 48px; }
+  footer a { color: var(--accent); }
+  [data-langue] { display: none; }
+  [data-langue].active { display: block; }
+</style>
 </head>
 <body>
-<p><a href="confidentialite.html">Politique de confidentialité · Privacy policy · Privacybeleid</a></p>
+<header>
+  <div class="large">
+    <div class="entete">
+      <div class="marque"><span class="compteur" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span> Compteurs</div>
+      <div class="langues" role="group" aria-label="Langue / Language / Taal">
+        <button type="button" data-choix="fr">FR</button>
+        <button type="button" data-choix="en">EN</button>
+        <button type="button" data-choix="nl">NL</button>
+      </div>
+    </div>
+
+    <div class="accroche" data-langue="fr">
+      <h1>Vos compteurs d'eau, de gaz et d'électricité, enfin lisibles.</h1>
+      <p>Relevez vos index en une photo, voyez où va votre année, et comparez vos consommations à climat égal. Gratuit, sans compte : vos données restent sur votre téléphone.</p>
+      <div class="boutons">
+        <a class="bouton plein" href="https://play.google.com/store/apps/details?id=be.suivicompteurs.app">Google Play</a>
+        <a class="bouton contour" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest">Télécharger l'APK</a>
+      </div>
+    </div>
+    <div class="accroche" data-langue="en">
+      <h1>Your water, gas and electricity meters, finally readable.</h1>
+      <p>Take readings with one photo, see where your year is heading, and compare your consumption at equal weather. Free, no account: your data stays on your phone.</p>
+      <div class="boutons">
+        <a class="bouton plein" href="https://play.google.com/store/apps/details?id=be.suivicompteurs.app">Google Play</a>
+        <a class="bouton contour" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest">Download the APK</a>
+      </div>
+    </div>
+    <div class="accroche" data-langue="nl">
+      <h1>Je meters voor water, gas en elektriciteit, eindelijk leesbaar.</h1>
+      <p>Lees je meters af met één foto, zie waar je jaar naartoe gaat en vergelijk je verbruik bij gelijk klimaat. Gratis, zonder account: je gegevens blijven op je telefoon.</p>
+      <div class="boutons">
+        <a class="bouton plein" href="https://play.google.com/store/apps/details?id=be.suivicompteurs.app">Google Play</a>
+        <a class="bouton contour" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest">APK downloaden</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="large">
+  <!-- ===================================================== FRANÇAIS -->
+  <div data-langue="fr">
+    <section>
+      <h2>Ce que fait l'application</h2>
+      <div class="points">
+        <div class="point"><h3>Relever en une photo</h3><p>L'index est lu automatiquement, sur le téléphone, même sans réseau. Une lecture douteuse est signalée, jamais enregistrée en douce.</p></div>
+        <div class="point"><h3>Prévoir son année</h3><p>Consommation prévue jusqu'au prochain relevé annuel, avec une fourchette et le coût estimé d'après vos tarifs.</p></div>
+        <div class="point"><h3>Comparer à climat égal</h3><p>Grâce aux degrés-jours, un hiver doux ne passe plus pour une économie, et l'effet d'une isolation se voit.</p></div>
+        <div class="point"><h3>Vos données chez vous</h3><p>Pas de compte, pas de serveur, pas de publicité. Export Excel vers Google Drive ou ailleurs pour vos sauvegardes.</p></div>
+      </div>
+    </section>
+    <section>
+      <h2>Aperçu</h2>
+      <div class="captures">
+        <img src="captures/fr/previsions.webp" alt="Prévisions de l'année pour l'eau, le gaz et l'électricité" loading="lazy">
+        <img src="captures/fr/detail.webp" alt="Détail du gaz : prévision, évolution et cumul par année" loading="lazy">
+        <img src="captures/fr/comparaison.webp" alt="Comparaison des années, mesurée et à climat normal" loading="lazy">
+        <img src="captures/fr/saisie.webp" alt="Saisie d'un relevé" loading="lazy">
+      </div>
+    </section>
+    <section>
+      <h2>Télécharger</h2>
+      <div class="tableau">
+        <div class="ligne"><p><strong>Google Play</strong>Mises à jour automatiques.</p><a class="bouton" href="https://play.google.com/store/apps/details?id=be.suivicompteurs.app">Google Play</a></div>
+        <div class="ligne"><p><strong>APK complet</strong>Avec lecture automatique de l'index.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs.apk">suivi-compteurs.apk</a></div>
+        <div class="ligne"><p><strong>APK libre</strong>Sans aucun composant propriétaire : l'index se saisit à la main.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk">suivi-compteurs-libre.apk</a></div>
+      </div>
+    </section>
+    <section>
+      <h2>Soutenir le projet</h2>
+      <p>L'application est gratuite et le restera. Si elle vous est utile, un don libre aide à la faire vivre.</p>
+      <!-- Remplacer [lien de dons] par l'adresse de votre page de dons (Liberapay, Ko-fi…). -->
+      <p><a class="bouton" href="[lien de dons]">♥ Faire un don</a></p>
+    </section>
+  </div>
+
+  <!-- ===================================================== ENGLISH -->
+  <div data-langue="en">
+    <section>
+      <h2>What the app does</h2>
+      <div class="points">
+        <div class="point"><h3>Readings in one photo</h3><p>The index is recognised automatically, on the phone, even offline. A doubtful reading is flagged, never saved silently.</p></div>
+        <div class="point"><h3>Forecast your year</h3><p>Expected consumption up to your next annual reading, with a range and an estimated cost from your tariffs.</p></div>
+        <div class="point"><h3>Compare at equal weather</h3><p>Thanks to degree days, a mild winter no longer looks like a saving, and the effect of insulation shows.</p></div>
+        <div class="point"><h3>Your data stays yours</h3><p>No account, no server, no ads. Excel export to Google Drive or elsewhere for your backups.</p></div>
+      </div>
+    </section>
+    <section>
+      <h2>Preview</h2>
+      <div class="captures">
+        <img src="captures/en/previsions.webp" alt="Yearly forecasts for water, gas and electricity" loading="lazy">
+        <img src="captures/en/detail.webp" alt="Gas details: forecast, change and cumulative by year" loading="lazy">
+        <img src="captures/en/comparaison.webp" alt="Year comparison, measured and at normal weather" loading="lazy">
+        <img src="captures/en/saisie.webp" alt="Entering a reading" loading="lazy">
+      </div>
+    </section>
+    <section>
+      <h2>Download</h2>
+      <div class="tableau">
+        <div class="ligne"><p><strong>Google Play</strong>Automatic updates.</p><a class="bouton" href="https://play.google.com/store/apps/details?id=be.suivicompteurs.app">Google Play</a></div>
+        <div class="ligne"><p><strong>Full APK</strong>With automatic reading of the index.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs.apk">suivi-compteurs.apk</a></div>
+        <div class="ligne"><p><strong>Free APK</strong>No proprietary component at all: the index is typed by hand.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk">suivi-compteurs-libre.apk</a></div>
+      </div>
+    </section>
+    <section>
+      <h2>Support the project</h2>
+      <p>The app is free and will stay free. If you find it useful, a donation of any amount helps keep it going.</p>
+      <p><a class="bouton" href="[lien de dons]">♥ Donate</a></p>
+    </section>
+  </div>
+
+  <!-- ===================================================== NEDERLANDS -->
+  <div data-langue="nl">
+    <section>
+      <h2>Wat de app doet</h2>
+      <div class="points">
+        <div class="point"><h3>Aflezen met één foto</h3><p>De stand wordt automatisch gelezen, op de telefoon, ook zonder netwerk. Een twijfelachtige lezing wordt gemeld, nooit stilletjes opgeslagen.</p></div>
+        <div class="point"><h3>Je jaar voorspellen</h3><p>Verwacht verbruik tot de volgende jaarlijkse meterstand, met een marge en de geschatte kosten volgens je tarieven.</p></div>
+        <div class="point"><h3>Vergelijken bij gelijk klimaat</h3><p>Dankzij graaddagen lijkt een zachte winter niet langer een besparing, en wordt het effect van isolatie zichtbaar.</p></div>
+        <div class="point"><h3>Je gegevens blijven bij jou</h3><p>Geen account, geen server, geen reclame. Excel-export naar Google Drive of elders voor je back-ups.</p></div>
+      </div>
+    </section>
+    <section>
+      <h2>Voorbeeld</h2>
+      <div class="captures">
+        <img src="captures/nl/previsions.webp" alt="Jaarvoorspellingen voor water, gas en elektriciteit" loading="lazy">
+        <img src="captures/nl/detail.webp" alt="Details voor gas: voorspelling, evolutie en cumulatief per jaar" loading="lazy">
+        <img src="captures/nl/comparaison.webp" alt="Jaarvergelijking, gemeten en bij normaal klimaat" loading="lazy">
+        <img src="captures/nl/saisie.webp" alt="Een meterstand invoeren" loading="lazy">
+      </div>
+    </section>
+    <section>
+      <h2>Downloaden</h2>
+      <div class="tableau">
+        <div class="ligne"><p><strong>Google Play</strong>Automatische updates.</p><a class="bouton" href="https://play.google.com/store/apps/details?id=be.suivicompteurs.app">Google Play</a></div>
+        <div class="ligne"><p><strong>Volledige APK</strong>Met automatisch lezen van de meterstand.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs.apk">suivi-compteurs.apk</a></div>
+        <div class="ligne"><p><strong>Vrije APK</strong>Zonder enig propriëtair onderdeel: de stand wordt met de hand ingevoerd.</p><a class="bouton discret" href="https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk">suivi-compteurs-libre.apk</a></div>
+      </div>
+    </section>
+    <section>
+      <h2>Het project steunen</h2>
+      <p>De app is gratis en blijft gratis. Vind je ze nuttig, dan helpt een vrije gift om ze levend te houden.</p>
+      <p><a class="bouton" href="[lien de dons]">♥ Doneren</a></p>
+    </section>
+  </div>
+
+  <footer>
+    <p>
+      <a href="confidentialite.html">Confidentialité · Privacy · Privacy</a> ·
+      <a href="https://github.com/doolieSoft/suivi_compteurs_project">GitHub</a> ·
+      © doolieSoft — <a href="https://github.com/doolieSoft/suivi_compteurs_project/blob/main/LICENSE">GPL-3.0</a> ·
+      Données météo / Weather data / Weergegevens : <a href="https://open-meteo.com/">Open-Meteo.com</a> (CC BY 4.0)
+    </p>
+  </footer>
+</main>
+
+<script>
+  // Langue : celle demandée dans l'adresse (#en), sinon celle du navigateur.
+  (function () {
+    var proposees = ["fr", "en", "nl"];
+    function choisir(langue) {
+      if (proposees.indexOf(langue) < 0) langue = "fr";
+      document.documentElement.lang = langue;
+      document.querySelectorAll("[data-langue]").forEach(function (el) {
+        el.classList.toggle("active", el.getAttribute("data-langue") === langue);
+      });
+      document.querySelectorAll("[data-choix]").forEach(function (b) {
+        b.setAttribute("aria-pressed", b.getAttribute("data-choix") === langue ? "true" : "false");
+      });
+    }
+    document.querySelectorAll("[data-choix]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var langue = b.getAttribute("data-choix");
+        history.replaceState(null, "", "#" + langue);
+        choisir(langue);
+      });
+    });
+    var demandee = location.hash.replace("#", "");
+    choisir(demandee || (navigator.language || "fr").slice(0, 2));
+  })();
+</script>
+<noscript><style>[data-langue="fr"] { display: block; }</style></noscript>
 </body>
 </html>
