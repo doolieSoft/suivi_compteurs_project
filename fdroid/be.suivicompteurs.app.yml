@@ -1,6 +1,3 @@
-# Recette F-Droid, à proposer par une demande de fusion sur
-# https://gitlab.com/fdroid/fdroiddata (fichier metadata/be.suivicompteurs.app.yml).
-# Voir fdroid/LISEZMOI.md.
 Categories:
   - Money
   - Science & Education
@@ -23,8 +20,6 @@ Builds:
     subdir: android/app
     gradle:
       - libre
-    # La variante libre n'utilise pas ML Kit ; on retire jusqu'à sa mention,
-    # que l'analyse de F-Droid signalerait.
     prebuild: sed -i -e '/com.google.mlkit/d' build.gradle.kts
     gradleprops:
       - suiviLienDons=https://liberapay.com/doolieSoft/donate

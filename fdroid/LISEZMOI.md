@@ -11,8 +11,11 @@ F-Droid compile lui-même l'application depuis ce dépôt, avec la variante
 2. Y ajouter `metadata/be.suivicompteurs.app.yml`, copié de
    `be.suivicompteurs.app.yml` ici. Ajuster `versionName`, `versionCode` et
    `commit` sur la dernière étiquette publiée. Le lien de dons (champ
-   `Liberapay` et `suiviLienDons`) est déjà renseigné.
-3. Ouvrir une demande de fusion (merge request) avec le modèle « New App ».
+   `Liberapay` et `suiviLienDons`) est déjà renseigné. Pas de commentaires
+   `#` dans ce fichier : la vérification de F-Droid les refuse.
+   Message de commit : `New App: be.suivicompteurs.app`.
+3. Ouvrir une demande de fusion (merge request) avec le modèle « App
+   inclusion », sous le même titre que le commit.
    Les relecteurs de F-Droid compilent, signalent ce qui manque, puis
    publient. Comptez de quelques jours à quelques semaines.
 
