@@ -121,7 +121,7 @@ fun EcranMaison(
         if (origine == null) {
             nom = m.nom; adresse = m.adresse
             facades = m.nbFacades?.toString().orEmpty(); surface = m.surface?.toString().orEmpty()
-            entree = m.dateEntree; sortie = m.dateSortie; relevee = m.actuelle; notes = m.notes
+            entree = m.dateEntree; sortie = m.dateSortie; relevee = m.actuelle; notes = m.notes; ville = m.ville
             gestion.station(m.stationId)?.let { latitude = it.latitude.toString(); longitude = it.longitude.toString() }
         }
         origine = m
@@ -137,6 +137,7 @@ fun EcranMaison(
             nom = nom, adresse = adresse.trim(), nbFacades = facades.toIntOrNull(),
             surface = surface.toIntOrNull(), dateEntree = entree, dateSortie = sortie, notes = notes.trim(),
             actuelle = relevee && sortie == null,
+            ville = ville.trim(),
         )
         maisonId = gestion.enregistrerMaison(m, lireNombre(latitude), lireNombre(longitude))
         version++

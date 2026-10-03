@@ -147,7 +147,7 @@ object ExportClasseur {
             listOf(
                 "Code", "Nom", "Adresse", "Façades", "Surface chauffée (m²)", "Occupée depuis",
                 "Occupée jusqu'au", "Station météo", "Latitude", "Longitude", "Base des degrés-jours", "Notes",
-                "Compteurs à relever",
+                "Compteurs à relever", "Ville",
             ),
             maisons.map { m ->
                 val s = m.stationId?.let { stations[it] }
@@ -156,6 +156,7 @@ object ExportClasseur {
                     Cellule(m.surface), date(m.dateEntree), date(m.dateSortie), Cellule(s?.nom),
                     Cellule(s?.latitude, Format.DECIMALES_5), Cellule(s?.longitude, Format.DECIMALES_5),
                     Cellule(s?.base), Cellule(m.notes), Cellule(if (m.actuelle) "oui" else "non"),
+                    Cellule(m.ville),
                 )
             },
         )

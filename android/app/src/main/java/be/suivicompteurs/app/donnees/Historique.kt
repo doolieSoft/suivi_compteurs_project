@@ -38,6 +38,8 @@ data class MaisonLocale(
     /** Absente tant que la maison est occupée. */
     val dateSortie: String? = null,
     @ColumnInfo(defaultValue = "") val notes: String = "",
+    /** « Liège, Wallonie, Belgique » : le lieu choisi, d'où viennent les coordonnées. */
+    @ColumnInfo(defaultValue = "") val ville: String = "",
 )
 
 @Entity(tableName = "stations")

@@ -93,6 +93,7 @@ object ImportClasseur {
                     dateEntree = enDate(l["Occupée depuis"])?.toString(),
                     dateSortie = sortie?.toString(),
                     notes = enTexte(l["Notes"]),
+                    ville = enTexte(l["Ville"]),
                 )
             }
         }
