@@ -34,6 +34,7 @@ SLUGS_ENERGIE = {
     Energie.EAU: "eau",
     Energie.GAZ: "gaz",
     Energie.ELECTRICITE: "electricite",
+    Energie.MAZOUT: "mazout",
 }
 ENERGIES_PAR_SLUG = {v: k for k, v in SLUGS_ENERGIE.items()}
 
@@ -58,7 +59,7 @@ MIN_AMPLITUDE_DJ = 1.0
 # Seules ces énergies sont normalisées par les degrés-jours. La consommation
 # d'eau suit l'occupation du logement, pas la météo : une corrélation apparente
 # sur quelques années y serait fortuite, et la « corriger » fausserait tout.
-ENERGIES_THERMOSENSIBLES = frozenset({Energie.GAZ, Energie.ELECTRICITE})
+ENERGIES_THERMOSENSIBLES = frozenset({Energie.GAZ, Energie.ELECTRICITE, Energie.MAZOUT})
 
 
 # ---------------------------------------------------------------------------
@@ -430,7 +431,7 @@ def lignes_de(
     for compteur in qs:
         groupes.setdefault((compteur.energie, compteur.plage), []).append(compteur)
 
-    ordre = {Energie.EAU: 0, Energie.GAZ: 1, Energie.ELECTRICITE: 2}
+    ordre = {Energie.EAU: 0, Energie.GAZ: 1, Energie.ELECTRICITE: 2, Energie.MAZOUT: 3}
     resultat: list[Ligne] = []
     for (energie_code, plage), compteurs in sorted(
         groupes.items(), key=lambda kv: (ordre.get(kv[0][0], 9), kv[0][1])

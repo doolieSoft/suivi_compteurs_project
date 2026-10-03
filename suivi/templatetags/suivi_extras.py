@@ -13,6 +13,7 @@ CLASSES_ENERGIE = {
     Energie.EAU: "eau",
     Energie.GAZ: "gaz",
     Energie.ELECTRICITE: "elec",
+    Energie.MAZOUT: "mazout",
 }
 
 # En deçà, une variation est du bruit de mesure plutôt qu'une tendance.

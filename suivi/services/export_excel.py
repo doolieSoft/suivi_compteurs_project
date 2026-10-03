@@ -37,6 +37,7 @@ FEUILLES_ENERGIE = (
     (Energie.EAU, "Eau"),
     (Energie.GAZ, "Gaz"),
     (Energie.ELECTRICITE, "Électricité"),
+    (Energie.MAZOUT, "Mazout"),
 )
 
 ENTETES_RELEVES = (

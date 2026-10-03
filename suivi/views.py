@@ -151,6 +151,7 @@ def _graphique_annuel(ligne: cs.Ligne, annees: list[cs.AnneeComparee]) -> dict:
             Energie.EAU: "eau",
             Energie.GAZ: "gaz",
             Energie.ELECTRICITE: "elec",
+            Energie.MAZOUT: "mazout",
         }.get(ligne.energie, ""),
         "donnees": _serie_annuelle_pour_graphique(annees),
     }

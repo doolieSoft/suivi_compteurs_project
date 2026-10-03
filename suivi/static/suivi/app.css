@@ -27,6 +27,7 @@
   --eau: #2a78d6;
   --gaz: #eb6834;
   --elec: #eda100;
+  --mazout: #8a5a2b;
 
   --bien: #0ca30c;
   --bien-texte: #006300;
@@ -64,6 +65,7 @@
     --eau: #3987e5;
     --gaz: #d95926;
     --elec: #c98500;
+    --mazout: #b07a45;
 
     --bien-texte: #0ca30c;
     --ombre: none;
@@ -203,6 +205,7 @@ a.tuile:hover { border-color: var(--trait); border-left-color: currentColor; bac
 .tuile.eau { border-left-color: var(--eau); }
 .tuile.gaz { border-left-color: var(--gaz); }
 .tuile.elec { border-left-color: var(--elec); }
+.tuile.mazout { border-left-color: var(--mazout); }
 
 .tuile-titre {
   font-size: 12.5px;
@@ -263,6 +266,7 @@ a.tuile:hover { border-color: var(--trait); border-left-color: currentColor; bac
 .pastille.eau { background: var(--eau); }
 .pastille.gaz { background: var(--gaz); }
 .pastille.elec { background: var(--elec); }
+.pastille.mazout { background: var(--mazout); }
 
 /* --- Messages ---------------------------------------------------------- */
 

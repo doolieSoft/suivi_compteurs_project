@@ -30,6 +30,8 @@ class Energie(models.TextChoices):
     EAU = "EAU", "Eau"
     GAZ = "GAZ", "Gaz"
     ELECTRICITE = "ELEC", "Électricité"
+    # Code de trois lettres : le champ « energie » en compte cinq au plus.
+    MAZOUT = "MAZ", "Mazout"
 
 
 class Plage(models.TextChoices):
