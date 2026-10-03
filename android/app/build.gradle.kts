@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
 }
 
@@ -32,7 +33,8 @@ android {
         //   ./gradlew assembleRelease -PsuiviVersionCode=7 -PsuiviVersionName=1.3
         versionCode = (findProperty("suiviVersionCode") as String?)?.toInt() ?: 1
         versionName = (findProperty("suiviVersionName") as String?) ?: "1.0"
-        resourceConfigurations += listOf("fr")
+        // Langues de l'interface ; le français reste la langue par défaut.
+        resourceConfigurations += listOf("fr", "en", "nl")
     }
 
     signingConfigs {
@@ -66,8 +68,17 @@ android {
         jvmTarget = "17"
     }
 
+    androidResources {
+        // Déclare au système les langues proposées : Android 13 et au-delà
+        // les offrent alors dans les réglages de l'application.
+        generateLocaleConfig = true
+    }
+
     buildFeatures {
         viewBinding = true
+        // Les nouveaux écrans (gestion des données, analyses) sont écrits en
+        // Compose ; les anciens restent en vues classiques.
+        compose = true
     }
 
     packaging {
@@ -110,8 +121,33 @@ dependencies {
     // Reconnaissance de texte : modèle embarqué dans l'APK, donc hors ligne.
     implementation("com.google.mlkit:text-recognition:16.0.1")
 
+    // Écrans en Compose.
+    val compose = platform("androidx.compose:compose-bom:2024.10.01")
+    implementation(compose)
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-core")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+    implementation("androidx.navigation:navigation-compose:2.8.3")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
     testImplementation("junit:junit:4.13.2")
+    // org.json n'existe sur le PC qu'à l'état de bouchon : le vrai, pour lire
+    // la référence du test de parité avec le moteur Python.
+    testImplementation("org.json:json:20240303")
+}
+
+// Référence du moteur Python, produite par « python manage.py reference_moteur ».
+val referenceMoteur = layout.buildDirectory.file("reference-moteur.json")
+val referenceClasseur = layout.buildDirectory.file("export-reference.xlsx")
+tasks.withType<Test>().configureEach {
+    systemProperty("reference.moteur", referenceMoteur.get().asFile.absolutePath)
+    systemProperty("reference.classeur", referenceClasseur.get().asFile.absolutePath)
+    // Relancer le test quand la référence change, même sans toucher au code.
+    inputs.property("referenceMoteur", referenceMoteur.get().asFile.let { if (it.exists()) it.lastModified() else 0L })
+    testLogging { showStandardStreams = true }
 }

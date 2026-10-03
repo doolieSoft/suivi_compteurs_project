@@ -68,8 +68,11 @@ jobs:
           echo "nom=$NOM" >> "$GITHUB_OUTPUT"
           # Le numéro d'exécution est un entier toujours croissant : Android
           # refuse d'installer un versionCode inférieur ou égal au précédent.
-          echo "code=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
-          echo "Version $NOM (code ${{ github.run_number }})"
+          # Décalé de 100 : des versions d'essai, installées par câble, ont
+          # déjà porté les numéros 1 à 12.
+          CODE=$(( ${{ github.run_number }} + 100 ))
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "Version $NOM (code $CODE)"
 
       - name: Lancer les tests
         working-directory: android
