@@ -9,7 +9,7 @@ AuthorName: doolieSoft
 SourceCode: https://github.com/doolieSoft/suivi_compteurs_project
 IssueTracker: https://github.com/doolieSoft/suivi_compteurs_project/issues
 Changelog: https://github.com/doolieSoft/suivi_compteurs_project/releases
-# Liberapay: VOTRE_IDENTIFIANT
+Liberapay: doolieSoft
 
 AutoName: Compteurs
 
@@ -26,7 +26,7 @@ Builds:
     gradleprops:
       - suiviVersionCode=105
       - suiviVersionName=1.2.1
-      # - suiviLienDons=https://liberapay.com/VOTRE_IDENTIFIANT
+      - suiviLienDons=https://liberapay.com/doolieSoft/donate
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$

@@ -10,8 +10,8 @@ F-Droid compile lui-même l'application depuis ce dépôt, avec la variante
    <https://gitlab.com/fdroid/fdroiddata>.
 2. Y ajouter `metadata/be.suivicompteurs.app.yml`, copié de
    `be.suivicompteurs.app.yml` ici. Ajuster `versionName`, `versionCode` et
-   `commit` sur la dernière étiquette publiée ; décommenter la ligne Liberapay
-   et `suiviLienDons` si vous avez une page de dons.
+   `commit` sur la dernière étiquette publiée. Le lien de dons (champ
+   `Liberapay` et `suiviLienDons`) est déjà renseigné.
 3. Ouvrir une demande de fusion (merge request) avec le modèle « New App ».
    Les relecteurs de F-Droid compilent, signalent ce qui manque, puis
    publient. Comptez de quelques jours à quelques semaines.
