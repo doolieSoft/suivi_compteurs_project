@@ -18,6 +18,10 @@ permissions:
 jobs:
   publier:
     runs-on: ubuntu-latest
+    env:
+      # Vide tant que le compte de service Google n'est pas déposé : l'envoi
+      # au Play Store est alors sauté.
+      PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
 
     steps:
       - name: Récupérer le dépôt
@@ -85,6 +89,12 @@ jobs:
             -PsuiviVersionCode=${{ steps.version.outputs.code }} \
             -PsuiviVersionName=${{ steps.version.outputs.nom }}
 
+      - name: Construire l'AAB pour le Play Store
+        working-directory: android
+        run: |
+          # Le Play Store n'accepte que ce format ; mêmes numéros que l'APK.
+          ./gradlew bundleRelease --console=plain             -PsuiviVersionCode=${{ steps.version.outputs.code }}             -PsuiviVersionName=${{ steps.version.outputs.nom }}
+
       - name: Vérifier la signature
         run: |
           APK=android/app/build/outputs/apk/release/app-release.apk
@@ -110,6 +120,26 @@ jobs:
           gh release create "$ETIQUETTE" suivi-compteurs.apk \
             --title "$ETIQUETTE" \
             --generate-notes
+
+      # Envoi au Play Store, seulement une fois le compte de service déposé
+      # dans le secret PLAY_SERVICE_ACCOUNT_JSON : jusque-là, l'étape est
+      # sautée et la publication GitHub fonctionne comme avant.
+      #
+      # Piste et statut se règlent par les variables du dépôt (onglet
+      # Settings › Secrets and variables › Actions › Variables) :
+      #   PLAY_PISTE  internal (défaut), alpha (test fermé), production…
+      #   PLAY_STATUT draft (défaut, obligatoire tant que l'application n'a
+      #               jamais été publiée), puis completed.
+      - name: Envoyer au Play Store
+        if: env.PLAY_JSON != '' && github.ref_type == 'tag'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: be.suivicompteurs.app
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          releaseName: ${{ steps.version.outputs.nom }}
+          track: ${{ vars.PLAY_PISTE || 'internal' }}
+          status: ${{ vars.PLAY_STATUT || 'draft' }}
 
       - name: Effacer la clé
         if: always()

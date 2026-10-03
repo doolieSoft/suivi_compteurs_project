@@ -1,0 +1,28 @@
+Notez vos compteurs d'eau, de gaz, d'électricité et de mazout, et voyez où va votre année.
+
+RELEVER EN QUELQUES SECONDES
+• Photographiez le compteur : l'index est lu automatiquement, sur le téléphone, sans réseau.
+• L'application vérifie la lecture : un compteur ne recule pas, et un numéro de série n'est pas pris pour un index.
+• Rappels de relevé, au rythme que vous choisissez.
+
+PRÉVOIR VOTRE ANNÉE
+• Prévision de la consommation jusqu'au prochain relevé annuel, ou jusqu'au 31 décembre.
+• Pour le chauffage, la prévision suit le climat : un hiver doux n'est pas extrapolé sur un mois de janvier.
+• Coût estimé, d'après vos tarifs.
+
+COMPARER À CLIMAT ÉGAL
+• Chaque année est corrigée de sa rigueur grâce aux degrés-jours : une baisse due à un hiver doux ne passe plus pour une économie.
+• Signature énergétique : voyez combien votre maison consomme par degré de froid, et l'effet d'une isolation.
+• Justesse des prévisions : rejouez une année passée pour voir ce que l'application aurait annoncé.
+
+VOS DONNÉES RESTENT CHEZ VOUS
+• Pas de compte, pas de serveur, pas de publicité.
+• Toutes les données restent sur le téléphone ; seule la position de la maison est envoyée à Open-Meteo pour la météo.
+• Export et import Excel : sauvegardez sur Google Drive ou ailleurs, reprenez un historique existant.
+
+ET AUSSI
+• Plusieurs maisons, remplacement de compteur, compteurs bi-horaires, tarifs et événements (isolation, travaux…).
+• Graphiques : cumul de l'année, consommation mensuelle, comparaison des années, climat.
+• Disponible en français, anglais et néerlandais.
+
+Données météo : Open-Meteo.com (CC BY 4.0).

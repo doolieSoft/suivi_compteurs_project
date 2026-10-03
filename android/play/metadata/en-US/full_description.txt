@@ -1,0 +1,28 @@
+Record your water, gas, electricity and heating oil meters, and see where your year is heading.
+
+READINGS IN SECONDS
+• Photograph the meter: the reading is recognised automatically, on the phone, offline.
+• The app checks the reading: a meter never goes backwards, and a serial number is not mistaken for a reading.
+• Reading reminders, as often as you like.
+
+FORECAST YOUR YEAR
+• Forecast of your consumption up to your next annual reading, or to 31 December.
+• For heating, the forecast follows the weather: a mild autumn is not extrapolated onto January.
+• Estimated cost, from your tariffs.
+
+COMPARE AT EQUAL WEATHER
+• Each year is corrected for how cold it was, using degree days: a drop caused by a mild winter no longer looks like a saving.
+• Energy signature: see how much your house uses per degree of cold, and the effect of insulation.
+• Forecast accuracy: replay a past year to see what the app would have announced.
+
+YOUR DATA STAYS WITH YOU
+• No account, no server, no ads.
+• All data stays on the phone; only the house's location is sent to Open-Meteo for the weather.
+• Excel export and import: back up to Google Drive or elsewhere, bring in an existing history.
+
+AND ALSO
+• Several houses, meter replacement, dual-rate meters, tariffs and events (insulation, works…).
+• Charts: year to date, monthly consumption, year comparison, climate.
+• Available in English, French and Dutch, in any currency.
+
+Weather data: Open-Meteo.com (CC BY 4.0).

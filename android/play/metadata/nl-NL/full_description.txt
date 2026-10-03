@@ -1,0 +1,28 @@
+Noteer je meters voor water, gas, elektriciteit en stookolie, en zie waar je jaar naartoe gaat.
+
+AFLEZEN IN ENKELE SECONDEN
+• Fotografeer de meter: de stand wordt automatisch gelezen, op de telefoon, zonder netwerk.
+• De app controleert de lezing: een meter loopt nooit terug, en een serienummer wordt niet voor een meterstand aangezien.
+• Herinneringen om af te lezen, zo vaak als je wilt.
+
+VOORSPEL JE JAAR
+• Voorspelling van je verbruik tot de volgende jaarlijkse meterstand, of tot 31 december.
+• Voor verwarming volgt de voorspelling het weer: een zachte herfst wordt niet doorgetrokken naar januari.
+• Geschatte kosten, op basis van je tarieven.
+
+VERGELIJKEN BIJ GELIJK KLIMAAT
+• Elk jaar wordt gecorrigeerd voor hoe koud het was, met graaddagen: een daling door een zachte winter lijkt niet langer een besparing.
+• Energiesignatuur: zie hoeveel je woning verbruikt per graad kou, en het effect van isolatie.
+• Nauwkeurigheid van de voorspellingen: speel een voorbij jaar opnieuw af en zie wat de app zou hebben aangekondigd.
+
+JE GEGEVENS BLIJVEN BIJ JOU
+• Geen account, geen server, geen reclame.
+• Alle gegevens blijven op de telefoon; alleen de ligging van de woning gaat naar Open-Meteo voor het weer.
+• Excel-export en -import: maak een back-up op Google Drive of elders, neem een bestaande historiek over.
+
+EN OOK
+• Meerdere woningen, vervanging van meters, dubbeltariefmeters, tarieven en gebeurtenissen (isolatie, werken…).
+• Grafieken: cumulatief sinds 1 januari, maandverbruik, jaarvergelijking, klimaat.
+• Beschikbaar in het Nederlands, Frans en Engels.
+
+Weergegevens: Open-Meteo.com (CC BY 4.0).
