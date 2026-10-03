@@ -1,0 +1,2 @@
+• Much smaller app (about 3 MB for the free version).
+• Fixed display of whole-number readings in English.

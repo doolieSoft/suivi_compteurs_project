@@ -1,0 +1,2 @@
+• Application nettement plus légère (environ 3 Mo pour la version libre).
+• Correction de l'affichage des index ronds en anglais.

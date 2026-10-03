@@ -1,0 +1,2 @@
+• Veel lichtere app (ongeveer 3 MB voor de vrije versie).
+• Weergave van ronde meterstanden in het Engels verbeterd.

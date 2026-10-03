@@ -327,8 +327,9 @@ class CompteurAdapter(
         cellule.vues.root.setOnClickListener { auClic(compteur) }
     }
 
+    /** Jusqu'à trois décimales, sans zéros ni séparateur décimal superflus, dans toutes les langues. */
     private fun formaterIndex(valeur: Double): String =
-        String.format(Locale.getDefault(), "%,.3f", valeur).trimEnd('0').trimEnd(',')
+        java.text.NumberFormat.getNumberInstance(Locale.getDefault()).apply { maximumFractionDigits = 3 }.format(valeur)
 
     private fun formaterDate(iso: String): String = runCatching {
         val source = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).parse(iso)!!
