@@ -10,6 +10,10 @@
         android:title="@string/consulter"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_exporter"
+        android:title="@string/exporter"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_reglages"
         android:title="@string/reglages"
         app:showAsAction="never" />

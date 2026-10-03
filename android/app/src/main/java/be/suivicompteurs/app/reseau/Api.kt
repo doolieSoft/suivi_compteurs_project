@@ -167,6 +167,37 @@ class Api(private val reglages: Reglages) {
             executer(requete("/api/releves/").post(corps)) { }
         }
 
+    /**
+     * Télécharge le classeur Excel de toutes les données dans [destination].
+     *
+     * Écrit dans un fichier plutôt que de renvoyer une chaîne : le classeur
+     * est binaire, et le serveur peut mettre quelques secondes à le produire.
+     */
+    suspend fun exporter(destination: File): Resultat<Unit> = withContext(Dispatchers.IO) {
+        try {
+            client.newBuilder()
+                .readTimeout(2, TimeUnit.MINUTES)
+                .build()
+                .newCall(requete("/api/export/").get().build())
+                .execute()
+                .use { reponse ->
+                    if (!reponse.isSuccessful) {
+                        return@withContext Resultat.Echec(
+                            messageErreur(reponse.code, reponse.body?.string().orEmpty())
+                        )
+                    }
+                    val corps = reponse.body
+                        ?: return@withContext Resultat.Echec("Réponse vide du serveur.")
+                    destination.outputStream().use { sortie ->
+                        corps.byteStream().use { it.copyTo(sortie) }
+                    }
+                    Resultat.Succes(Unit)
+                }
+        } catch (e: Exception) {
+            Resultat.Echec(e.message ?: "Serveur injoignable", horsLigne = true)
+        }
+    }
+
     /** Vérifie adresse et jeton. Renvoie le nombre de compteurs trouvés. */
     suspend fun tester(): Resultat<Int> = when (val r = compteurs()) {
         is Resultat.Succes -> Resultat.Succes(r.valeur.size)

@@ -30,6 +30,7 @@ from django.utils.text import slugify
 
 from suivi.models import (
     Compteur,
+    DegreJour,
     Energie,
     Evenement,
     Maison,
@@ -39,6 +40,7 @@ from suivi.models import (
     StationMeteo,
     Tarif,
 )
+from suivi.services import export_excel as ex
 
 # Liège : les deux maisons sont dans la même région climatique.
 STATION_DEFAUT = {
@@ -155,8 +157,8 @@ def _vers_date(valeur) -> dt.date | None:
     return None
 
 
-def _vers_decimal(valeur) -> Decimal | None:
-    if valeur is None or isinstance(valeur, str):
+def _vers_decimal(valeur, decimales: int = 3) -> Decimal | None:
+    if valeur is None or isinstance(valeur, (str, bool)):
         return None
     try:
         nombre = Decimal(str(valeur))
@@ -164,7 +166,74 @@ def _vers_decimal(valeur) -> Decimal | None:
         return None
     if nombre < 0:
         return None
-    return nombre.quantize(Decimal("0.001"))
+    return nombre.quantize(Decimal(1).scaleb(-decimales))
+
+
+def _vers_jour(valeur) -> dt.date | None:
+    """Date d'une cellule de l'export : jamais un millésime, contrairement à ``_vers_date``."""
+    if isinstance(valeur, dt.datetime):
+        return valeur.date()
+    if isinstance(valeur, dt.date):
+        return valeur
+    if isinstance(valeur, str):
+        for format_ in ("%d/%m/%Y", "%Y-%m-%d"):
+            try:
+                return dt.datetime.strptime(valeur.strip(), format_).date()
+            except ValueError:
+                pass
+    return None
+
+
+def _vers_entier(valeur) -> int | None:
+    if isinstance(valeur, (int, float)) and not isinstance(valeur, bool):
+        return int(valeur)
+    return None
+
+
+def _vers_coordonnee(valeur) -> Decimal:
+    nombre = Decimal(str(valeur if valeur is not None else 0))
+    return nombre.quantize(Decimal("0.00001"))
+
+
+def _texte(valeur) -> str:
+    return "" if valeur is None else str(valeur).strip()
+
+
+def _choix(choix, valeur) -> str | None:
+    """Code d'un choix à partir de son libellé (« Gaz ») ou de son code (« GAZ »)."""
+    texte = _texte(valeur)
+    for code, libelle in choix.choices:
+        if texte in (code, libelle):
+            return code
+    return None
+
+
+def _est_un_export(classeur) -> bool:
+    """Le classeur vient-il de l'export de l'application ?"""
+    if ex.FEUILLE_COMPTEURS not in classeur.sheetnames:
+        return False
+    premiere = next(classeur[ex.FEUILLE_COMPTEURS].iter_rows(max_row=1, values_only=True), ())
+    return bool(premiere) and premiere[0] == ex.ENTETE_CODE
+
+
+def _lignes(feuille, entetes):
+    """Lignes d'un tableau de l'export, en dictionnaires indexés par en-tête.
+
+    Les colonnes sont retrouvées par leur titre : une colonne déplacée ou
+    ajoutée à la main dans le classeur ne fausse donc pas la lecture.
+    """
+    lignes = feuille.iter_rows(values_only=True)
+    titres = [_texte(t) for t in next(lignes, ())]
+    positions = {titre: titres.index(titre) for titre in entetes if titre in titres}
+    for valeurs in lignes:
+        if not any(v is not None for v in valeurs):
+            continue
+        yield {
+            titre: valeurs[positions[titre]]
+            if titre in positions and positions[titre] < len(valeurs)
+            else None
+            for titre in entetes
+        }
 
 
 @dataclass
@@ -229,10 +298,13 @@ class Command(BaseCommand):
                         self.style.WARNING("Données existantes supprimées.")
                     )
 
-            station = self._station()
-            maisons = self._maisons(station, bilan)
-            self._importer_releves(classeur, maisons, bilan)
-            self._importer_tarifs(classeur, maisons, bilan)
+            if _est_un_export(classeur):
+                self._importer_export(classeur, bilan)
+            else:
+                station = self._station()
+                maisons = self._maisons(station, bilan)
+                self._importer_releves(classeur, maisons, bilan)
+                self._importer_tarifs(classeur, maisons, bilan)
 
         classeur.close()
         self._afficher(bilan)
@@ -462,6 +534,194 @@ class Command(BaseCommand):
             "Les tarifs importés sont des acomptes mensuels : le prix unitaire "
             "(€/m³, €/kWh) reste à saisir dans l'admin pour chiffrer les consommations."
         )
+
+    # -- classeur produit par l'export --------------------------------------
+
+    def _importer_export(self, classeur, bilan: Bilan) -> None:
+        """Relit un classeur produit par l'export de l'application.
+
+        Contrairement à ``compteur.xlsx``, tout y est nommé : maisons et
+        compteurs portent un code, et chaque bloc de relevés commence par celui
+        de son compteur. Rien n'est donc deviné.
+        """
+        stations: dict[str, StationMeteo] = {}
+        maisons: dict[str, Maison] = {}
+        for ligne in _lignes(classeur[ex.FEUILLE_MAISONS], ex.ENTETES_MAISONS):
+            code = _texte(ligne["Code"])
+            if not code:
+                continue
+            station = None
+            nom_station = _texte(ligne["Station météo"])
+            if nom_station:
+                station = stations.get(nom_station)
+                if station is None:
+                    station, _ = StationMeteo.objects.update_or_create(
+                        nom=nom_station,
+                        defaults={
+                            "latitude": _vers_coordonnee(ligne["Latitude"]),
+                            "longitude": _vers_coordonnee(ligne["Longitude"]),
+                            "base_dj": _vers_decimal(ligne["Base des degrés-jours"])
+                            or Decimal(str(settings.BASE_DEGRES_JOURS)),
+                        },
+                    )
+                    stations[nom_station] = station
+            maison, cree = Maison.objects.update_or_create(
+                slug=code,
+                defaults={
+                    "nom": _texte(ligne["Nom"]) or code,
+                    "adresse": _texte(ligne["Adresse"]),
+                    "nb_facades": _vers_entier(ligne["Façades"]),
+                    "surface_m2": _vers_entier(ligne["Surface chauffée (m²)"]),
+                    "date_entree": _vers_jour(ligne["Occupée depuis"]),
+                    "date_sortie": _vers_jour(ligne["Occupée jusqu'au"]),
+                    "station": station,
+                    "notes": _texte(ligne["Notes"]),
+                },
+            )
+            maisons[code] = maison
+            bilan.maisons += int(cree)
+
+        compteurs: dict[str, Compteur] = {}
+        remplacements: list[tuple[Compteur, str]] = []
+        for ligne in _lignes(classeur[ex.FEUILLE_COMPTEURS], ex.ENTETES_COMPTEURS):
+            code = _texte(ligne["Code"])
+            maison = maisons.get(_texte(ligne["Maison"]))
+            energie = _choix(Energie, ligne["Énergie"])
+            plage = _choix(Plage, ligne["Plage"]) or Plage.UNIQUE
+            if not code or maison is None or energie is None:
+                bilan.avertissements.append(f"Compteur ignoré : {code or '(sans code)'}")
+                continue
+            compteur, cree = Compteur.objects.update_or_create(
+                maison=maison,
+                energie=energie,
+                plage=plage,
+                libelle=_texte(ligne["Libellé"]),
+                defaults={
+                    "numero": _texte(ligne["Numéro"]),
+                    "unite": _texte(ligne["Unité"]) or "m³",
+                    "coef_kwh": _vers_decimal(ligne["Coefficient kWh"]) or Decimal("1"),
+                    "date_pose": _vers_jour(ligne["Posé le"]),
+                    "date_depose": _vers_jour(ligne["Déposé le"]),
+                },
+            )
+            compteurs[code] = compteur
+            bilan.compteurs += int(cree)
+            if _texte(ligne["Remplace"]):
+                remplacements.append((compteur, _texte(ligne["Remplace"])))
+        for compteur, code in remplacements:
+            if code in compteurs:
+                compteur.remplace = compteurs[code]
+                compteur.save(update_fields=["remplace"])
+
+        for _, titre in ex.FEUILLES_ENERGIE:
+            if titre in classeur.sheetnames:
+                self._relire_blocs(classeur[titre], compteurs, bilan)
+
+        if ex.FEUILLE_EVENEMENTS in classeur.sheetnames:
+            for ligne in _lignes(classeur[ex.FEUILLE_EVENEMENTS], ex.ENTETES_EVENEMENTS):
+                maison = maisons.get(_texte(ligne["Maison"]))
+                jour = _vers_jour(ligne["Date"])
+                libelle = _texte(ligne["Libellé"])
+                if maison is None or jour is None or not libelle:
+                    continue
+                _, cree = Evenement.objects.update_or_create(
+                    maison=maison,
+                    date=jour,
+                    libelle=libelle[:150],
+                    defaults={
+                        "energie": _choix(Energie, ligne["Énergie"]) or "",
+                        "description": _texte(ligne["Description"]),
+                    },
+                )
+                bilan.evenements += int(cree)
+
+        if ex.FEUILLE_TARIFS in classeur.sheetnames:
+            for ligne in _lignes(classeur[ex.FEUILLE_TARIFS], ex.ENTETES_TARIFS):
+                energie = _choix(Energie, ligne["Énergie"])
+                debut = _vers_jour(ligne["Début"])
+                if energie is None or debut is None:
+                    continue
+                _, cree = Tarif.objects.update_or_create(
+                    maison=maisons.get(_texte(ligne["Maison"])),
+                    energie=energie,
+                    date_debut=debut,
+                    defaults={
+                        "date_fin": _vers_jour(ligne["Fin"]),
+                        "fournisseur": _texte(ligne["Fournisseur"]),
+                        "prix_unitaire": _vers_decimal(ligne["Prix unitaire (€)"], 5)
+                        or Decimal("0"),
+                        "abonnement_mensuel": _vers_decimal(ligne["Abonnement (€/mois)"], 2)
+                        or Decimal("0"),
+                        "notes": _texte(ligne["Notes"]),
+                    },
+                )
+                bilan.tarifs += int(cree)
+
+        if ex.FEUILLE_DJ in classeur.sheetnames:
+            self._relire_degres_jours(classeur[ex.FEUILLE_DJ], stations, bilan)
+
+    def _relire_blocs(self, feuille, compteurs: dict[str, Compteur], bilan: Bilan) -> None:
+        """Parcourt les blocs d'une feuille d'énergie, chacun ouvert par un code."""
+        sources = {libelle: code for code, libelle in SourceReleve.choices}
+        compteur: Compteur | None = None
+        for valeurs in feuille.iter_rows(values_only=True):
+            premiere = valeurs[0] if valeurs else None
+            if isinstance(premiere, str) and premiere.strip() in compteurs:
+                compteur = compteurs[premiere.strip()]
+                continue
+            jour = _vers_jour(premiere)
+            if compteur is None or jour is None:
+                continue  # ligne d'en-tête, ligne vide ou bloc inconnu
+            index = _vers_decimal(valeurs[1] if len(valeurs) > 1 else None)
+            if index is None:
+                continue
+            colonne = lambda rang: valeurs[rang] if len(valeurs) > rang else None  # noqa: E731
+            _, cree = Releve.objects.update_or_create(
+                compteur=compteur,
+                date=jour,
+                defaults={
+                    "index": index,
+                    "annuel": _texte(colonne(6)).lower() == "oui",
+                    "source": sources.get(_texte(colonne(7)), SourceReleve.IMPORT),
+                    "commentaire": _texte(colonne(8))[:200],
+                },
+            )
+            if cree:
+                bilan.releves_crees += 1
+            else:
+                bilan.releves_maj += 1
+
+    def _relire_degres_jours(self, feuille, stations: dict[str, StationMeteo], bilan: Bilan):
+        """Les degrés-jours se retéléchargent, mais les relire évite d'attendre."""
+        connus: dict[int, set[dt.date]] = {}
+        nouveaux: list[DegreJour] = []
+        for ligne in _lignes(feuille, ex.ENTETES_DJ):
+            station = stations.get(_texte(ligne["Station"]))
+            jour = _vers_jour(ligne["Date"])
+            valeur = _vers_decimal(ligne["Degrés-jours"])
+            if station is None or jour is None or valeur is None:
+                continue
+            if station.pk not in connus:
+                connus[station.pk] = set(
+                    DegreJour.objects.filter(station=station).values_list("date", flat=True)
+                )
+            if jour in connus[station.pk]:
+                continue
+            temperature = ligne["Température moyenne (°C)"]
+            nouveaux.append(
+                DegreJour(
+                    station=station,
+                    date=jour,
+                    temperature_moyenne=None
+                    if temperature is None
+                    else Decimal(f"{float(temperature):.2f}"),
+                    dj=valeur,
+                )
+            )
+            connus[station.pk].add(jour)
+        DegreJour.objects.bulk_create(nouveaux, batch_size=1000)
+        if nouveaux:
+            bilan.avertissements.append(f"{len(nouveaux)} degrés-jours repris du classeur.")
 
     # -- sortie -------------------------------------------------------------
 

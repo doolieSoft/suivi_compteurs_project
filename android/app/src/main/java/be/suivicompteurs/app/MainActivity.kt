@@ -2,8 +2,10 @@ package be.suivicompteurs.app
 
 import android.Manifest
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -20,13 +22,18 @@ import be.suivicompteurs.app.databinding.ActivityMainBinding
 import be.suivicompteurs.app.databinding.ItemCompteurBinding
 import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.CompteurLocal
+import be.suivicompteurs.app.reseau.Api
+import be.suivicompteurs.app.reseau.Resultat
 import be.suivicompteurs.app.sync.Synchroniseur
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,6 +43,15 @@ class MainActivity : AppCompatActivity() {
 
     private val demanderNotifications =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+
+    /**
+     * « Enregistrer sous » d'Android : Google Drive y figure comme un dossier
+     * parmi d'autres, ce qui évite toute connexion à un compte Google ici.
+     */
+    private val choisirDestinationExport =
+        registerForActivityResult(ActivityResultContracts.CreateDocument(TYPE_XLSX)) { uri ->
+            if (uri != null) exporterVers(uri)
+        }
 
     override fun onCreate(etat: Bundle?) {
         super.onCreate(etat)
@@ -150,6 +166,52 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun exporter() {
+        if (!reglages.configure) {
+            Snackbar.make(vues.root, R.string.accueil_non_configure, Snackbar.LENGTH_LONG)
+                .setAction(R.string.reglages) { ouvrirReglages() }
+                .show()
+            return
+        }
+        val jour = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+        choisirDestinationExport.launch("suivi-compteurs-$jour.xlsx")
+    }
+
+    private fun exporterVers(destination: Uri) {
+        lifecycleScope.launch {
+            val attente = Snackbar.make(vues.root, R.string.export_en_cours, Snackbar.LENGTH_INDEFINITE)
+            attente.show()
+
+            // Téléchargé d'abord à part : un échec réseau ne doit pas laisser
+            // un fichier vide ou tronqué dans le dossier Drive choisi.
+            val temporaire = File(cacheDir, "export.xlsx")
+            val message = when (val resultat = Api(reglages).exporter(temporaire)) {
+                is Resultat.Succes -> {
+                    val copie = withContext(Dispatchers.IO) {
+                        runCatching {
+                            val sortie = contentResolver.openOutputStream(destination, "wt")
+                                ?: error("destination inaccessible")
+                            sortie.use { s -> temporaire.inputStream().use { it.copyTo(s) } }
+                        }
+                    }
+                    if (copie.isSuccess) getString(R.string.export_reussi)
+                    else getString(R.string.export_ecriture_impossible)
+                }
+                is Resultat.Echec -> {
+                    withContext(Dispatchers.IO) {
+                        runCatching { DocumentsContract.deleteDocument(contentResolver, destination) }
+                    }
+                    if (resultat.horsLigne) getString(R.string.export_hors_ligne)
+                    else getString(R.string.export_echec, resultat.message)
+                }
+            }
+            withContext(Dispatchers.IO) { temporaire.delete() }
+
+            attente.dismiss()
+            Snackbar.make(vues.root, message, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
     private fun ouvrirSaisie(compteurId: Int) {
         startActivity(
             Intent(this, SaisieActivity::class.java)
@@ -176,8 +238,14 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, ConsultationActivity::class.java)); true
         }
         R.id.action_synchroniser -> { synchroniser(manuel = true); true }
+        R.id.action_exporter -> { exporter(); true }
         R.id.action_reglages -> { ouvrirReglages(); true }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        private const val TYPE_XLSX =
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     }
 }
 

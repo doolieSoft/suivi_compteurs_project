@@ -86,6 +86,7 @@ class AccesAnonymeTest(TestCase):
             "suivi:api_creer_releve",
             "suivi:api_instantane",
             "suivi:api_synchroniser",
+            "suivi:api_exporter",
         }
         resolveur = get_resolver()
         noms = {
@@ -158,6 +159,14 @@ class AccesApiTest(TestCase):
             with self.subTest(nom=nom):
                 reponse = self.client.get(reverse(nom), headers={"x-jeton": JETON})
                 self.assertEqual(reponse.status_code, 200)
+
+    def test_l_export_excel_exige_le_jeton(self):
+        reponse = self.client.get(reverse("suivi:api_exporter"))
+        self.assertEqual(reponse.status_code, 401)
+        reponse = self.client.get(reverse("suivi:api_exporter"), headers={"x-jeton": JETON})
+        self.assertEqual(reponse.status_code, 200)
+        self.assertTrue(reponse["Content-Type"].startswith("application/vnd.openxml"))
+        self.assertIn(".xlsx", reponse["Content-Disposition"])
 
     def test_l_api_refuse_sans_jeton(self):
         for nom in ("suivi:api_etat", "suivi:api_instantane"):

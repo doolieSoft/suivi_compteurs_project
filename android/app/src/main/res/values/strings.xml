@@ -12,6 +12,12 @@
     <string name="releve_du">relevé du %1$s</string>
     <string name="reglages">Réglages</string>
     <string name="consulter">Consulter</string>
+    <string name="exporter">Exporter en Excel</string>
+    <string name="export_en_cours">Préparation du classeur…</string>
+    <string name="export_reussi">Classeur enregistré.</string>
+    <string name="export_hors_ligne">Serveur injoignable : l\'export a besoin du réseau.</string>
+    <string name="export_echec">Export impossible : %1$s</string>
+    <string name="export_ecriture_impossible">Le classeur n\'a pas pu être écrit à cet emplacement.</string>
     <string name="synchroniser">Synchroniser</string>
     <string name="tirer_pour_synchroniser">Tirez vers le bas pour synchroniser</string>
 

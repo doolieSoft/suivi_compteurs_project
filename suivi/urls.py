@@ -32,6 +32,7 @@ urlpatterns = [
     path("api/releves/", api.creer_releve, name="api_creer_releve"),
     path("api/instantane/", api.instantane, name="api_instantane"),
     path("api/synchroniser/", api.synchroniser, name="api_synchroniser"),
+    path("api/export/", api.exporter, name="api_exporter"),
     # --- Application web installable (PWA) ----------------------------
     path("manifest.webmanifest", views.manifeste, name="manifeste"),
     path("sw.js", views.service_worker, name="service_worker"),

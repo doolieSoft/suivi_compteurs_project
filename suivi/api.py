@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_not_required
 from django.core.cache import cache
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import Count, Max, Sum
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
@@ -550,3 +550,31 @@ def _enregistrer_une_entree(entree: dict) -> dict:
         },
     )
     return {"id": releve.pk, "cree": cree, "attend_photo": bool(entree.get("a_photo"))}
+
+
+# ---------------------------------------------------------------------------
+# Export : toutes les données dans un classeur Excel
+# ---------------------------------------------------------------------------
+
+
+@login_not_required
+@require_GET
+def exporter(request: HttpRequest) -> HttpResponse:
+    """Classeur Excel de toutes les données, à partager depuis le téléphone."""
+    try:
+        _verifier_jeton(request)
+    except ErreurApi as exc:
+        return _json_erreur(exc)
+
+    from .services import export_excel
+
+    reponse = HttpResponse(
+        export_excel.classeur(),
+        content_type=(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ),
+    )
+    reponse["Content-Disposition"] = (
+        f'attachment; filename="suivi-compteurs-{dt.date.today():%Y-%m-%d}.xlsx"'
+    )
+    return reponse
