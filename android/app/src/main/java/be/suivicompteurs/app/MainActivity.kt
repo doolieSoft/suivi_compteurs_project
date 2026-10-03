@@ -18,20 +18,21 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import be.suivicompteurs.app.classeur.Classeur
+import be.suivicompteurs.app.classeur.ClasseurIllisible
+import be.suivicompteurs.app.classeur.ExportClasseur
+import be.suivicompteurs.app.classeur.ImportClasseur
 import be.suivicompteurs.app.databinding.ActivityMainBinding
 import be.suivicompteurs.app.databinding.ItemCompteurBinding
 import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.CompteurLocal
-import be.suivicompteurs.app.reseau.Api
-import be.suivicompteurs.app.reseau.Resultat
 import be.suivicompteurs.app.sync.Synchroniseur
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -48,6 +49,11 @@ class MainActivity : AppCompatActivity() {
      * « Enregistrer sous » d'Android : Google Drive y figure comme un dossier
      * parmi d'autres, ce qui évite toute connexion à un compte Google ici.
      */
+    private val choisirClasseur =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri != null) confirmerImport(uri)
+        }
+
     private val choisirDestinationExport =
         registerForActivityResult(ActivityResultContracts.CreateDocument(TYPE_XLSX)) { uri ->
             if (uri != null) exporterVers(uri)
@@ -66,7 +72,8 @@ class MainActivity : AppCompatActivity() {
         vues.liste.adapter = adaptateur
 
         vues.rafraichir.setOnRefreshListener { synchroniser(manuel = true) }
-        vues.boutonReglages.setOnClickListener { ouvrirReglages() }
+        vues.boutonImporter.setOnClickListener { importer() }
+        vues.boutonCreer.setOnClickListener { ouvrirGestion() }
 
         observerDonnees()
         demanderNotificationsSiNecessaire()
@@ -94,85 +101,51 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observerDonnees() {
-        val base = BaseLocale.obtenir(this)
         lifecycleScope.launch {
-            combine(
-                base.compteurs().suivre(),
-                base.releves().nombreEnAttente(),
-            ) { compteurs, attente -> compteurs to attente }
-                .collect { (compteurs, attente) -> afficher(compteurs, attente) }
+            BaseLocale.obtenir(this@MainActivity).compteurs().suivre().collect { afficher(it) }
         }
     }
 
-    private fun afficher(compteurs: List<CompteurLocal>, enAttente: Int) {
+    private fun afficher(compteurs: List<CompteurLocal>) {
         adaptateur.remplacer(compteurs)
-
-        val configure = reglages.configure
         vues.listeVide.visibility = if (compteurs.isEmpty()) View.VISIBLE else View.GONE
         vues.liste.visibility = if (compteurs.isEmpty()) View.GONE else View.VISIBLE
-        vues.messageVide.text = when {
-            !configure -> getString(R.string.accueil_non_configure)
-            else -> getString(R.string.accueil_aucun_compteur)
+        vues.messageVide.setText(R.string.accueil_vide)
+        vues.etat.text = if (reglages.derniereSynchro > 0) {
+            getString(R.string.meteo_a_jour, momentSynchro())
+        } else {
+            getString(R.string.donnees_sur_appareil)
         }
-        vues.boutonReglages.visibility = if (configure) View.GONE else View.VISIBLE
-
-        vues.etat.text = when {
-            enAttente > 0 -> resources.getQuantityString(
-                R.plurals.releves_en_attente, enAttente, enAttente
-            )
-            reglages.derniereSynchro > 0 -> getString(
-                R.string.derniere_synchro,
-                SimpleDateFormat("d MMMM 'à' HH:mm", Locale.FRANCE)
-                    .format(Date(reglages.derniereSynchro)),
-            )
-            else -> getString(R.string.jamais_synchronise)
-        }
-        vues.etat.setBackgroundResource(
-            if (enAttente > 0) R.color.bandeau_attente else R.color.bandeau_calme
-        )
     }
 
+    /** « 3 oct. 2026, 11:28 », dans la langue de l'appareil. */
+    private fun momentSynchro(): String =
+        java.time.Instant.ofEpochMilli(reglages.derniereSynchro)
+            .atZone(java.time.ZoneId.systemDefault())
+            .format(
+                java.time.format.DateTimeFormatter
+                    .ofLocalizedDateTime(java.time.format.FormatStyle.MEDIUM, java.time.format.FormatStyle.SHORT)
+            )
+
+    /** Met à jour la météo ; [manuel] quand l'utilisateur l'a demandé. */
     private fun synchroniser(manuel: Boolean) {
-        if (!reglages.configure) {
-            vues.rafraichir.isRefreshing = false
-            Snackbar.make(vues.root, R.string.accueil_non_configure, Snackbar.LENGTH_LONG)
-                .setAction(R.string.reglages) { ouvrirReglages() }
-                .show()
-            return
-        }
         lifecycleScope.launch {
-            vues.rafraichir.isRefreshing = true
+            vues.rafraichir.isRefreshing = manuel
             val bilan = Synchroniseur(this@MainActivity).executer()
             vues.rafraichir.isRefreshing = false
-
-            val message = when {
-                !bilan.reussie && bilan.horsLigne ->
-                    getString(R.string.synchro_hors_ligne)
-                !bilan.reussie -> bilan.erreur ?: getString(R.string.synchro_echec)
-                bilan.envoyes == 0 && bilan.refuses == 0 ->
-                    getString(R.string.synchro_a_jour)
-                bilan.refuses > 0 -> resources.getQuantityString(
-                    R.plurals.synchro_refuses, bilan.refuses, bilan.envoyes, bilan.refuses
-                )
-                else -> resources.getQuantityString(
-                    R.plurals.synchro_envoyes, bilan.envoyes, bilan.envoyes
-                )
-            }
-            if (manuel || !bilan.reussie) {
+            if (manuel) {
+                val message = when {
+                    bilan.horsLigne -> getString(R.string.meteo_hors_ligne)
+                    !bilan.reussie -> getString(R.string.meteo_echec, bilan.erreur)
+                    else -> getString(R.string.meteo_mise_a_jour)
+                }
                 Snackbar.make(vues.root, message, Snackbar.LENGTH_LONG).show()
             }
-            afficher(adaptateur.elements, BaseLocale.obtenir(this@MainActivity)
-                .releves().enAttente().count { !it.envoye })
+            afficher(adaptateur.elements)
         }
     }
 
     private fun exporter() {
-        if (!reglages.configure) {
-            Snackbar.make(vues.root, R.string.accueil_non_configure, Snackbar.LENGTH_LONG)
-                .setAction(R.string.reglages) { ouvrirReglages() }
-                .show()
-            return
-        }
         val jour = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
         choisirDestinationExport.launch("suivi-compteurs-$jour.xlsx")
     }
@@ -181,34 +154,26 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val attente = Snackbar.make(vues.root, R.string.export_en_cours, Snackbar.LENGTH_INDEFINITE)
             attente.show()
-
-            // Téléchargé d'abord à part : un échec réseau ne doit pas laisser
-            // un fichier vide ou tronqué dans le dossier Drive choisi.
-            val temporaire = File(cacheDir, "export.xlsx")
-            val message = when (val resultat = Api(reglages).exporter(temporaire)) {
-                is Resultat.Succes -> {
-                    val copie = withContext(Dispatchers.IO) {
-                        runCatching {
-                            val sortie = contentResolver.openOutputStream(destination, "wt")
-                                ?: error("destination inaccessible")
-                            sortie.use { s -> temporaire.inputStream().use { it.copyTo(s) } }
-                        }
-                    }
-                    if (copie.isSuccess) getString(R.string.export_reussi)
-                    else getString(R.string.export_ecriture_impossible)
-                }
-                is Resultat.Echec -> {
-                    withContext(Dispatchers.IO) {
-                        runCatching { DocumentsContract.deleteDocument(contentResolver, destination) }
-                    }
-                    if (resultat.horsLigne) getString(R.string.export_hors_ligne)
-                    else getString(R.string.export_echec, resultat.message)
+            val historique = BaseLocale.obtenir(this@MainActivity).historique().tout()
+            val ecrit = withContext(Dispatchers.IO) {
+                runCatching {
+                    val sortie = contentResolver.openOutputStream(destination, "wt")
+                        ?: error("destination inaccessible")
+                    sortie.use { ExportClasseur.ecrire(historique, it) }
                 }
             }
-            withContext(Dispatchers.IO) { temporaire.delete() }
-
+            if (ecrit.isFailure) {
+                // Pas de fichier vide ou tronqué dans le dossier choisi.
+                withContext(Dispatchers.IO) {
+                    runCatching { DocumentsContract.deleteDocument(contentResolver, destination) }
+                }
+            }
             attente.dismiss()
-            Snackbar.make(vues.root, message, Snackbar.LENGTH_LONG).show()
+            Snackbar.make(
+                vues.root,
+                if (ecrit.isSuccess) R.string.export_reussi else R.string.export_ecriture_impossible,
+                Snackbar.LENGTH_LONG,
+            ).show()
         }
     }
 
@@ -223,9 +188,14 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, ReglagesActivity::class.java))
     }
 
+    private fun ouvrirGestion() {
+        startActivity(Intent(this, be.suivicompteurs.app.gestion.GestionActivity::class.java))
+    }
+
     override fun onResume() {
         super.onResume()
-        if (reglages.configure) synchroniser(manuel = false)
+        // La météo se complète d'elle-même ; rien à faire sans maison.
+        synchroniser(manuel = false)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -233,12 +203,69 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    // --- import d'un classeur ------------------------------------------------
+
+    private fun importer() {
+        choisirClasseur.launch(arrayOf(TYPE_XLSX, "application/octet-stream"))
+    }
+
+    private fun confirmerImport(source: Uri) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.import_titre)
+            .setMessage(R.string.import_confirmation)
+            .setNegativeButton(R.string.annuler, null)
+            .setPositiveButton(R.string.importer_confirmer) { _, _ -> importerDepuis(source) }
+            .show()
+    }
+
+    private fun importerDepuis(source: Uri) {
+        lifecycleScope.launch {
+            val attente = Snackbar.make(vues.root, R.string.import_en_cours, Snackbar.LENGTH_INDEFINITE)
+            attente.show()
+            val resultat = withContext(Dispatchers.IO) {
+                runCatching {
+                    val flux = contentResolver.openInputStream(source) ?: error("fichier inaccessible")
+                    val classeur = flux.use { Classeur.lire(it) }
+                    ImportClasseur.importer(classeur, version = "import-${System.currentTimeMillis()}")
+                }
+            }
+            attente.dismiss()
+
+            resultat.onSuccess { brut ->
+                val base = BaseLocale.obtenir(this@MainActivity)
+                // Les relevés de l'appareil que le classeur ignore sont repris :
+                // rien de ce qui a été noté ici ne se perd.
+                val enService = base.compteurs().tous()
+                val importe = ImportClasseur.reprendreSaisies(
+                    brut,
+                    enService,
+                    ImportClasseur.relevesDeLAppareil(base.historique().tout(), enService),
+                )
+                base.historique().remplacer(importe.historique)
+                base.compteurs().enregistrer(importe.compteursASaisir)
+                base.compteurs().supprimerAbsents(importe.compteursASaisir.map { it.id })
+                Snackbar.make(
+                    vues.root,
+                    resources.getQuantityString(R.plurals.import_reussi, importe.nbReleves, importe.nbReleves),
+                    Snackbar.LENGTH_LONG,
+                ).show()
+                // Complète aussitôt les degrés-jours depuis la date de l'export.
+                synchroniser(manuel = false)
+            }.onFailure { erreur ->
+                val motif = (erreur as? ClasseurIllisible)?.message ?: getString(R.string.import_illisible)
+                Snackbar.make(vues.root, motif, Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_consulter -> {
-            startActivity(Intent(this, ConsultationActivity::class.java)); true
+            startActivity(Intent(this, TableauDeBordActivity::class.java)); true
         }
         R.id.action_synchroniser -> { synchroniser(manuel = true); true }
         R.id.action_exporter -> { exporter(); true }
+        R.id.action_gerer -> { ouvrirGestion(); true }
+        R.id.action_importer -> { importer(); true }
         R.id.action_reglages -> { ouvrirReglages(); true }
         else -> super.onOptionsItemSelected(item)
     }
@@ -285,6 +312,7 @@ class CompteurAdapter(
             when (compteur.energie) {
                 "EAU" -> R.color.eau
                 "GAZ" -> R.color.gaz
+                "MAZ" -> R.color.mazout
                 else -> R.color.elec
             }
         )
@@ -292,10 +320,10 @@ class CompteurAdapter(
     }
 
     private fun formaterIndex(valeur: Double): String =
-        String.format(Locale.FRANCE, "%,.3f", valeur).trimEnd('0').trimEnd(',')
+        String.format(Locale.getDefault(), "%,.3f", valeur).trimEnd('0').trimEnd(',')
 
     private fun formaterDate(iso: String): String = runCatching {
-        val source = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE).parse(iso)!!
-        SimpleDateFormat("d MMMM yyyy", Locale.FRANCE).format(source)
+        val source = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).parse(iso)!!
+        SimpleDateFormat("d MMMM yyyy", Locale.getDefault()).format(source)
     }.getOrDefault(iso)
 }

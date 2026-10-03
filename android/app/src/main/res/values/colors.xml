@@ -6,6 +6,7 @@
     <color name="eau">#2A78D6</color>
     <color name="gaz">#EB6834</color>
     <color name="elec">#EDA100</color>
+    <color name="mazout">#8A5A2B</color>
 
     <color name="primaire">#2A78D6</color>
     <color name="primaire_sombre">#1C5CAB</color>
@@ -15,7 +16,6 @@
     <color name="critique">#D03B3B</color>
 
     <color name="bandeau_calme">#F2F2EE</color>
-    <color name="bandeau_attente">#FDF0D5</color>
 
     <color name="encre">#0B0B0B</color>
     <color name="encre_2">#52514E</color>

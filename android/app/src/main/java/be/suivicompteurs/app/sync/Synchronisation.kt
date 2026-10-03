@@ -5,25 +5,23 @@ import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import be.suivicompteurs.app.Reglages
+import be.suivicompteurs.app.classeur.ImportClasseur
 import be.suivicompteurs.app.donnees.BaseLocale
-import be.suivicompteurs.app.donnees.InstantaneLocal
-import be.suivicompteurs.app.reseau.Api
+import be.suivicompteurs.app.donnees.DegreJourLocal
+import be.suivicompteurs.app.moteur.DegresJours
+import be.suivicompteurs.app.reseau.OpenMeteo
 import be.suivicompteurs.app.reseau.Resultat
-import java.io.File
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
-/** Issue d'une synchronisation, telle qu'on la présente à l'utilisateur. */
+/** Issue d'une mise à jour, telle qu'on la présente à l'utilisateur. */
 data class BilanSynchro(
-    val envoyes: Int = 0,
-    val refuses: Int = 0,
-    val photos: Int = 0,
-    val compteursMisAJour: Int = 0,
-    val instantaneRafraichi: Boolean = false,
+    /** Jours de météo ajoutés. */
+    val joursMeteo: Int = 0,
     val erreur: String? = null,
     val horsLigne: Boolean = false,
 ) {
@@ -31,124 +29,58 @@ data class BilanSynchro(
 }
 
 /**
- * Échange avec le serveur, dans cet ordre précis :
+ * Mise à jour des données qui ne viennent pas de l'utilisateur.
  *
- *  1. vider la file des relevés en attente — c'est ce qui compte le plus, et
- *     cela doit partir avant toute chose ;
- *  2. envoyer les photos, plus lourdes et moins critiques ;
- *  3. rapatrier la liste des compteurs puis l'instantané de l'analyse.
- *
- * Chaque étape est indépendante : l'échec de l'une n'annule pas les autres.
+ * Toutes les données vivent sur l'appareil ; seule la météo vient d'ailleurs.
+ * Cette mise à jour demande donc à Open-Meteo les degrés-jours manquants de
+ * chaque station, puis rafraîchit la liste des compteurs à relever.
  */
-class Synchroniseur(private val contexte: Context) {
+class Synchroniseur(contexte: Context) {
 
     private val reglages = Reglages(contexte)
     private val base = BaseLocale.obtenir(contexte)
-    private val api = Api(reglages)
 
     suspend fun executer(): BilanSynchro {
-        if (!reglages.configure) {
-            return BilanSynchro(erreur = "Adresse du serveur ou jeton non renseigné.")
-        }
+        val historique = base.historique()
 
-        var envoyes = 0
-        var refuses = 0
-        var photos = 0
-
-        // --- 1. relevés en attente ---------------------------------------
-        val attente = base.releves().enAttente().filter { !it.envoye }
-        if (attente.isNotEmpty()) {
-            when (val reponse = api.synchroniser(attente)) {
+        var joursMeteo = 0
+        var echec: Resultat.Echec? = null
+        val hier = LocalDate.now().minusDays(1)
+        for (station in historique.stations()) {
+            val dernier = historique.dernierDegreJour(station.id)?.let(LocalDate::parse)
+            // Sans historique météo, deux ans suffisent à une première normale.
+            val debut = dernier?.plusDays(1) ?: hier.minusYears(2)
+            when (val reponse = OpenMeteo().temperatures(station.latitude, station.longitude, debut, hier)) {
                 is Resultat.Succes -> {
-                    attente.forEach { releve ->
-                        val erreur = reponse.valeur[releve.reference]
-                        if (reponse.valeur.containsKey(releve.reference) && erreur == null) {
-                            base.releves().modifier(releve.copy(envoye = true, erreur = null))
-                            envoyes++
-                        } else if (erreur != null) {
-                            // Conservé sur l'appareil, avec son motif de refus :
-                            // l'utilisateur doit pouvoir le corriger, pas le perdre.
-                            base.releves().modifier(releve.copy(erreur = erreur))
-                            refuses++
+                    historique.enregistrerDegresJours(
+                        reponse.valeur.map { (jour, t) ->
+                            DegreJourLocal(station.id, jour.toString(), DegresJours.calculer(t, station.base))
                         }
-                    }
+                    )
+                    joursMeteo += reponse.valeur.size
                 }
-                is Resultat.Echec -> return BilanSynchro(
-                    erreur = reponse.message,
-                    horsLigne = reponse.horsLigne,
-                )
+                is Resultat.Echec -> echec = reponse
             }
         }
 
-        // --- 2. photos ----------------------------------------------------
-        base.releves().enAttente()
-            .filter { it.envoye && it.cheminPhoto != null && !it.photoEnvoyee }
-            .forEach { releve ->
-                val fichier = File(releve.cheminPhoto!!)
-                when (api.envoyerPhoto(releve, fichier)) {
-                    is Resultat.Succes -> {
-                        base.releves().modifier(releve.copy(photoEnvoyee = true))
-                        // La copie locale a rempli son office ; le serveur est
-                        // désormais dépositaire de la preuve.
-                        fichier.delete()
-                        photos++
-                    }
-                    is Resultat.Echec -> Unit // retenté à la prochaine occasion
-                }
-            }
+        // La liste de l'écran d'accueil suit l'historique : compteurs posés ou
+        // déposés, derniers index.
+        val aSaisir = ImportClasseur.compteursASaisir(historique.tout())
+        base.compteurs().enregistrer(aSaisir)
+        base.compteurs().supprimerAbsents(aSaisir.map { it.id })
 
-        // --- 3. référentiel et analyse ------------------------------------
-        var compteursMisAJour = 0
-        when (val reponse = api.compteurs()) {
-            is Resultat.Succes -> {
-                base.compteurs().enregistrer(reponse.valeur)
-                base.compteurs().supprimerAbsents(reponse.valeur.map { it.id })
-                compteursMisAJour = reponse.valeur.size
-            }
-            is Resultat.Echec -> Unit
+        val manque = echec
+        if (manque != null && joursMeteo == 0) {
+            return BilanSynchro(erreur = manque.message, horsLigne = manque.horsLigne)
         }
-
-        var instantaneRafraichi = false
-        when (val reponse = api.instantane()) {
-            is Resultat.Succes -> {
-                val (json, genereLe) = reponse.valeur
-                base.instantane().enregistrer(InstantaneLocal(json = json, genereLe = genereLe))
-                instantaneRafraichi = true
-            }
-            is Resultat.Echec -> Unit
-        }
-
-        // Sans file d'attente à vider, l'échec des étapes 2 et 3 passerait
-        // inaperçu et l'on daterait une synchronisation qui n'a jamais eu lieu.
-        val contactEtabli = envoyes > 0 || refuses > 0 ||
-            compteursMisAJour > 0 || instantaneRafraichi
-        if (!contactEtabli) {
-            return BilanSynchro(
-                erreur = "Serveur injoignable.",
-                horsLigne = true,
-            )
-        }
-
         reglages.derniereSynchro = System.currentTimeMillis()
-        // Les relevés transmis depuis plus d'un mois n'ont plus d'utilité ici.
-        base.releves().purger(System.currentTimeMillis() - 30L * 24 * 3600 * 1000)
-
-        return BilanSynchro(
-            envoyes = envoyes,
-            refuses = refuses,
-            photos = photos,
-            compteursMisAJour = compteursMisAJour,
-            instantaneRafraichi = instantaneRafraichi,
-        )
+        return BilanSynchro(joursMeteo = joursMeteo)
     }
 }
 
 /**
- * Tâche de fond confiée au système.
- *
- * WorkManager garantit l'exécution même si l'application est fermée, et attend
- * de lui-même qu'un réseau soit disponible : le relevé pris dans la cave part
- * tout seul au retour du Wi-Fi.
+ * Tâche de fond confiée au système : la météo se met à jour d'elle-même, et
+ * WorkManager attend qu'un réseau soit disponible pour la lancer.
  */
 class SyncWorker(contexte: Context, parametres: WorkerParameters) :
     CoroutineWorker(contexte, parametres) {
@@ -164,30 +96,23 @@ class SyncWorker(contexte: Context, parametres: WorkerParameters) :
 
     companion object {
         private const val PERIODIQUE = "synchro-periodique"
-        private const val IMMEDIAT = "synchro-immediate"
 
         private val contraintes = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        /** Programme une tentative régulière, en plus des envois à la demande. */
+        /** Une mise à jour par jour suffit : la météo n'est publiée qu'une fois par jour. */
         fun programmer(contexte: Context) {
-            val tache = PeriodicWorkRequestBuilder<SyncWorker>(6, TimeUnit.HOURS)
+            val tache = PeriodicWorkRequestBuilder<SyncWorker>(1, TimeUnit.DAYS)
                 .setConstraints(contraintes)
                 .build()
             WorkManager.getInstance(contexte).enqueueUniquePeriodicWork(
                 PERIODIQUE,
-                ExistingPeriodicWorkPolicy.KEEP,
+                // Remplace la synchronisation toutes les six heures des
+                // versions qui parlaient au serveur.
+                ExistingPeriodicWorkPolicy.UPDATE,
                 tache,
             )
-        }
-
-        /** Tente un envoi dès que le réseau le permet. */
-        fun declencher(contexte: Context) {
-            val tache = OneTimeWorkRequestBuilder<SyncWorker>()
-                .setConstraints(contraintes)
-                .build()
-            WorkManager.getInstance(contexte).enqueue(tache)
         }
     }
 }

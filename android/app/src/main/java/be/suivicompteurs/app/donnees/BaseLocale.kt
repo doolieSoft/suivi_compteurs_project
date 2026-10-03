@@ -10,7 +10,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -31,76 +30,23 @@ interface CompteurDao {
     suspend fun supprimerAbsents(idsConserves: List<Int>)
 }
 
-@Dao
-interface ReleveDao {
-    @Query("SELECT * FROM releves ORDER BY date DESC, creeLe DESC")
-    fun suivre(): Flow<List<ReleveLocal>>
-
-    /** Relevés qu'il reste à transmettre, les plus anciens d'abord. */
-    @Query(
-        "SELECT * FROM releves WHERE envoye = 0 " +
-            "OR (cheminPhoto IS NOT NULL AND photoEnvoyee = 0) ORDER BY creeLe ASC"
-    )
-    suspend fun enAttente(): List<ReleveLocal>
-
-    @Query("SELECT COUNT(*) FROM releves WHERE envoye = 0")
-    fun nombreEnAttente(): Flow<Int>
-
-    /**
-     * Dernier index connu pour un compteur, en tenant compte des relevés pas
-     * encore transmis : sans cela, deux saisies successives hors ligne
-     * compareraient toutes deux à la même valeur périmée.
-     */
-    @Query(
-        "SELECT `index` FROM releves WHERE compteurId = :compteurId " +
-            "ORDER BY date DESC, creeLe DESC LIMIT 1"
-    )
-    suspend fun dernierIndexLocal(compteurId: Int): Double?
-
-    @Query(
-        "SELECT * FROM releves WHERE compteurId = :compteurId " +
-            "ORDER BY date DESC, creeLe DESC LIMIT 1"
-    )
-    suspend fun dernierReleveLocal(compteurId: Int): ReleveLocal?
-
-    @Insert
-    suspend fun ajouter(releve: ReleveLocal): Long
-
-    @Update
-    suspend fun modifier(releve: ReleveLocal)
-
-    @Query("DELETE FROM releves WHERE id = :id")
-    suspend fun supprimer(id: Long)
-
-    /** Purge les relevés transmis depuis longtemps : le serveur en est l'archive. */
-    @Query(
-        "DELETE FROM releves WHERE envoye = 1 " +
-            "AND (cheminPhoto IS NULL OR photoEnvoyee = 1) AND creeLe < :avant"
-    )
-    suspend fun purger(avant: Long)
-}
-
-@Dao
-interface InstantaneDao {
-    @Query("SELECT * FROM instantane WHERE id = 1")
-    fun suivre(): Flow<InstantaneLocal?>
-
-    @Query("SELECT * FROM instantane WHERE id = 1")
-    suspend fun actuel(): InstantaneLocal?
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun enregistrer(instantane: InstantaneLocal)
-}
-
 @Database(
-    entities = [CompteurLocal::class, ReleveLocal::class, InstantaneLocal::class],
-    version = 3,
+    entities = [
+        CompteurLocal::class,
+        MaisonLocale::class,
+        StationLocale::class,
+        CompteurHistorique::class,
+        ReleveHistorique::class,
+        DegreJourLocal::class,
+        TarifLocal::class,
+        EvenementLocal::class,
+    ],
+    version = 6,
     exportSchema = true,
 )
 abstract class BaseLocale : RoomDatabase() {
     abstract fun compteurs(): CompteurDao
-    abstract fun releves(): ReleveDao
-    abstract fun instantane(): InstantaneDao
+    abstract fun historique(): HistoriqueDao
 
     companion object {
         /**
@@ -128,6 +74,92 @@ abstract class BaseLocale : RoomDatabase() {
             }
         }
 
+        /**
+         * Copie locale de l'historique, pour le moteur de calcul embarqué.
+         * Les tables arrivent vides : la synchronisation suivante les remplit.
+         */
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                CREATION_HISTORIQUE.forEach(db::execSQL)
+            }
+        }
+
+        // Recopié du schéma généré par Room (schemas/…/4.json) : Room vérifie
+        // à l'ouverture que les tables correspondent exactement aux entités.
+        private val CREATION_HISTORIQUE = listOf(
+            "CREATE TABLE IF NOT EXISTS `maisons` (`id` INTEGER NOT NULL, `nom` TEXT NOT NULL, " +
+                "`actuelle` INTEGER NOT NULL, `stationId` INTEGER, PRIMARY KEY(`id`))",
+            "CREATE TABLE IF NOT EXISTS `stations` (`id` INTEGER NOT NULL, `nom` TEXT NOT NULL, " +
+                "`latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `base` REAL NOT NULL, " +
+                "PRIMARY KEY(`id`))",
+            "CREATE TABLE IF NOT EXISTS `historique_compteurs` (`id` INTEGER NOT NULL, " +
+                "`maisonId` INTEGER NOT NULL, `energie` TEXT NOT NULL, `plage` TEXT NOT NULL, " +
+                "`unite` TEXT NOT NULL, `libelle` TEXT NOT NULL, `datePose` TEXT, PRIMARY KEY(`id`))",
+            "CREATE TABLE IF NOT EXISTS `historique_releves` (`compteurId` INTEGER NOT NULL, " +
+                "`date` TEXT NOT NULL, `index` REAL NOT NULL, `annuel` INTEGER NOT NULL, " +
+                "PRIMARY KEY(`compteurId`, `date`))",
+            "CREATE TABLE IF NOT EXISTS `degres_jours` (`stationId` INTEGER NOT NULL, " +
+                "`date` TEXT NOT NULL, `dj` REAL NOT NULL, PRIMARY KEY(`stationId`, `date`))",
+            "CREATE TABLE IF NOT EXISTS `tarifs` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`maisonId` INTEGER, `energie` TEXT NOT NULL, `debut` TEXT NOT NULL, " +
+                "`fin` TEXT, `prix` REAL NOT NULL, `abonnement` REAL NOT NULL)",
+        )
+
+        /**
+         * Tout ce que le site gère et que l'appareil ignorait encore : en mode
+         * autonome, c'est lui qui fait référence et l'export doit tout rendre.
+         * Copié du schéma généré par Room (schemas/…/5.json).
+         */
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                listOf(
+                    "ALTER TABLE `maisons` ADD COLUMN `adresse` TEXT NOT NULL DEFAULT ''",
+                    "ALTER TABLE `maisons` ADD COLUMN `nbFacades` INTEGER",
+                    "ALTER TABLE `maisons` ADD COLUMN `surface` INTEGER",
+                    "ALTER TABLE `maisons` ADD COLUMN `dateEntree` TEXT",
+                    "ALTER TABLE `maisons` ADD COLUMN `dateSortie` TEXT",
+                    "ALTER TABLE `maisons` ADD COLUMN `notes` TEXT NOT NULL DEFAULT ''",
+                    "ALTER TABLE `historique_compteurs` ADD COLUMN `numero` TEXT NOT NULL DEFAULT ''",
+                    "ALTER TABLE `historique_compteurs` ADD COLUMN `coefKwh` REAL NOT NULL DEFAULT 1.0",
+                    "ALTER TABLE `historique_compteurs` ADD COLUMN `dateDepose` TEXT",
+                    "ALTER TABLE `historique_compteurs` ADD COLUMN `remplaceId` INTEGER",
+                    "ALTER TABLE `historique_releves` ADD COLUMN `source` TEXT NOT NULL DEFAULT 'MANUEL'",
+                    "ALTER TABLE `historique_releves` ADD COLUMN `commentaire` TEXT NOT NULL DEFAULT ''",
+                    "ALTER TABLE `tarifs` ADD COLUMN `fournisseur` TEXT NOT NULL DEFAULT ''",
+                    "ALTER TABLE `tarifs` ADD COLUMN `notes` TEXT NOT NULL DEFAULT ''",
+                    "CREATE TABLE IF NOT EXISTS `evenements` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`maisonId` INTEGER NOT NULL, `date` TEXT NOT NULL, `energie` TEXT NOT NULL, " +
+                        "`libelle` TEXT NOT NULL, `description` TEXT NOT NULL)",
+                ).forEach(db::execSQL)
+            }
+        }
+
+        /**
+         * L'application devient indépendante du site : plus de file d'envoi
+         * ni d'instantané du serveur. Un relevé pas encore transmis rejoint
+         * l'historique, avec sa photo : rien de ce qui a été noté ne se perd.
+         */
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `historique_releves` ADD COLUMN `photo` TEXT")
+                db.execSQL(
+                    "INSERT OR IGNORE INTO `historique_releves` " +
+                        "(`compteurId`, `date`, `index`, `annuel`, `source`, `commentaire`, `photo`) " +
+                        "SELECT `compteurId`, `date`, `index`, `annuel`, 'MANUEL', `commentaire`, `cheminPhoto` " +
+                        "FROM `releves` WHERE `envoye` = 0 AND `erreur` IS NULL"
+                )
+                // Les photos de relevés déjà transmis restent rattachées.
+                db.execSQL(
+                    "UPDATE `historique_releves` SET `photo` = (" +
+                        "SELECT `cheminPhoto` FROM `releves` r WHERE r.`compteurId` = `historique_releves`.`compteurId` " +
+                        "AND r.`date` = `historique_releves`.`date` AND r.`cheminPhoto` IS NOT NULL LIMIT 1) " +
+                        "WHERE `photo` IS NULL"
+                )
+                db.execSQL("DROP TABLE IF EXISTS `releves`")
+                db.execSQL("DROP TABLE IF EXISTS `instantane`")
+            }
+        }
+
         @Volatile
         private var instance: BaseLocale? = null
 
@@ -137,7 +169,7 @@ abstract class BaseLocale : RoomDatabase() {
                     contexte.applicationContext,
                     BaseLocale::class.java,
                     "suivi-compteurs.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6).build().also { instance = it }
             }
     }
 }

@@ -25,10 +25,12 @@ import androidx.lifecycle.lifecycleScope
 import be.suivicompteurs.app.databinding.ActivitySaisieBinding
 import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.CompteurLocal
-import be.suivicompteurs.app.donnees.ReleveLocal
+import be.suivicompteurs.app.donnees.ReleveHistorique
+import be.suivicompteurs.app.gestion.Gestion
+import be.suivicompteurs.app.gestion.Refus
+import be.suivicompteurs.app.ocr.Explication
 import be.suivicompteurs.app.ocr.LecteurIndex
 import be.suivicompteurs.app.ocr.Proposition
-import be.suivicompteurs.app.sync.SyncWorker
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.text.SimpleDateFormat
@@ -124,15 +126,8 @@ class SaisieActivity : AppCompatActivity() {
             }
             compteur = trouve
 
-            // Le dernier index local prime sur celui du serveur : il tient
-            // compte des relevés déjà saisis mais pas encore transmis.
-            val local = base.releves().dernierIndexLocal(compteurId)
-            dernierIndexConnu = listOfNotNull(local, trouve.dernierIndex).maxOrNull()
-
-            val dateLocale = base.releves().dernierReleveLocal(compteurId)?.date
-            derniereDate = listOfNotNull(dateLocale, trouve.dernierReleve)
-                .mapNotNull { runCatching { formatIso.parse(it)?.time }.getOrNull() }
-                .maxOrNull()
+            dernierIndexConnu = trouve.dernierIndex
+            derniereDate = trouve.dernierReleve?.let { runCatching { formatIso.parse(it)?.time }.getOrNull() }
 
             vues.titre.text = trouve.libelle
             vues.rappelIndex.text = dernierIndexConnu?.let {
@@ -286,8 +281,7 @@ class SaisieActivity : AppCompatActivity() {
                 lecture?.suitesLues?.takeIf { it.isNotEmpty() }?.let {
                     appendLine()
                     appendLine()
-                    append("Lu sur la photo : ")
-                    append(it.joinToString(" · "))
+                    append(getString(R.string.ocr_lu_sur_la_photo, it.joinToString(" · ")))
                 }
             }
             vues.messageOcr.setTextColor(
@@ -301,11 +295,10 @@ class SaisieActivity : AppCompatActivity() {
             // message explique, le champ reste vide et prend le curseur.
             vues.champIndex.setText("")
             vues.messageOcr.text = buildString {
-                append(lecture.explication)
+                append(expliquer(lecture.explication))
                 appendLine()
                 appendLine()
-                append("Lu sur la photo : ")
-                append(lecture.suitesLues.take(8).joinToString(" · "))
+                append(getString(R.string.ocr_lu_sur_la_photo, lecture.suitesLues.take(8).joinToString(" · ")))
             }
             vues.messageOcr.setTextColor(
                 ContextCompat.getColor(this@SaisieActivity, R.color.critique)
@@ -314,19 +307,18 @@ class SaisieActivity : AppCompatActivity() {
         } else {
             vues.champIndex.setText(formater(lecture.valeur))
             vues.messageOcr.text = buildString {
-                append(getString(R.string.ocr_resultat, lecture.brut, lecture.explication))
+                append(getString(R.string.ocr_resultat, lecture.brut, expliquer(lecture.explication)))
                 // Quand la proposition est douteuse, montrer tout ce qui a
                 // été lu : c'est la seule façon de comprendre pourquoi elle
                 // l'est, et de savoir s'il faut recadrer ou simplement taper.
                 if (lecture.confiance < 0.5 && lecture.suitesLues.size > 1) {
                     appendLine()
                     appendLine()
-                    append("Autres suites lues : ")
                     append(
-                        lecture.suitesLues
-                            .filter { it != lecture.brut }
-                            .take(8)
-                            .joinToString(" · ")
+                        getString(
+                            R.string.ocr_autres_suites,
+                            lecture.suitesLues.filter { it != lecture.brut }.take(8).joinToString(" · "),
+                        )
                     )
                 }
             }
@@ -460,36 +452,31 @@ class SaisieActivity : AppCompatActivity() {
             vues.champIndexConteneur.error = getString(R.string.index_obligatoire)
             return
         }
-        val plancher = dernierIndexConnu
-        if (plancher != null && valeur < plancher) {
-            // Même contrôle que côté serveur : autant le dire tout de suite,
-            // plutôt que de laisser partir un relevé qui sera refusé.
-            vues.champIndexConteneur.error =
-                getString(R.string.index_en_recul, formater(plancher))
-            return
-        }
         vues.champIndexConteneur.error = null
+        val plancher = dernierIndexConnu
 
         lifecycleScope.launch {
-            val base = BaseLocale.obtenir(this@SaisieActivity)
-            base.releves().ajouter(
-                ReleveLocal(
-                    reference = UUID.randomUUID().toString(),
-                    compteurId = compteur.id,
-                    compteurLibelle = compteur.libelle,
-                    unite = compteur.unite,
-                    date = formatIso.format(dateChoisie),
-                    index = valeur,
-                    indexOcr = proposition?.valeur,
-                    commentaire = vues.champCommentaire.text?.toString()?.trim().orEmpty(),
-                    annuel = vues.caseAnnuel.isChecked,
-                    cheminPhoto = photo?.absolutePath,
+            // Mêmes contrôles que la gestion : l'index doit rester entre ses
+            // voisins, et une date ne porte qu'un relevé.
+            try {
+                Gestion(this@SaisieActivity).enregistrerReleve(
+                    ReleveHistorique(
+                        compteurId = compteur.id.toLong(),
+                        date = formatIso.format(dateChoisie),
+                        index = valeur,
+                        annuel = vues.caseAnnuel.isChecked,
+                        source = "MANUEL",
+                        commentaire = vues.champCommentaire.text?.toString()?.trim().orEmpty().take(200),
+                        photo = photo?.absolutePath,
+                    ),
+                    dateAvant = null,
                 )
-            )
-            // Le système l'enverra dès qu'un réseau sera disponible.
-            SyncWorker.declencher(this@SaisieActivity)
+            } catch (refus: Refus) {
+                vues.champIndexConteneur.error = refus.texte(this@SaisieActivity)
+                return@launch
+            }
 
-            val progression = plancher?.let { valeur - it }
+            val progression = plancher?.takeIf { valeur >= it }?.let { valeur - it }
             val message = if (progression != null) {
                 getString(R.string.releve_enregistre_avec_ecart, formater(progression), compteur.unite)
             } else {
@@ -502,7 +489,19 @@ class SaisieActivity : AppCompatActivity() {
     }
 
     private fun formater(valeur: Double): String =
-        String.format(Locale.FRANCE, "%.3f", valeur).trimEnd('0').trimEnd(',', '.')
+        java.text.NumberFormat.getNumberInstance().apply {
+            maximumFractionDigits = 3
+            isGroupingUsed = false
+        }.format(valeur)
+
+    private fun expliquer(explication: Explication): String = when (explication) {
+        Explication.AucunChiffre -> getString(R.string.ocr_aucun_chiffre)
+        Explication.SansHistorique -> getString(R.string.ocr_sans_historique)
+        Explication.RienNeRessemble -> getString(R.string.ocr_rien_ne_ressemble)
+        is Explication.Inhabituelle -> getString(R.string.ocr_inhabituelle, formater(explication.ecart))
+        is Explication.Progression -> getString(R.string.ocr_progression, formater(explication.ecart))
+        Explication.Recul -> getString(R.string.ocr_recul)
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -531,7 +530,7 @@ class SaisieActivity : AppCompatActivity() {
          * rognerait sur la seule chose qui compte, la finesse des chiffres.
          */
         private const val COTE_UTILE_MIN = 2200
-        private val formatIso = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
-        private val formatAffichage = SimpleDateFormat("d MMMM yyyy", Locale.FRANCE)
+        private val formatIso = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
+        private val formatAffichage = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
     }
 }

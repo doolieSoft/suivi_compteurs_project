@@ -59,12 +59,21 @@
                     android:textColor="@color/encre_2"
                     android:textSize="15sp" />
 
+                <!-- Premier lancement : partir d'un export, ou de zéro. -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/boutonReglages"
+                    android:id="@+id/boutonImporter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="@string/reglages" />
+                    android:text="@string/importer" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/boutonCreer"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/creer_maison" />
             </LinearLayout>
         </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

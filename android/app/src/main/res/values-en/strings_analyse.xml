@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Analysis screens computed on the device. -->
+<resources>
+    <string name="comparaison_climat">Year comparison and climate</string>
+    <string name="justesse_previsions">Forecast accuracy</string>
+
+    <string name="prevision_annee">Forecast %1$d</string>
+    <string name="evolution_vs_titre">Change compared with %1$d</string>
+    <string name="reference_valeur">%1$d: %2$s %3$s</string>
+    <string name="depuis_janvier">Since 1 January, up to %1$s</string>
+    <string name="an_dernier_a_date">last year on the same date: %1$s %2$s (%3$s)</string>
+    <string name="climat_vs_an_dernier">weather: %1$s degree days</string>
+    <string name="graphique_cumul">Cumulative since 1 January</string>
+    <string name="graphique_mensuel">Monthly consumption (%1$s)</string>
+    <string name="graphique_signature">Energy signature</string>
+    <string name="periodes_entre_releves">Periods between readings</string>
+    <string name="modele_ajuste">Model</string>
+    <string name="modele_resume">Horizontally, degree days per day; vertically, consumption per day. Base %1$s per day, %2$s per degree day, R² %3$s; heating accounts for about %4$s %% of consumption.</string>
+    <string name="modele_non_fiable">Horizontally, degree days per day; vertically, consumption per day. The link with the weather is not clear enough for a reliable model.</string>
+    <string name="par_annee">By year</string>
+    <string name="annee">Year</string>
+    <string name="consommation_unite">Cons. (%1$s)</string>
+    <string name="jours">Days</string>
+    <string name="degres_jours_court">DD</string>
+    <string name="degres_jours">Degree days</string>
+    <string name="climat_normal">Normal weather</string>
+    <string name="annee_incomplete">* incomplete year</string>
+    <string name="couts">Costs</string>
+    <string name="cout_variable">Consumption</string>
+    <string name="cout_abonnement">Standing charge</string>
+    <string name="cout_total">Total</string>
+    <string name="graphique_index">Meter readings (%1$s)</string>
+    <string name="compteur_n">Meter %1$d</string>
+
+    <string name="titre_comparaison">Comparison</string>
+    <string name="mesuree">Measured</string>
+    <string name="voir_le_detail">See details ›</string>
+    <string name="titre_climat">Climate: degree days per year</string>
+    <string name="normale">Normal</string>
+    <string name="ecart_normale">Difference from normal</string>
+    <string name="climat_explication">The more degree days, the colder the year. The normal is the average of the last ten years.</string>
+
+    <string name="titre_justesse">Forecast accuracy</string>
+    <string name="justesse_explication">What the forecast would have announced at each reading of the year, hiding everything that came after, compared with the consumption actually measured.</string>
+    <string name="rien_a_rejouer">No complete year to replay yet.</string>
+    <string name="reel_et_ecart">Actual: %1$s %2$s · mean error %3$s %%</string>
+    <string name="periode_annuelle">From %1$s to %2$s, from one annual reading to the next</string>
+    <string name="periode_civile">Calendar year: consumption around 1 January is estimated.</string>
+    <string name="borne_estimee">No annual reading near %1$s: boundary fully estimated.</string>
+    <string name="borne_pile">Annual reading of %1$s, right on the boundary.</string>
+    <string name="borne_ecart">Annual reading of %1$s, %2$d days from the boundary: %3$s %4$s estimated to bridge the gap.</string>
+    <string name="au">On</string>
+    <string name="prevu">Forecast</string>
+    <string name="ecart">Error</string>
+    <string name="fourchette_court">Within range</string>
+    <string name="oui">yes</string>
+    <string name="non">no</string>
+</resources>

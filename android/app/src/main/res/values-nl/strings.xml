@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Meters</string>
+
+    <!-- Startscherm -->
+    <string name="index_avec_unite">%1$s %2$s</string>
+    <string name="aucun_index">Geen meterstand</string>
+    <string name="releve_du">opgenomen op %1$s</string>
+    <string name="reglages">Instellingen</string>
+    <string name="consulter">Bekijken</string>
+    <string name="exporter">Exporteren naar Excel</string>
+    <string name="export_en_cours">Werkmap wordt voorbereid…</string>
+    <string name="export_reussi">Werkmap opgeslagen.</string>
+    <string name="export_ecriture_impossible">De werkmap kon niet op deze locatie worden opgeslagen.</string>
+    <string name="importer">Excel-werkmap importeren</string>
+    <string name="import_titre">Werkmap importeren?</string>
+    <string name="import_confirmation">De gegevens op dit toestel worden vervangen door die van de werkmap; meterstanden die op de telefoon zijn genoteerd en niet in de werkmap staan, blijven behouden.</string>
+    <string name="importer_confirmer">Importeren</string>
+    <string name="annuler">Annuleren</string>
+    <string name="import_en_cours">Werkmap wordt gelezen…</string>
+    <string name="import_illisible">Dit bestand kon niet als Excel-werkmap worden gelezen.</string>
+    <plurals name="import_reussi">
+        <item quantity="one">Werkmap geïmporteerd: %1$d meterstand.</item>
+        <item quantity="other">Werkmap geïmporteerd: %1$d meterstanden.</item>
+    </plurals>
+    <string name="tirer_pour_synchroniser">Trek omlaag om het weer bij te werken</string>
+
+    <!-- Meteropname -->
+    <string name="titre_saisie">Nieuwe meterstand</string>
+    <string name="compteur_introuvable">Meter niet gevonden</string>
+    <string name="dernier_index">Laatst bekende stand: %1$s %2$s</string>
+    <string name="cadrer_le_compteur">Kom dichterbij: de cijfers moeten de breedte vullen</string>
+    <string name="declencher">Foto nemen</string>
+    <string name="reprendre">Foto opnieuw nemen</string>
+    <string name="sans_photo">Zonder foto</string>
+    <string name="depuis_galerie">Uit de galerij</string>
+    <string name="lampe_allumer">Lamp</string>
+    <string name="lampe_eteindre">Lamp aan</string>
+    <string name="lampe_indisponible">Geen lamp op dit toestel</string>
+    <string name="entourer_le_cadran">Omcirkel de cijfers van de wijzerplaat met je vinger en lees opnieuw.</string>
+    <string name="lire_la_zone">Omcirkelde zone lezen</string>
+    <string name="photo_echouee">De foto kon niet worden genomen</string>
+    <string name="camera_refusee">Camera niet beschikbaar: typ de stand met de hand.</string>
+    <string name="ocr_en_cours">Meterstand wordt gelezen…</string>
+    <string name="ocr_echec">Geen cijfers herkend. Typ de stand met de hand.</string>
+    <string name="ocr_lu_sur_la_photo">Gelezen op de foto: %1$s</string>
+    <string name="ocr_autres_suites">Andere gelezen reeksen: %1$s</string>
+    <string name="ocr_aucun_chiffre">Geen cijfers herkend op de foto.</string>
+    <string name="ocr_sans_historique">Geen eerdere meterstand: controleer zorgvuldig.</string>
+    <string name="ocr_rien_ne_ressemble">Geen enkele cijferreeks lijkt op de meterstand: typ hem met de hand.</string>
+    <string name="ocr_inhabituelle">Ongewone stijging van %1$s: graag bevestigen.</string>
+    <string name="ocr_progression">Dat is %1$s sinds de vorige meterstand.</string>
+    <string name="ocr_recul">Lager dan de vorige meterstand: corrigeer met de hand.</string>
+    <string name="ocr_resultat">Gelezen op de foto: %1$s. %2$s</string>
+    <string name="index_releve">Meterstand</string>
+    <string name="index_obligatoire">Vul een meterstand in</string>
+    <string name="date_du_releve">Datum van de opname</string>
+    <string name="commentaire">Opmerking (optioneel)</string>
+    <string name="releve_annuel">Jaarlijkse meterstand</string>
+    <string name="releve_annuel_aide">Aanvinken voor de meterstand die het jaar afsluit: de voorspellingen vertrekken vanaf deze datum.</string>
+    <string name="enregistrer">Opslaan</string>
+    <string name="releve_enregistre">Meterstand opgeslagen</string>
+    <string name="releve_enregistre_avec_ecart">Meterstand opgeslagen: %1$s %2$s sinds de vorige</string>
+
+    <!-- Overzicht, berekend op het toestel -->
+    <string name="titre_tableau_de_bord">Voorspellingen</string>
+    <string name="tableau_vide">Geen gegevens op dit toestel. Importeer een Excel-werkmap via het menu van het startscherm, of synchroniseer met een bijgewerkte server.</string>
+    <string name="tiret">—</string>
+    <string name="valeur_unite">%1$s %2$s</string>
+    <string name="pourcent">%1$s %%</string>
+    <string name="pas_de_releve_sur_la_periode">Geen meterstand in het lopende jaar</string>
+    <string name="periode_releve_annuel">verwacht tegen %2$s, sinds de jaarlijkse meterstand van %1$s</string>
+    <string name="periode_annee_civile">verwacht voor %1$d</string>
+    <string name="detail_realise">%1$s %2$s gemeten over %3$d dagen, %4$s %2$s geschat over %5$d dagen</string>
+    <string name="fourchette">marge %1$s – %2$s</string>
+    <string name="evolution_vs">%1$s t.o.v. %2$d (%3$s %4$s)</string>
+    <string name="evolution_climat_egal">%1$s bij gelijk klimaat</string>
+    <string name="cout_estime">≈ € %1$s</string>
+    <string name="methode_employee">Methode: %1$s</string>
+    <string name="methode_thermique">thermisch model (normale graaddagen)</string>
+    <plurals name="methode_profil">
+        <item quantity="one">seizoensprofiel (%1$d referentiejaar)</item>
+        <item quantity="other">seizoensprofiel (%1$d referentiejaren)</item>
+    </plurals>
+    <plurals name="methode_moyenne">
+        <item quantity="one">gemiddelde van %1$d voorbij jaar</item>
+        <item quantity="other">gemiddelde van %1$d voorbije jaren</item>
+    </plurals>
+    <string name="methode_prorata">pro rata van de verstreken tijd (geen volledige historiek)</string>
+    <string name="methode_aucune">niets te schatten</string>
+    <plurals name="points_a_verifier">
+        <item quantity="one">⚠ %1$d punt om na te kijken</item>
+        <item quantity="other">⚠ %1$d punten om na te kijken</item>
+    </plurals>
+    <string name="periode_du_au">van %1$s tot %2$s</string>
+    <string name="anomalie_avec_periode">%1$s: %2$s</string>
+    <plurals name="anomalie_lacune">
+        <item quantity="one">geen bruikbare meterstand gedurende %1$d dag</item>
+        <item quantity="other">geen bruikbare meterstand gedurende %1$d dagen</item>
+    </plurals>
+    <plurals name="anomalie_index_fige">
+        <item quantity="one">stand onveranderd gedurende %1$d dag, waarschijnlijk een ontbrekende meterstand</item>
+        <item quantity="other">stand onveranderd gedurende %1$d dagen, waarschijnlijk een ontbrekende meterstand</item>
+    </plurals>
+    <string name="anomalie_surconso_climat">%1$s %2$s in %3$d dagen, %4$s× wat het weer liet verwachten</string>
+    <string name="anomalie_surconso">%1$s %2$s in %3$d dagen, %4$s× het gebruikelijke verbruik</string>
+    <string name="energie_eau">Water</string>
+    <string name="energie_gaz">Gas</string>
+    <string name="energie_electricite">Elektriciteit</string>
+    <string name="energie_mazout">Stookolie</string>
+    <string name="plage_haute">piekuren</string>
+    <string name="plage_basse">daluren</string>
+    <string name="libelle_plage">%1$s – %2$s</string>
+
+    <!-- Instellingen -->
+    <string name="titre_reglages">Instellingen</string>
+    <string name="rappel_titre_reglage">Herinner me aan de meteropname</string>
+    <string name="rappel_intervalle">Om de hoeveel dagen?</string>
+    <string name="notifications_refusees">Zonder toestemming voor meldingen kan de herinnering niet werken.</string>
+
+    <string name="langue">Taal</string>
+    <string name="langue_actuelle">Taal: %1$s</string>
+    <string name="langue_appareil">Taal van het toestel</string>
+
+    <!-- Herinneringen -->
+    <string name="canal_rappels">Herinneringen voor meteropname</string>
+    <string name="canal_rappels_description">Periodieke melding om de meters op te nemen.</string>
+    <string name="rappel_titre">Meteropname</string>
+    <string name="rappel_texte">Tijd om je meterstanden te noteren.</string>
+    <string name="accueil_vide">Welkom! Importeer om te beginnen een Excel-werkmap die uit de app of de website is geëxporteerd, of maak je woning en haar meters aan.</string>
+    <string name="creer_maison">Mijn woning aanmaken</string>
+    <string name="mettre_a_jour_meteo">Weer bijwerken</string>
+    <string name="donnees_sur_appareil">Je gegevens blijven op dit toestel</string>
+    <string name="meteo_a_jour">Weer bijgewerkt op %1$s</string>
+    <string name="meteo_mise_a_jour">Weer is bijgewerkt</string>
+    <string name="meteo_hors_ligne">Geen netwerk: het weer wordt later bijgewerkt. Al de rest werkt zonder netwerk.</string>
+    <string name="meteo_echec">Weer niet beschikbaar: %1$s</string>
+</resources>

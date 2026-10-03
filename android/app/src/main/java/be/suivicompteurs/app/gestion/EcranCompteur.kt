@@ -1,0 +1,272 @@
+package be.suivicompteurs.app.gestion
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import be.suivicompteurs.app.R
+import be.suivicompteurs.app.donnees.CompteurHistorique
+import be.suivicompteurs.app.donnees.ReleveHistorique
+import java.time.LocalDate
+import kotlinx.coroutines.launch
+
+@Composable
+fun EcranCompteur(
+    gestion: Gestion,
+    id: Long,
+    maisonId: Long,
+    surRetour: () -> Unit,
+    surCompteur: (Long) -> Unit,
+) {
+    val portee = rememberCoroutineScope()
+    var compteurId by remember { mutableStateOf(id) }
+    var origine by remember { mutableStateOf<CompteurHistorique?>(null) }
+    var energie by remember { mutableStateOf("GAZ") }
+    var plage by remember { mutableStateOf("UNIQUE") }
+    var libelle by remember { mutableStateOf("") }
+    var numero by remember { mutableStateOf("") }
+    var unite by remember { mutableStateOf("m³") }
+    var coef by remember { mutableStateOf("11") }
+    var pose by remember { mutableStateOf<String?>(null) }
+    var depose by remember { mutableStateOf<String?>(null) }
+    var releves by remember { mutableStateOf<List<ReleveHistorique>>(emptyList()) }
+    var releveEdite by remember { mutableStateOf<Pair<ReleveHistorique, String?>?>(null) }
+    var remplacer by remember { mutableStateOf(false) }
+    var confirmer by remember { mutableStateOf(false) }
+    var version by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(compteurId, version) {
+        if (compteurId == 0L) return@LaunchedEffect
+        val c = gestion.compteur(compteurId) ?: return@LaunchedEffect
+        if (origine == null) {
+            energie = c.energie; plage = c.plage; libelle = c.libelle; numero = c.numero
+            unite = c.unite; coef = ecrireNombre(c.coefKwh); pose = c.datePose; depose = c.dateDepose
+        }
+        origine = c
+        releves = gestion.releves(compteurId).sortedByDescending { it.date }
+    }
+
+    fun enregistrer() = portee.launch {
+        val c = (origine ?: CompteurHistorique(0, maisonId, energie, plage, unite, "", null)).copy(
+            energie = energie, plage = plage, libelle = libelle, numero = numero.trim(), unite = unite.trim(),
+            coefKwh = lireNombre(coef) ?: 1.0, datePose = pose, dateDepose = depose,
+        )
+        compteurId = gestion.enregistrerCompteur(c)
+        version++
+    }
+
+    Cadre(
+        titre = if (compteurId == 0L) stringResource(R.string.nouveau_compteur) else origine?.let { libelleCompteur(it) }.orEmpty(),
+        surRetour = surRetour,
+        surSuppression = if (compteurId != 0L) ({ confirmer = true }) else null,
+    ) {
+        ChampChoix(stringResource(R.string.energie), energies(), energie) {
+            energie = it
+            // Valeurs usuelles : le gaz se relève en m³ et se convertit à ~11 kWh/m³.
+            if (compteurId == 0L) {
+                unite = when (it) { "ELEC" -> "kWh"; "MAZ" -> "L"; else -> "m³" }
+                // Un litre de mazout libère environ 10 kWh.
+                coef = when (it) { "GAZ" -> "11"; "MAZ" -> "10"; else -> "1" }
+            }
+        }
+        if (energie == "ELEC") ChampChoix(stringResource(R.string.plage), plages(), plage) { plage = it }
+        ChampTexte(stringResource(R.string.libelle_facultatif), libelle, { libelle = it })
+        ChampTexte(stringResource(R.string.numero_compteur), numero, { numero = it })
+        Row {
+            ChampTexte(stringResource(R.string.unite), unite, { unite = it }, Modifier.weight(1f).padding(end = 8.dp))
+            ChampTexte(stringResource(R.string.coef_kwh), coef, { coef = it }, Modifier.weight(1f), numerique = true)
+        }
+        ChampDate(stringResource(R.string.pose_le), pose, { pose = it }, facultatif = true)
+        ChampDate(stringResource(R.string.depose_le_champ), depose, { depose = it }, facultatif = true)
+        Button(onClick = { enregistrer() }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+            Text(stringResource(R.string.enregistrer))
+        }
+        if (compteurId != 0L && depose == null) {
+            OutlinedButton(onClick = { remplacer = true }, Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.remplacer_compteur))
+            }
+        }
+
+        if (compteurId != 0L) {
+            TitreSection(stringResource(R.string.releves_titre, releves.size), action = {
+                TextButton(onClick = {
+                    releveEdite = ReleveHistorique(compteurId, LocalDate.now().toString(), releves.firstOrNull()?.index ?: 0.0, false) to null
+                }) { Text(stringResource(R.string.ajouter)) }
+            })
+            releves.forEach { r ->
+                LigneListe(
+                    titre = "${jour(r.date)} · ${afficherNombre(r.index)} $unite",
+                    detail = listOfNotNull(
+                        if (r.annuel) stringResource(R.string.releve_annuel) else null,
+                        r.commentaire.ifEmpty { null },
+                    ).joinToString(" · "),
+                    surAppui = { releveEdite = r to r.date },
+                )
+            }
+        }
+    }
+
+    releveEdite?.let { (r, dateAvant) ->
+        DialogueReleve(
+            r, unite,
+            surFermeture = { releveEdite = null },
+            surEnregistrement = { nouveau ->
+                try {
+                    gestion.enregistrerReleve(nouveau, dateAvant)
+                    releveEdite = null
+                    version++
+                    null
+                } catch (refus: Refus) {
+                    refus
+                }
+            },
+            surSuppression = if (dateAvant != null) ({
+                portee.launch { gestion.supprimerReleve(r.compteurId, dateAvant); releveEdite = null; version++ }
+            }) else null,
+        )
+    }
+    if (remplacer) {
+        DialogueRemplacement(
+            surFermeture = { remplacer = false },
+            surConfirmation = { date, index, nouveauNumero ->
+                portee.launch {
+                    val nouveau = gestion.remplacerCompteur(compteurId, date, index, nouveauNumero)
+                    remplacer = false
+                    surCompteur(nouveau)
+                }
+            },
+        )
+    }
+    if (confirmer) {
+        ConfirmerSuppression(
+            stringResource(R.string.supprimer_compteur_confirmation, releves.size),
+            surConfirmation = { portee.launch { gestion.supprimerCompteur(compteurId); confirmer = false; surRetour() } },
+            surAbandon = { confirmer = false },
+        )
+    }
+}
+
+@Composable
+fun messageRefus(refus: Refus): String = when (refus.motif) {
+    Motif.INDEX_RECULE -> stringResource(R.string.refus_index_recule, jour(refus.details[0] as String), ecrireNombre(refus.details[1] as Double))
+    Motif.INDEX_DEPASSE -> stringResource(R.string.refus_index_depasse, jour(refus.details[0] as String), ecrireNombre(refus.details[1] as Double))
+    Motif.DATE_DEJA_RELEVEE -> stringResource(R.string.refus_date_deja_relevee, jour(refus.details[0] as String))
+    Motif.NOM_OBLIGATOIRE -> stringResource(R.string.nom_obligatoire)
+    Motif.DATE_OBLIGATOIRE -> stringResource(R.string.date_obligatoire)
+}
+
+@Composable
+fun DialogueReleve(
+    releve: ReleveHistorique,
+    unite: String,
+    surFermeture: () -> Unit,
+    surEnregistrement: suspend (ReleveHistorique) -> Refus?,
+    surSuppression: (() -> Unit)?,
+) {
+    val portee = rememberCoroutineScope()
+    var date by remember { mutableStateOf<String?>(releve.date) }
+    var index by remember { mutableStateOf(ecrireNombre(releve.index)) }
+    var annuel by remember { mutableStateOf(releve.annuel) }
+    var source by remember { mutableStateOf(releve.source) }
+    var commentaire by remember { mutableStateOf(releve.commentaire) }
+    var refus by remember { mutableStateOf<Refus?>(null) }
+    AlertDialog(
+        onDismissRequest = surFermeture,
+        title = { Text(stringResource(R.string.releve)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                ChampDate(stringResource(R.string.date_du_releve), date, { date = it })
+                ChampTexte(
+                    stringResource(R.string.index_unite, unite), index, { index = it; refus = null },
+                    numerique = true, erreur = refus?.let { messageRefus(it) },
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = annuel, onCheckedChange = { annuel = it })
+                    Text(stringResource(R.string.releve_annuel))
+                }
+                ChampChoix(
+                    stringResource(R.string.source),
+                    listOf(
+                        "MANUEL" to stringResource(R.string.source_manuel),
+                        "FOURNISSEUR" to stringResource(R.string.source_fournisseur),
+                        "ESTIME" to stringResource(R.string.source_estime),
+                        "IMPORT" to stringResource(R.string.source_import),
+                    ),
+                    source,
+                ) { source = it }
+                ChampTexte(stringResource(R.string.commentaire), commentaire, { commentaire = it })
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = lireNombre(index) != null && date != null,
+                onClick = {
+                    portee.launch {
+                        refus = surEnregistrement(
+                            releve.copy(
+                                date = date!!, index = lireNombre(index)!!, annuel = annuel,
+                                source = source, commentaire = commentaire.trim().take(200),
+                            )
+                        )
+                    }
+                },
+            ) { Text(stringResource(R.string.enregistrer)) }
+        },
+        dismissButton = {
+            Row {
+                surSuppression?.let { TextButton(onClick = it) { Text(stringResource(R.string.supprimer), color = Couleurs.critique) } }
+                TextButton(onClick = surFermeture) { Text(stringResource(R.string.annuler)) }
+            }
+        },
+    )
+}
+
+@Composable
+fun DialogueRemplacement(
+    surFermeture: () -> Unit,
+    surConfirmation: (LocalDate, Double, String) -> Unit,
+) {
+    var date by remember { mutableStateOf<String?>(LocalDate.now().toString()) }
+    var index by remember { mutableStateOf("0") }
+    var numero by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = surFermeture,
+        title = { Text(stringResource(R.string.remplacer_compteur)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text(stringResource(R.string.remplacer_explication), style = MaterialTheme.typography.bodyMedium)
+                ChampDate(stringResource(R.string.date_remplacement), date, { date = it })
+                ChampTexte(stringResource(R.string.index_depart), index, { index = it }, numerique = true)
+                ChampTexte(stringResource(R.string.numero_nouveau), numero, { numero = it })
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = date != null && lireNombre(index) != null,
+                onClick = { surConfirmation(LocalDate.parse(date), lireNombre(index)!!, numero) },
+            ) { Text(stringResource(R.string.remplacer)) }
+        },
+        dismissButton = { TextButton(onClick = surFermeture) { Text(stringResource(R.string.annuler)) } },
+    )
+}

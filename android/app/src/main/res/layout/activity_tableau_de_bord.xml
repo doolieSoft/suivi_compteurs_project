@@ -13,58 +13,41 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/surface"
         app:navigationIcon="@drawable/ic_retour"
-        app:title="@string/titre_consultation" />
+        app:title="@string/titre_tableau_de_bord" />
 
-    <ProgressBar
-        android:id="@+id/progression"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:indeterminate="true"
-        android:visibility="gone" />
-
-    <FrameLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/rafraichir"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <WebView
-            android:id="@+id/web"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <!-- Repli hors ligne : le dernier instantané reçu du serveur. -->
         <ScrollView
-            android:id="@+id/horsLigne"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone">
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:paddingTop="6dp"
+                android:paddingBottom="16dp">
 
                 <TextView
-                    android:id="@+id/motif"
+                    android:id="@+id/vide"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/bandeau_attente"
-                    android:padding="14dp"
+                    android:padding="24dp"
+                    android:text="@string/tableau_vide"
                     android:textColor="@color/encre_2"
-                    android:textSize="14sp" />
+                    android:textSize="15sp"
+                    android:visibility="gone" />
 
-                <TextView
-                    android:id="@+id/resume"
+                <LinearLayout
+                    android:id="@+id/contenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:fontFamily="monospace"
-                    android:lineSpacingExtra="3dp"
-                    android:textColor="@color/encre"
-                    android:textSize="14sp" />
+                    android:orientation="vertical" />
             </LinearLayout>
         </ScrollView>
-    </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </LinearLayout>

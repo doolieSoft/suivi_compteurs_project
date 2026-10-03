@@ -10,4 +10,13 @@
         <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
         <item name="android:navigationBarColor" tools:targetApi="l">@android:color/transparent</item>
     </style>
+
+    <!-- Lignes de détail des tuiles du tableau de bord. -->
+    <style name="TexteTuile">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:textColor">@color/encre_3</item>
+        <item name="android:textSize">13sp</item>
+    </style>
 </resources>

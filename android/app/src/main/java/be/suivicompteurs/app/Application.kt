@@ -9,8 +9,7 @@ class Application : Application() {
         super.onCreate()
         Rappels.creerCanal(this)
         Rappels.appliquer(this)
-        // Rattrape les relevés restés en attente si l'application a été fermée
-        // avant le retour du réseau.
+        // La météo (degrés-jours) se met à jour d'elle-même chaque jour.
         SyncWorker.programmer(this)
     }
 }

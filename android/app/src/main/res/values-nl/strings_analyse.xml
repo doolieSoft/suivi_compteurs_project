@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Analyseschermen, berekend op het toestel. -->
+<resources>
+    <string name="comparaison_climat">Jaarvergelijking en klimaat</string>
+    <string name="justesse_previsions">Nauwkeurigheid van de voorspellingen</string>
+
+    <string name="prevision_annee">Voorspelling %1$d</string>
+    <string name="evolution_vs_titre">Evolutie t.o.v. %1$d</string>
+    <string name="reference_valeur">%1$d: %2$s %3$s</string>
+    <string name="depuis_janvier">Sinds 1 januari, tot %1$s</string>
+    <string name="an_dernier_a_date">vorig jaar op dezelfde datum: %1$s %2$s (%3$s)</string>
+    <string name="climat_vs_an_dernier">weer: %1$s graaddagen</string>
+    <string name="graphique_cumul">Cumulatief sinds 1 januari</string>
+    <string name="graphique_mensuel">Maandelijks verbruik (%1$s)</string>
+    <string name="graphique_signature">Energiesignatuur</string>
+    <string name="periodes_entre_releves">Periodes tussen meterstanden</string>
+    <string name="modele_ajuste">Model</string>
+    <string name="modele_resume">Horizontaal de graaddagen per dag, verticaal het verbruik per dag. Basis %1$s per dag, %2$s per graaddag, R² %3$s; verwarming is goed voor ongeveer %4$s %% van het verbruik.</string>
+    <string name="modele_non_fiable">Horizontaal de graaddagen per dag, verticaal het verbruik per dag. Het verband met het weer is niet duidelijk genoeg voor een betrouwbaar model.</string>
+    <string name="par_annee">Per jaar</string>
+    <string name="annee">Jaar</string>
+    <string name="consommation_unite">Verbr. (%1$s)</string>
+    <string name="jours">Dagen</string>
+    <string name="degres_jours_court">GD</string>
+    <string name="degres_jours">Graaddagen</string>
+    <string name="climat_normal">Normaal klimaat</string>
+    <string name="annee_incomplete">* onvolledig jaar</string>
+    <string name="couts">Kosten</string>
+    <string name="cout_variable">Verbruik</string>
+    <string name="cout_abonnement">Vaste vergoeding</string>
+    <string name="cout_total">Totaal</string>
+    <string name="graphique_index">Meterstanden (%1$s)</string>
+    <string name="compteur_n">Meter %1$d</string>
+
+    <string name="titre_comparaison">Vergelijking</string>
+    <string name="mesuree">Gemeten</string>
+    <string name="voir_le_detail">Details bekijken ›</string>
+    <string name="titre_climat">Klimaat: graaddagen per jaar</string>
+    <string name="normale">Normaal</string>
+    <string name="ecart_normale">Afwijking t.o.v. normaal</string>
+    <string name="climat_explication">Hoe meer graaddagen, hoe kouder het jaar. De normaal is het gemiddelde van de laatste tien jaar.</string>
+
+    <string name="titre_justesse">Nauwkeurigheid van de voorspellingen</string>
+    <string name="justesse_explication">Wat de voorspelling bij elke meterstand van het jaar zou hebben aangekondigd, met verberging van alles wat volgde, vergeleken met het werkelijk gemeten verbruik.</string>
+    <string name="rien_a_rejouer">Nog geen volledig jaar om opnieuw af te spelen.</string>
+    <string name="reel_et_ecart">Werkelijk: %1$s %2$s · gemiddelde afwijking %3$s %%</string>
+    <string name="periode_annuelle">Van %1$s tot %2$s, van de ene jaarlijkse meterstand tot de volgende</string>
+    <string name="periode_civile">Kalenderjaar: het verbruik rond 1 januari is geschat.</string>
+    <string name="borne_estimee">Geen jaarlijkse meterstand in de buurt van %1$s: grens volledig geschat.</string>
+    <string name="borne_pile">Jaarlijkse meterstand van %1$s, precies op de grens.</string>
+    <string name="borne_ecart">Jaarlijkse meterstand van %1$s, %2$d dagen van de grens: %3$s %4$s geschat om het verschil te overbruggen.</string>
+    <string name="au">Op</string>
+    <string name="prevu">Voorspeld</string>
+    <string name="ecart">Afwijking</string>
+    <string name="fourchette_court">Binnen de marge</string>
+    <string name="oui">ja</string>
+    <string name="non">nee</string>
+</resources>

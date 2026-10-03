@@ -1,25 +1,33 @@
 # Application Android
 
-Client mobile du suivi de compteurs. Son rôle : **relever un compteur sans
-dépendre du serveur**, puis transmettre quand il redevient joignable.
+Application **autonome** de suivi des compteurs d'eau, de gaz, d'électricité et
+de mazout. Toutes les données vivent sur le téléphone ; seule la météo
+(degrés-jours) vient d'Internet, d'Open-Meteo. Aucun compte, aucun serveur.
 
-L'analyse n'est pas réimplémentée ici. Pas un degré-jour, pas un modèle
-thermique, pas une prévision : tout cela reste en Python côté serveur. Le Kotlin
-saisit, stocke, transmet et affiche.
+Le moteur de calcul — ventilation des consommations, modèle thermique,
+correction climatique, prévisions, coûts — est un portage en Kotlin des services
+Python du site (`suivi/services/`). Les deux donnent les mêmes chiffres : voir
+« Parité avec le site » plus bas.
 
-## Ce qui fonctionne serveur éteint
+## Ce que fait l'application
 
-- liste des compteurs et dernier index connu ;
-- photographie du compteur ;
-- **lecture automatique de l'index** — le modèle ML Kit est embarqué dans l'APK ;
-- contrôle de cohérence (un index ne recule pas) ;
-- enregistrement du relevé dans la base locale ;
-- plusieurs relevés d'affilée, chacun tenant compte du précédent ;
+- relevé d'un compteur, avec **lecture automatique de l'index** sur la photo
+  (le modèle ML Kit est embarqué : aucun réseau nécessaire) ;
+- contrôle de cohérence : un index ne recule pas, une date ne porte qu'un relevé ;
+- prévisions de l'année, d'un relevé annuel au suivant ou en année civile ;
+- détail de chaque énergie : cumul, consommation mensuelle, signature
+  énergétique, index, années comparées à climat normal, coûts ;
+- comparaison des années, climat, justesse des prévisions passées ;
+- gestion des maisons, compteurs (remplacement compris), relevés, tarifs et
+  événements ;
+- import et export Excel, au même format que le site : un classeur exporté de
+  l'un se réimporte dans l'autre. L'export, enregistré où l'on veut (Google
+  Drive compris), tient lieu de sauvegarde ;
 - rappels de relevé ;
-- consultation du dernier instantané d'analyse reçu.
+- interface en français, anglais et néerlandais.
 
-Ce qui attend le serveur : l'arrivée du relevé dans l'archive, et le recalcul
-des prévisions avec les nouvelles valeurs.
+Seule la mise à jour de la météo demande du réseau ; elle se fait d'elle-même
+une fois par jour, ou en tirant l'écran d'accueil vers le bas.
 
 ## Construire
 
@@ -101,7 +109,7 @@ avec `cle-release.jks` dont le mot de passe est dans `keystore.properties`.
 **Sauvegardez ces deux fichiers ailleurs que sur ce PC.** Les perdre interdit
 définitivement toute mise à jour de l'application déjà installée : Android
 refuse une signature différente, il faudrait désinstaller — donc perdre les
-relevés en attente et les réglages.
+relevés et les réglages, sauf export préalable.
 
 Sans eux, la compilation retombe sur la clé de débogage. C'est volontaire : le
 dépôt reste constructible par qui le clone, sans pouvoir publier par mégarde un
@@ -122,33 +130,48 @@ d'installer depuis cette application.
 
 ## Premier démarrage
 
-Menu **⋮** → **Réglages** :
+L'écran d'accueil propose deux départs :
 
-| Champ | Serveur domestique | Hébergeur en ligne |
-|---|---|---|
-| Adresse | `192.168.0.10` | `https://VOTRENOM.pythonanywhere.com` |
-| Jeton | `JETON_API` de `config/settings.py` | `SUIVI_JETON_API` du `.env` |
-
-Une adresse IP nue reçoit automatiquement `http://` et le port 8000 ; un nom de
-domaine reçoit `https://` sans port. **Tester la connexion** avant d'enregistrer.
+- **Importer un classeur Excel** — un export de l'application ou du site, pour
+  reprendre un historique existant ;
+- **Créer ma maison** — puis ses compteurs, dans *Gérer maisons et compteurs*.
+  La position de la maison (latitude, longitude) sert à récupérer sa météo.
 
 ## Organisation
 
 ```
 app/src/main/java/be/suivicompteurs/app/
-├── MainActivity.kt          liste des compteurs, état de synchronisation
+├── MainActivity.kt          liste des compteurs, import, export
 ├── SaisieActivity.kt        appareil photo, OCR, formulaire
-├── ConsultationActivity.kt  WebView, et repli sur l'instantané hors ligne
-├── ReglagesActivity.kt      adresse, jeton, rappels
-├── Reglages.kt              préférences et normalisation de l'adresse
-├── donnees/                 base locale (Room) : compteurs, file d'attente
+├── TableauDeBordActivity.kt prévisions de chaque énergie
+├── ReglagesActivity.kt      rappels et langue
+├── moteur/                  calculs, portés du Python du site — sans Android
+├── analyse/                 écrans d'analyse (Compose) et leurs graphiques
+├── gestion/                 maisons, compteurs, relevés, tarifs (Compose)
+├── classeur/                lecture et écriture des classeurs Excel
+├── donnees/                 base locale (Room)
 ├── ocr/
 │   ├── LecteurIndex.kt      appel à ML Kit
 │   └── SelecteurIndex.kt    choix de l'index — la logique faillible, testée
-├── reseau/Api.kt            client HTTP
-├── sync/Synchronisation.kt  vidage de la file, rapatriement de l'analyse
+├── reseau/OpenMeteo.kt      températures journalières
+├── sync/Synchronisation.kt  mise à jour quotidienne de la météo
 └── rappel/Rappels.kt        notifications locales
 ```
+
+## Parité avec le site
+
+Le moteur Kotlin doit rendre les mêmes chiffres que le moteur Python. Sur les
+données réelles :
+
+```bash
+python manage.py reference_moteur      # depuis la racine du projet
+cd android && ./gradlew testDebugUnitTest
+```
+
+La commande fige ce que calcule le Python, ainsi qu'un export Excel, dans
+`android/app/build/` (non versionné : ce sont des relevés personnels). Les tests
+`ParitePythonTest` et `ImportClasseurTest` les relisent et exigent les mêmes
+valeurs au milliardième près. Sans ces fichiers, ces deux tests sont ignorés.
 
 ## Pourquoi le choix de l'index est séparé du reste
 
@@ -176,8 +199,11 @@ sans que vous ayez vu la valeur.
 
 - **Afficheurs à sept segments** (compteurs électriques à cristaux liquides) :
   mal reconnus par les OCR génériques, entraînés sur des polices de caractères.
-  Prévoyez de corriger à la main, ou utilisez *Saisir sans photo*.
-- **La date du relevé est celle du jour**, non modifiable depuis le téléphone.
-  Corrigez depuis l'interface web si vous relevez a posteriori.
-- L'application n'affiche pas les graphiques hors ligne, seulement les chiffres
-  clés de l'instantané.
+  Prévoyez de corriger à la main, ou utilisez *Sans photo*.
+- **La date d'un nouveau relevé est celle du jour.** Pour un relevé fait
+  a posteriori, corrigez sa date dans *Gérer maisons et compteurs*, sur la fiche
+  du compteur.
+- **Mazout** : traité comme un compteur dont l'index monte. Le suivi par niveau
+  de cuve et livraisons, comme un réservoir de voiture, n'est pas encore géré.
+- Les noms des compteurs de l'écran d'accueil et le classeur Excel restent en
+  français : le classeur doit pouvoir être relu par le site.

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Écrans d'analyse calculés sur l'appareil. -->
+<resources>
+    <string name="comparaison_climat">Comparaison des années et climat</string>
+    <string name="justesse_previsions">Justesse des prévisions</string>
+
+    <string name="prevision_annee">Prévision %1$d</string>
+    <string name="evolution_vs_titre">Évolution par rapport à %1$d</string>
+    <string name="reference_valeur">%1$d : %2$s %3$s</string>
+    <string name="depuis_janvier">Depuis le 1er janvier, jusqu\'au %1$s</string>
+    <string name="an_dernier_a_date">l\'an dernier à la même date : %1$s %2$s (%3$s)</string>
+    <string name="climat_vs_an_dernier">climat : %1$s de degrés-jours</string>
+    <string name="graphique_cumul">Cumul depuis le 1er janvier</string>
+    <string name="graphique_mensuel">Consommation mensuelle (%1$s)</string>
+    <string name="graphique_signature">Signature énergétique</string>
+    <string name="periodes_entre_releves">Périodes entre relevés</string>
+    <string name="modele_ajuste">Modèle</string>
+    <string name="modele_resume">En abscisse les degrés-jours par jour, en ordonnée la consommation par jour. Base %1$s par jour, %2$s par degré-jour, R² %3$s ; le chauffage représente environ %4$s %% de la consommation.</string>
+    <string name="modele_non_fiable">En abscisse les degrés-jours par jour, en ordonnée la consommation par jour. Le lien avec le climat n\'est pas assez net pour un modèle fiable.</string>
+    <string name="par_annee">Par année</string>
+    <string name="annee">Année</string>
+    <string name="consommation_unite">Conso. (%1$s)</string>
+    <string name="jours">Jours</string>
+    <string name="degres_jours_court">DJ</string>
+    <string name="degres_jours">Degrés-jours</string>
+    <string name="climat_normal">À climat normal</string>
+    <string name="annee_incomplete">* année incomplète</string>
+    <string name="couts">Coûts</string>
+    <string name="cout_variable">Consommation</string>
+    <string name="cout_abonnement">Abonnement</string>
+    <string name="cout_total">Total</string>
+    <string name="graphique_index">Index relevés (%1$s)</string>
+    <string name="compteur_n">Compteur %1$d</string>
+
+    <string name="titre_comparaison">Comparaison</string>
+    <string name="mesuree">Mesurée</string>
+    <string name="voir_le_detail">Voir le détail ›</string>
+    <string name="titre_climat">Climat : degrés-jours par année</string>
+    <string name="normale">Normale</string>
+    <string name="ecart_normale">Écart à la normale</string>
+    <string name="climat_explication">Plus il y a de degrés-jours, plus l\'année a été froide. La normale est la moyenne des dix dernières années.</string>
+
+    <string name="titre_justesse">Justesse des prévisions</string>
+    <string name="justesse_explication">Ce que la prévision aurait annoncé à chaque relevé de l\'année, en masquant tout ce qui a suivi, comparé à la consommation réellement mesurée.</string>
+    <string name="rien_a_rejouer">Aucune année complète à rejouer pour l\'instant.</string>
+    <string name="reel_et_ecart">Réel : %1$s %2$s · écart moyen %3$s %%</string>
+    <string name="periode_annuelle">Du %1$s au %2$s, d\'un relevé annuel au suivant</string>
+    <string name="periode_civile">Année civile : la consommation autour du 1er janvier est estimée.</string>
+    <string name="borne_estimee">Aucun relevé annuel proche du %1$s : borne entièrement estimée.</string>
+    <string name="borne_pile">Relevé annuel du %1$s, pile sur la borne.</string>
+    <string name="borne_ecart">Relevé annuel du %1$s, à %2$d jours de la borne : %3$s %4$s estimés pour combler l\'écart.</string>
+    <string name="au">Au</string>
+    <string name="prevu">Prévu</string>
+    <string name="ecart">Écart</string>
+    <string name="fourchette_court">Dans la fourchette</string>
+    <string name="oui">oui</string>
+    <string name="non">non</string>
+</resources>

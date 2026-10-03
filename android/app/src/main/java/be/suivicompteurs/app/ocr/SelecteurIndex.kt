@@ -12,11 +12,35 @@ import kotlin.math.pow
  * @param brut suite de chiffres dont il provient, pour expliquer la proposition
  * @param confiance 0 à 1 : cohérence de la valeur avec l'historique connu
  */
+/**
+ * Ce que l'on peut dire d'une lecture. L'écran de saisie le met en mots dans
+ * la langue de l'appareil.
+ */
+sealed interface Explication {
+    /** Rien de lisible sur la photo. */
+    data object AucunChiffre : Explication
+
+    /** Pas de relevé antérieur pour vérifier la lecture. */
+    data object SansHistorique : Explication
+
+    /** Aucune suite lue n'a la forme de l'index : autre chose sur la plaque. */
+    data object RienNeRessemble : Explication
+
+    /** Progression anormalement forte depuis le dernier relevé. */
+    data class Inhabituelle(val ecart: Double) : Explication
+
+    /** Progression plausible depuis le dernier relevé. */
+    data class Progression(val ecart: Double) : Explication
+
+    /** Lecture inférieure au dernier index : un chiffre a échappé. */
+    data object Recul : Explication
+}
+
 data class Proposition(
     val valeur: Double,
     val brut: String,
     val confiance: Double,
-    val explication: String,
+    val explication: Explication,
     /**
      * Suites de chiffres trouvées sur la photo, celle retenue comprise.
      *
@@ -105,7 +129,7 @@ object SelecteurIndex {
                 valeur = choix.valeur,
                 brut = choix.brut,
                 confiance = 0.3,
-                explication = "Aucun relevé antérieur : vérifiez attentivement.",
+                explication = Explication.SansHistorique,
                 suitesLues = suites,
             )
         }
@@ -155,12 +179,9 @@ object SelecteurIndex {
                 brut = choix.brut,
                 confiance = if (suspecte) 0.2 else 0.85,
                 explication = when {
-                    !ressemble ->
-                        "Aucune suite de chiffres ne ressemble à l'index : " +
-                            "saisissez-le à la main."
-                    ecart > borne ->
-                        "Progression inhabituelle de ${format(ecart)} : à confirmer."
-                    else -> "Soit ${format(ecart)} depuis le dernier relevé."
+                    !ressemble -> Explication.RienNeRessemble
+                    ecart > borne -> Explication.Inhabituelle(ecart)
+                    else -> Explication.Progression(ecart)
                 },
                 suitesLues = suites,
             )
@@ -172,7 +193,7 @@ object SelecteurIndex {
             valeur = approchant.valeur,
             brut = approchant.brut,
             confiance = 0.15,
-            explication = "Lecture inférieure au dernier index : corrigez à la main.",
+            explication = Explication.Recul,
             suitesLues = suites,
         )
     }
@@ -236,6 +257,4 @@ object SelecteurIndex {
         return commun
     }
 
-    private fun format(valeur: Double): String =
-        if (valeur >= 100) String.format("%.0f", valeur) else String.format("%.2f", valeur)
 }

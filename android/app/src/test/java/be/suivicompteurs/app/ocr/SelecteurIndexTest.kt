@@ -53,7 +53,7 @@ class SelecteurIndexTest {
             "une lecture invraisemblable doit être signalée",
             proposition!!.confiance <= 0.3,
         )
-        assertTrue(proposition.explication.contains("ressemble à l'index"))
+        assertEquals(Explication.RienNeRessemble, proposition.explication)
     }
 
     @Test
@@ -64,7 +64,7 @@ class SelecteurIndexTest {
         val proposition = SelecteurIndex.choisir(lignes, indexGazPrecedent, decimalesGaz)
         assertNotNull(proposition)
         assertTrue(proposition!!.confiance < 0.2)
-        assertTrue(proposition.explication.contains("corrigez", ignoreCase = true))
+        assertEquals(Explication.Recul, proposition.explication)
     }
 
     @Test
@@ -87,7 +87,7 @@ class SelecteurIndexTest {
         assertTrue(proposition.confiance <= 0.4)
         // Six chiffres entiers au lieu de cinq : ce n'est pas un index de ce
         // compteur, et c'est plus juste à dire qu'une progression inhabituelle.
-        assertTrue(proposition.explication.contains("ressemble à l'index"))
+        assertEquals(Explication.RienNeRessemble, proposition.explication)
     }
 
     @Test
@@ -119,7 +119,7 @@ class SelecteurIndexTest {
         val proposition = SelecteurIndex.choisir(listOf("00123", "456"), null, 3)
         assertNotNull(proposition)
         assertTrue(proposition!!.confiance <= 0.3)
-        assertTrue(proposition.explication.contains("Aucun relevé antérieur"))
+        assertEquals(Explication.SansHistorique, proposition.explication)
     }
 
     @Test
@@ -236,7 +236,7 @@ class SelecteurIndexCompteurReelTest {
         // Le motif retenu est le bon : « 27364 » ne partage qu'un chiffre de
         // tête avec « 24978 ». C'est plus précis que de parler de progression
         // inhabituelle, qui laisserait croire que le compteur a bougé.
-        assertTrue(proposition.explication.contains("ressemble à l'index"))
+        assertEquals(Explication.RienNeRessemble, proposition.explication)
     }
 }
 
@@ -277,9 +277,10 @@ class SelecteurIndexIndexIllisibleTest {
             "la confiance doit être au plancher quand rien ne ressemble à un index",
             proposition!!.confiance <= 0.2,
         )
-        assertTrue(
+        assertEquals(
             "le message doit inviter à saisir à la main, pas suggérer une valeur",
-            proposition.explication.contains("saisissez-le à la main"),
+            Explication.RienNeRessemble,
+            proposition.explication,
         )
     }
 

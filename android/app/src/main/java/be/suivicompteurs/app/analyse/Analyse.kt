@@ -1,0 +1,128 @@
+package be.suivicompteurs.app.analyse
+
+import android.content.Context
+import be.suivicompteurs.app.donnees.BaseLocale
+import be.suivicompteurs.app.donnees.EvenementLocal
+import be.suivicompteurs.app.donnees.MaisonLocale
+import be.suivicompteurs.app.moteur.Anomalie
+import be.suivicompteurs.app.moteur.ComparaisonGlissante
+import be.suivicompteurs.app.moteur.Compteur
+import be.suivicompteurs.app.moteur.DegresJours
+import be.suivicompteurs.app.moteur.Energie
+import be.suivicompteurs.app.moteur.Ligne
+import be.suivicompteurs.app.moteur.Plage
+import be.suivicompteurs.app.moteur.Prevision
+import be.suivicompteurs.app.moteur.Releve
+import be.suivicompteurs.app.moteur.Tarif
+import be.suivicompteurs.app.moteur.comparerAAnneePrecedente
+import be.suivicompteurs.app.moteur.detecterAnomalies
+import be.suivicompteurs.app.moteur.lignes
+import be.suivicompteurs.app.moteur.prevoir
+import be.suivicompteurs.app.moteur.valoriser
+import java.time.LocalDate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+/** Ce que le tableau de bord affiche pour une énergie. */
+data class ResumeLigne(
+    val ligne: Ligne,
+    val prevision: Prevision?,
+    val comparaison: ComparaisonGlissante?,
+    val anomalies: List<Anomalie>,
+    /** Coût de la prévision au tarif du jour, s'il est connu. */
+    val cout: Double?,
+)
+
+data class ResumeMaison(
+    val id: Long,
+    val nom: String,
+    val actuelle: Boolean,
+    val lignes: List<ResumeLigne>,
+)
+
+/** Une maison prête pour le moteur : compteurs, météo, tarifs et repères. */
+class MaisonChargee(
+    val maison: MaisonLocale,
+    val compteurs: List<Compteur>,
+    val djs: Map<LocalDate, Double>,
+    val tarifs: List<Tarif>,
+    val evenements: List<EvenementLocal>,
+) {
+    val lignes: List<Ligne> by lazy { lignes(compteurs, djs).filter { it.serie.jours.isNotEmpty() } }
+
+    fun normales(aujourdhui: LocalDate) = DegresJours.normales(djs, aujourdhui)
+
+    fun ligne(energie: Energie, plage: Plage) = lignes.firstOrNull { it.energie == energie && it.plage == plage }
+}
+
+/** Fait tourner le moteur de calcul sur les données de l'appareil. */
+class Analyse(contexte: Context) {
+
+    private val base = BaseLocale.obtenir(contexte)
+
+    suspend fun charger(): List<MaisonChargee> {
+        val historique = base.historique()
+        val maisons = historique.maisons()
+        if (maisons.isEmpty()) return emptyList()
+
+        val compteurs = historique.compteurs()
+        val releves = historique.releves().groupBy { it.compteurId }
+        val tarifs = historique.tarifs()
+        val evenements = historique.evenements()
+        val djsParStation = historique.stations().associate { station ->
+            station.id to historique.degresJours(station.id)
+                .associateTo(LinkedHashMap()) { LocalDate.parse(it.date) to it.dj }
+        }
+
+        return maisons.map { maison ->
+            MaisonChargee(
+                maison = maison,
+                compteurs = compteurs.filter { it.maisonId == maison.id }.map { c ->
+                    Compteur(
+                        id = c.id,
+                        energie = Energie.depuisCode(c.energie),
+                        plage = Plage.depuisCode(c.plage),
+                        unite = c.unite,
+                        datePose = c.datePose?.let(LocalDate::parse),
+                        releves = releves[c.id].orEmpty()
+                            .map { Releve(LocalDate.parse(it.date), it.index, it.annuel) },
+                    )
+                },
+                djs = maison.stationId?.let { djsParStation[it] } ?: emptyMap(),
+                tarifs = tarifs.filter { it.maisonId == null || it.maisonId == maison.id }.map {
+                    Tarif(
+                        energie = Energie.depuisCode(it.energie),
+                        dateDebut = LocalDate.parse(it.debut),
+                        dateFin = it.fin?.let(LocalDate::parse),
+                        prixUnitaire = it.prix,
+                        abonnementMensuel = it.abonnement,
+                        propreALaMaison = it.maisonId != null,
+                    )
+                },
+                evenements = evenements.filter { it.maisonId == maison.id },
+            )
+        }
+    }
+
+    suspend fun calculer(aujourdhui: LocalDate = LocalDate.now()): List<ResumeMaison> {
+        val maisons = charger()
+        return withContext(Dispatchers.Default) {
+            maisons.mapNotNull { chargee ->
+                val normales = chargee.normales(aujourdhui)
+                val resumes = chargee.lignes.map { ligne ->
+                    val prevision = prevoir(ligne, aujourdhui, normales)
+                    ResumeLigne(
+                        ligne = ligne,
+                        prevision = prevision,
+                        comparaison = comparerAAnneePrecedente(ligne, aujourdhui),
+                        anomalies = detecterAnomalies(ligne),
+                        cout = prevision?.let { valoriser(ligne, chargee.tarifs, it.totalPrevu, aujourdhui) },
+                    )
+                }
+                // Une ancienne maison sans prévision possible n'apporte rien ici.
+                if (resumes.none { it.prevision != null }) null
+                else ResumeMaison(chargee.maison.id, chargee.maison.nom, chargee.maison.actuelle, resumes)
+            }
+        }
+    }
+}

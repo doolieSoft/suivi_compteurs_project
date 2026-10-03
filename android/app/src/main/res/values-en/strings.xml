@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Meters</string>
+
+    <!-- Home -->
+    <string name="index_avec_unite">%1$s %2$s</string>
+    <string name="aucun_index">No reading</string>
+    <string name="releve_du">read on %1$s</string>
+    <string name="reglages">Settings</string>
+    <string name="consulter">View</string>
+    <string name="exporter">Export to Excel</string>
+    <string name="export_en_cours">Preparing the workbook…</string>
+    <string name="export_reussi">Workbook saved.</string>
+    <string name="export_ecriture_impossible">The workbook could not be written to this location.</string>
+    <string name="importer">Import an Excel workbook</string>
+    <string name="import_titre">Import the workbook?</string>
+    <string name="import_confirmation">The data on this device will be replaced by the workbook\'s; readings taken on the phone that are missing from the workbook are kept.</string>
+    <string name="importer_confirmer">Import</string>
+    <string name="annuler">Cancel</string>
+    <string name="import_en_cours">Reading the workbook…</string>
+    <string name="import_illisible">This file could not be read as an Excel workbook.</string>
+    <plurals name="import_reussi">
+        <item quantity="one">Workbook imported: %1$d reading.</item>
+        <item quantity="other">Workbook imported: %1$d readings.</item>
+    </plurals>
+    <string name="tirer_pour_synchroniser">Pull down to update the weather</string>
+
+    <!-- Reading -->
+    <string name="titre_saisie">New reading</string>
+    <string name="compteur_introuvable">Meter not found</string>
+    <string name="dernier_index">Last known reading: %1$s %2$s</string>
+    <string name="cadrer_le_compteur">Move closer: the digits should fill the width</string>
+    <string name="declencher">Take photo</string>
+    <string name="reprendre">Retake photo</string>
+    <string name="sans_photo">No photo</string>
+    <string name="depuis_galerie">From gallery</string>
+    <string name="lampe_allumer">Torch</string>
+    <string name="lampe_eteindre">Torch on</string>
+    <string name="lampe_indisponible">No torch on this device</string>
+    <string name="entourer_le_cadran">Circle the digits of the dial with your finger, then read again.</string>
+    <string name="lire_la_zone">Read the circled area</string>
+    <string name="photo_echouee">The photo could not be taken</string>
+    <string name="camera_refusee">Camera unavailable: type the reading by hand.</string>
+    <string name="ocr_en_cours">Reading the meter…</string>
+    <string name="ocr_echec">No digits recognised. Type the reading by hand.</string>
+    <string name="ocr_lu_sur_la_photo">Read on the photo: %1$s</string>
+    <string name="ocr_autres_suites">Other sequences read: %1$s</string>
+    <string name="ocr_aucun_chiffre">No digits recognised on the photo.</string>
+    <string name="ocr_sans_historique">No previous reading: check carefully.</string>
+    <string name="ocr_rien_ne_ressemble">No sequence of digits looks like the reading: type it by hand.</string>
+    <string name="ocr_inhabituelle">Unusual increase of %1$s: please confirm.</string>
+    <string name="ocr_progression">That is %1$s since the last reading.</string>
+    <string name="ocr_recul">Lower than the last reading: correct it by hand.</string>
+    <string name="ocr_resultat">Read on the photo: %1$s. %2$s</string>
+    <string name="index_releve">Meter reading</string>
+    <string name="index_obligatoire">Enter a reading</string>
+    <string name="date_du_releve">Reading date</string>
+    <string name="commentaire">Comment (optional)</string>
+    <string name="releve_annuel">Annual reading</string>
+    <string name="releve_annuel_aide">Tick for the reading that closes the year: forecasts will start from this date.</string>
+    <string name="enregistrer">Save</string>
+    <string name="releve_enregistre">Reading saved</string>
+    <string name="releve_enregistre_avec_ecart">Reading saved: %1$s %2$s since the previous one</string>
+
+    <!-- Dashboard, computed on the device -->
+    <string name="titre_tableau_de_bord">Forecasts</string>
+    <string name="tableau_vide">No data on this device. Import an Excel workbook from the home screen menu, or synchronise with an up-to-date server.</string>
+    <string name="tiret">—</string>
+    <string name="valeur_unite">%1$s %2$s</string>
+    <string name="pourcent">%1$s %%</string>
+    <string name="pas_de_releve_sur_la_periode">No reading for the current year</string>
+    <string name="periode_releve_annuel">expected by %2$s, since the annual reading of %1$s</string>
+    <string name="periode_annee_civile">expected for %1$d</string>
+    <string name="detail_realise">%1$s %2$s read over %3$d days, %4$s %2$s estimated over %5$d days</string>
+    <string name="fourchette">range %1$s – %2$s</string>
+    <string name="evolution_vs">%1$s compared with %2$d (%3$s %4$s)</string>
+    <string name="evolution_climat_egal">%1$s at equal climate</string>
+    <string name="cout_estime">≈ €%1$s</string>
+    <string name="methode_employee">Method: %1$s</string>
+    <string name="methode_thermique">thermal model (normal degree days)</string>
+    <plurals name="methode_profil">
+        <item quantity="one">seasonal profile (%1$d reference year)</item>
+        <item quantity="other">seasonal profile (%1$d reference years)</item>
+    </plurals>
+    <plurals name="methode_moyenne">
+        <item quantity="one">average of %1$d past year</item>
+        <item quantity="other">average of %1$d past years</item>
+    </plurals>
+    <string name="methode_prorata">pro rata of time elapsed (no complete history)</string>
+    <string name="methode_aucune">nothing to estimate</string>
+    <plurals name="points_a_verifier">
+        <item quantity="one">⚠ %1$d point to check</item>
+        <item quantity="other">⚠ %1$d points to check</item>
+    </plurals>
+    <string name="periode_du_au">from %1$s to %2$s</string>
+    <string name="anomalie_avec_periode">%1$s: %2$s</string>
+    <plurals name="anomalie_lacune">
+        <item quantity="one">no usable reading for %1$d day</item>
+        <item quantity="other">no usable reading for %1$d days</item>
+    </plurals>
+    <plurals name="anomalie_index_fige">
+        <item quantity="one">reading unchanged for %1$d day, probably a missing reading</item>
+        <item quantity="other">reading unchanged for %1$d days, probably a missing reading</item>
+    </plurals>
+    <string name="anomalie_surconso_climat">%1$s %2$s in %3$d days, %4$s× what the weather would suggest</string>
+    <string name="anomalie_surconso">%1$s %2$s in %3$d days, %4$s× the usual consumption</string>
+    <string name="energie_eau">Water</string>
+    <string name="energie_gaz">Gas</string>
+    <string name="energie_electricite">Electricity</string>
+    <string name="energie_mazout">Heating oil</string>
+    <string name="plage_haute">peak hours</string>
+    <string name="plage_basse">off-peak hours</string>
+    <string name="libelle_plage">%1$s – %2$s</string>
+
+    <!-- Settings -->
+    <string name="titre_reglages">Settings</string>
+    <string name="rappel_titre_reglage">Remind me to take readings</string>
+    <string name="rappel_intervalle">Every how many days?</string>
+    <string name="notifications_refusees">Without permission to send notifications, the reminder cannot work.</string>
+
+    <string name="langue">Language</string>
+    <string name="langue_actuelle">Language: %1$s</string>
+    <string name="langue_appareil">Device language</string>
+
+    <!-- Reminders -->
+    <string name="canal_rappels">Reading reminders</string>
+    <string name="canal_rappels_description">Periodic notification inviting you to read the meters.</string>
+    <string name="rappel_titre">Meter reading</string>
+    <string name="rappel_texte">Time to note your meter readings.</string>
+    <string name="accueil_vide">Welcome! To get started, import an Excel workbook exported from the app or the website, or create your house and its meters.</string>
+    <string name="creer_maison">Create my house</string>
+    <string name="mettre_a_jour_meteo">Update the weather</string>
+    <string name="donnees_sur_appareil">Your data stays on this device</string>
+    <string name="meteo_a_jour">Weather updated %1$s</string>
+    <string name="meteo_mise_a_jour">Weather up to date</string>
+    <string name="meteo_hors_ligne">No network: the weather will be updated later. Everything else works offline.</string>
+    <string name="meteo_echec">Weather unavailable: %1$s</string>
+</resources>

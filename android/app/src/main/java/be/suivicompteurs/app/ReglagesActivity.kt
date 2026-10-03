@@ -6,25 +6,40 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
 import be.suivicompteurs.app.databinding.ActivityReglagesBinding
 import be.suivicompteurs.app.rappel.Rappels
-import be.suivicompteurs.app.reseau.Api
-import be.suivicompteurs.app.reseau.Resultat
-import be.suivicompteurs.app.sync.Synchroniseur
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.launch
 
-/**
- * Adresse du serveur, jeton et rappels.
- *
- * L'adresse est modifiable parce que le PC la reçoit par DHCP : elle change au
- * gré de la box. Le bouton d'essai évite de découvrir une faute de frappe au
- * pied du compteur.
- */
+/** Rappels de relevé et langue de l'interface. */
 class ReglagesActivity : AppCompatActivity() {
+
+    /**
+     * Langues proposées, chacune dans sa propre langue : quelqu'un qui ne lit
+     * pas le français doit pouvoir retrouver la sienne.
+     */
+    private val langues = listOf("" to null, "fr" to "Français", "en" to "English", "nl" to "Nederlands")
+
+    private fun configurerLangue() {
+        val actuelle = AppCompatDelegate.getApplicationLocales().toLanguageTags().substringBefore('-')
+        fun libelle(code: String) = langues.first { it.first == code }.second ?: getString(R.string.langue_appareil)
+        vues.boutonLangue.text = getString(R.string.langue_actuelle, libelle(actuelle.takeIf { c -> langues.any { it.first == c } } ?: ""))
+        vues.boutonLangue.setOnClickListener {
+            val noms = langues.map { libelle(it.first) }.toTypedArray()
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.langue)
+                .setSingleChoiceItems(noms, langues.indexOfFirst { it.first == actuelle }.coerceAtLeast(0)) { dialogue, i ->
+                    dialogue.dismiss()
+                    // Vide : la langue de l'appareil. L'écran se recrée de lui-même.
+                    AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(langues[i].first))
+                }
+                .show()
+        }
+    }
 
     private lateinit var vues: ActivityReglagesBinding
     private lateinit var reglages: Reglages
@@ -55,8 +70,7 @@ class ReglagesActivity : AppCompatActivity() {
         }
 
         reglages = Reglages(this)
-        vues.champAdresse.setText(reglages.adresseServeur)
-        vues.champJeton.setText(reglages.jeton)
+        configurerLangue()
         vues.interrupteurRappel.isChecked = reglages.rappelActif
         vues.champJours.setText(reglages.rappelJours.toString())
         majVisibiliteRappel()
@@ -67,7 +81,6 @@ class ReglagesActivity : AppCompatActivity() {
                 demanderNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
-        vues.boutonTester.setOnClickListener { tester() }
         vues.boutonEnregistrer.setOnClickListener { enregistrer() }
     }
 
@@ -76,54 +89,10 @@ class ReglagesActivity : AppCompatActivity() {
             if (vues.interrupteurRappel.isChecked) View.VISIBLE else View.GONE
     }
 
-    /** Enregistre provisoirement pour que le test porte sur ce qui est affiché. */
-    private fun appliquerSaisie() {
-        reglages.adresseServeur = vues.champAdresse.text?.toString().orEmpty()
-        reglages.jeton = vues.champJeton.text?.toString().orEmpty()
+    private fun enregistrer() {
         reglages.rappelActif = vues.interrupteurRappel.isChecked
         vues.champJours.text?.toString()?.toIntOrNull()?.let { reglages.rappelJours = it }
-        // L'adresse normalisée est réaffichée : l'utilisateur voit ce qui sera utilisé.
-        vues.champAdresse.setText(reglages.adresseServeur)
-    }
-
-    private fun tester() {
-        appliquerSaisie()
-        if (!reglages.configure) {
-            Snackbar.make(vues.root, R.string.reglages_incomplets, Snackbar.LENGTH_LONG).show()
-            return
-        }
-        vues.boutonTester.isEnabled = false
-        vues.etatTest.visibility = View.VISIBLE
-        vues.etatTest.setText(R.string.test_en_cours)
-
-        lifecycleScope.launch {
-            val resultat = Api(reglages).tester()
-            vues.boutonTester.isEnabled = true
-            when (resultat) {
-                is Resultat.Succes -> {
-                    vues.etatTest.text = resources.getQuantityString(
-                        R.plurals.test_reussi, resultat.valeur, resultat.valeur
-                    )
-                    vues.etatTest.setTextColor(getColor(R.color.bien))
-                }
-                is Resultat.Echec -> {
-                    vues.etatTest.text = getString(R.string.test_echec, resultat.message)
-                    vues.etatTest.setTextColor(getColor(R.color.critique))
-                }
-            }
-        }
-    }
-
-    private fun enregistrer() {
-        appliquerSaisie()
         Rappels.appliquer(this)
-        if (reglages.configure) {
-            lifecycleScope.launch {
-                Synchroniseur(this@ReglagesActivity).executer()
-                finish()
-            }
-        } else {
-            finish()
-        }
+        finish()
     }
 }

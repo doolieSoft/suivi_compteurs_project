@@ -55,7 +55,7 @@ class LecteurIndex {
                 valeur = 0.0,
                 brut = "",
                 confiance = 0.0,
-                explication = "Aucun chiffre reconnu sur la photo.",
+                explication = Explication.AucunChiffre,
                 suitesLues = lignes.take(12),
             )
     }
