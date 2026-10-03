@@ -18,8 +18,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import be.suivicompteurs.app.Monnaie
 import be.suivicompteurs.app.R
 import be.suivicompteurs.app.donnees.CompteurHistorique
 import be.suivicompteurs.app.donnees.EvenementLocal
@@ -81,6 +83,7 @@ fun EcranMaison(
     surCompteur: (compteur: Long, maison: Long) -> Unit,
 ) {
     val portee = rememberCoroutineScope()
+    val contexte = LocalContext.current
     var maisonId by remember { mutableStateOf(id) }
     var nom by remember { mutableStateOf("") }
     var adresse by remember { mutableStateOf("") }
@@ -176,7 +179,11 @@ fun EcranMaison(
                 LigneListe(
                     titre = "${energies().first { it.first == t.energie }.second} · ${jour(t.debut)}" + (t.fin?.let { " → ${jour(it)}" } ?: ""),
                     detail = listOfNotNull(
-                        stringResource(R.string.tarif_detail, ecrireNombre(t.prix), ecrireNombre(t.abonnement)),
+                        stringResource(
+                            R.string.tarif_detail,
+                            Monnaie.formater(contexte, t.prix, decimales = 5),
+                            Monnaie.formater(contexte, t.abonnement, decimales = 2),
+                        ),
                         t.fournisseur.ifEmpty { null },
                         if (t.maisonId == null) stringResource(R.string.toutes_maisons) else null,
                     ).joinToString(" · "),
@@ -236,8 +243,9 @@ fun DialogueTarif(
                 ChampChoix(stringResource(R.string.energie), energies(), energie) { energie = it }
                 ChampDate(stringResource(R.string.debut), debut, { debut = it })
                 ChampDate(stringResource(R.string.fin), fin, { fin = it }, facultatif = true)
-                ChampTexte(stringResource(R.string.prix_unitaire), prix, { prix = it }, numerique = true)
-                ChampTexte(stringResource(R.string.abonnement_mensuel), abonnement, { abonnement = it }, numerique = true)
+                val symbole = Monnaie.symbole(LocalContext.current)
+                ChampTexte(stringResource(R.string.prix_unitaire, symbole), prix, { prix = it }, numerique = true)
+                ChampTexte(stringResource(R.string.abonnement_mensuel, symbole), abonnement, { abonnement = it }, numerique = true)
                 ChampTexte(stringResource(R.string.fournisseur), fournisseur, { fournisseur = it })
             }
         },

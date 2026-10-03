@@ -67,11 +67,28 @@
                 android:layout_height="wrap_content" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/boutonDevise"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/boutonEnregistrer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
                 android:text="@string/enregistrer" />
+
+            <!-- Exigée par la licence CC BY 4.0 des données d'Open-Meteo. -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:text="@string/source_meteo"
+                android:textColor="@color/encre_3"
+                android:textSize="12sp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

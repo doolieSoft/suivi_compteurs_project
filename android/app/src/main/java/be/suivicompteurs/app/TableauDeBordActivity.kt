@@ -153,7 +153,7 @@ class TableauDeBordActivity : AppCompatActivity() {
 
             val cout = resume.cout
             if (cout != null && cout > 0) {
-                tuile.cout.text = getString(R.string.cout_estime, textes.nombre(cout))
+                tuile.cout.text = getString(R.string.cout_estime, Monnaie.formater(this, cout))
             } else {
                 masquer(tuile.cout)
             }

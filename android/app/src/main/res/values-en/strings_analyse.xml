@@ -26,8 +26,8 @@
     <string name="climat_normal">Normal weather</string>
     <string name="annee_incomplete">* incomplete year</string>
     <string name="couts">Costs</string>
-    <string name="cout_variable">Consumption</string>
-    <string name="cout_abonnement">Standing charge</string>
+    <string name="cout_variable">Usage</string>
+    <string name="cout_abonnement">Standing</string>
     <string name="cout_total">Total</string>
     <string name="graphique_index">Meter readings (%1$s)</string>
     <string name="compteur_n">Meter %1$d</string>

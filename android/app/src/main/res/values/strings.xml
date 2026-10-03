@@ -75,7 +75,7 @@
     <string name="fourchette">fourchette %1$s – %2$s</string>
     <string name="evolution_vs">%1$s par rapport à %2$d (%3$s %4$s)</string>
     <string name="evolution_climat_egal">%1$s à climat égal</string>
-    <string name="cout_estime">≈ %1$s €</string>
+    <string name="cout_estime">≈ %1$s</string>
     <string name="methode_employee">Méthode : %1$s</string>
     <string name="methode_thermique">modèle thermique (degrés-jours normaux)</string>
     <plurals name="methode_profil">
@@ -135,4 +135,8 @@
     <string name="meteo_mise_a_jour">Météo à jour</string>
     <string name="meteo_hors_ligne">Pas de réseau : la météo sera mise à jour plus tard. Tout le reste fonctionne sans réseau.</string>
     <string name="meteo_echec">Météo indisponible : %1$s</string>
+    <string name="devise">Devise des tarifs</string>
+    <string name="devise_actuelle">Devise : %1$s</string>
+    <string name="devise_region">Selon la région (%1$s)</string>
+    <string name="source_meteo">Données météo : Open-Meteo.com (CC BY 4.0)</string>
 </resources>

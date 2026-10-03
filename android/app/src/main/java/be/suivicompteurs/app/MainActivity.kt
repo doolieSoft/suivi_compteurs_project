@@ -26,6 +26,7 @@ import be.suivicompteurs.app.databinding.ActivityMainBinding
 import be.suivicompteurs.app.databinding.ItemCompteurBinding
 import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.CompteurLocal
+import be.suivicompteurs.app.donnees.nomAffiche
 import be.suivicompteurs.app.sync.Synchroniseur
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -301,7 +302,7 @@ class CompteurAdapter(
         val compteur = elements[position]
         val contexte = cellule.vues.root.context
 
-        cellule.vues.libelle.text = compteur.libelle
+        cellule.vues.libelle.text = compteur.nomAffiche(contexte)
         cellule.vues.index.text = compteur.dernierIndex?.let {
             contexte.getString(R.string.index_avec_unite, formaterIndex(it), compteur.unite)
         } ?: contexte.getString(R.string.aucun_index)

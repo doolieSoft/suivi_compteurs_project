@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import be.suivicompteurs.app.Monnaie
 import be.suivicompteurs.app.R
 import be.suivicompteurs.app.donnees.EvenementLocal
 import be.suivicompteurs.app.gestion.Cadre
@@ -224,7 +225,12 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
                         stringResource(R.string.cout_abonnement), stringResource(R.string.cout_total),
                     ),
                     lignes = d.couts.reversed().map { c ->
-                        listOf(c.annee.toString(), "${nombre(c.coutVariable)} €", "${nombre(c.coutAbonnement)} €", "${nombre(c.total)} €")
+                        listOf(
+                            c.annee.toString(),
+                            Monnaie.formater(contexte, c.coutVariable),
+                            Monnaie.formater(contexte, c.coutAbonnement),
+                            Monnaie.formater(contexte, c.total),
+                        )
                     },
                 )
             }

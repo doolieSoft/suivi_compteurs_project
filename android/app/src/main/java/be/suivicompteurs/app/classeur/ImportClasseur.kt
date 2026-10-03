@@ -320,6 +320,8 @@ object ImportClasseur {
                 dernierIndex = siens.lastOrNull()?.index,
                 dernierReleve = siens.lastOrNull()?.date,
                 consoJournaliereMax = round(max(debits.maxOrNull() ?: 1.0, 1.0) * 1000) / 1000,
+                plage = c.plage,
+                nomCompteur = c.libelle,
             )
         }
     }

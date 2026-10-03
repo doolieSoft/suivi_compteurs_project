@@ -24,7 +24,7 @@
     <string name="depose_le">déposé le %1$s</string>
     <string name="tarifs">Tarifs</string>
     <string name="tarif">Tarif</string>
-    <string name="tarif_detail">%1$s €/unité, %2$s €/mois</string>
+    <string name="tarif_detail">%1$s par unité, %2$s par mois</string>
     <string name="toutes_maisons">toutes les maisons</string>
     <string name="evenements">Événements</string>
     <string name="evenement">Événement</string>
@@ -32,8 +32,8 @@
     <string name="energie">Énergie</string>
     <string name="debut">Début</string>
     <string name="fin">Fin (facultative)</string>
-    <string name="prix_unitaire">Prix unitaire (€ par unité du compteur)</string>
-    <string name="abonnement_mensuel">Abonnement (€ par mois)</string>
+    <string name="prix_unitaire">Prix unitaire (%1$s par unité du compteur)</string>
+    <string name="abonnement_mensuel">Abonnement (%1$s par mois)</string>
     <string name="fournisseur">Fournisseur</string>
     <string name="supprimer">Supprimer</string>
     <string name="date">Date</string>

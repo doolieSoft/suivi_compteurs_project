@@ -18,6 +18,11 @@ class Reglages(contexte: Context) {
         get() = prefs.getInt(CLE_RAPPEL_JOURS, 14)
         set(valeur) = prefs.edit().putInt(CLE_RAPPEL_JOURS, valeur.coerceIn(1, 365)).apply()
 
+    /** Code ISO de la devise des tarifs ; vide : celle de la région, voir [Monnaie]. */
+    var devise: String
+        get() = prefs.getString(CLE_DEVISE, "") ?: ""
+        set(valeur) = prefs.edit().putString(CLE_DEVISE, valeur).apply()
+
     /** Dernière mise à jour des degrés-jours depuis Open-Meteo. */
     var derniereSynchro: Long
         get() = prefs.getLong(CLE_DERNIERE_SYNCHRO, 0L)
@@ -27,5 +32,6 @@ class Reglages(contexte: Context) {
         private const val CLE_RAPPEL_ACTIF = "rappel_actif"
         private const val CLE_RAPPEL_JOURS = "rappel_jours"
         private const val CLE_DERNIERE_SYNCHRO = "derniere_synchro"
+        private const val CLE_DEVISE = "devise"
     }
 }

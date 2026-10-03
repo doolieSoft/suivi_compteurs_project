@@ -24,6 +24,32 @@ class ReglagesActivity : AppCompatActivity() {
      */
     private val langues = listOf("" to null, "fr" to "Français", "en" to "English", "nl" to "Nederlands")
 
+    /** Devise des tarifs : celle de la région, ou une autre au choix. */
+    private fun configurerDevise() {
+        fun afficher() {
+            vues.boutonDevise.text = getString(
+                R.string.devise_actuelle,
+                Monnaie.libelle(this, Monnaie.devise(this)),
+            )
+        }
+        afficher()
+        vues.boutonDevise.setOnClickListener {
+            val codes = listOf("") + Monnaie.PROPOSEES
+            val noms = codes.map { code ->
+                if (code.isEmpty()) getString(R.string.devise_region, Monnaie.libelle(this, Monnaie.deRegion(this)))
+                else Monnaie.libelle(this, java.util.Currency.getInstance(code))
+            }.toTypedArray()
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.devise)
+                .setSingleChoiceItems(noms, codes.indexOf(reglages.devise).coerceAtLeast(0)) { dialogue, i ->
+                    reglages.devise = codes[i]
+                    afficher()
+                    dialogue.dismiss()
+                }
+                .show()
+        }
+    }
+
     private fun configurerLangue() {
         val actuelle = AppCompatDelegate.getApplicationLocales().toLanguageTags().substringBefore('-')
         fun libelle(code: String) = langues.first { it.first == code }.second ?: getString(R.string.langue_appareil)
@@ -71,6 +97,7 @@ class ReglagesActivity : AppCompatActivity() {
 
         reglages = Reglages(this)
         configurerLangue()
+        configurerDevise()
         vues.interrupteurRappel.isChecked = reglages.rappelActif
         vues.champJours.setText(reglages.rappelJours.toString())
         majVisibiliteRappel()

@@ -19,13 +19,13 @@ val clePresente = fichierCle.exists() && rootProject.file("cle-release.jks").exi
 
 android {
     namespace = "be.suivicompteurs.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "be.suivicompteurs.app"
         // Android 8.0. En deçà, ni canaux de notification ni icônes adaptatives.
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         // Surchargeables depuis la ligne de commande, ce dont se sert la
         // publication automatique : l'étiquette Git donne le nom de version, et
         // le numéro d'exécution du workflow fournit un entier toujours
@@ -33,8 +33,6 @@ android {
         //   ./gradlew assembleRelease -PsuiviVersionCode=7 -PsuiviVersionName=1.3
         versionCode = (findProperty("suiviVersionCode") as String?)?.toInt() ?: 1
         versionName = (findProperty("suiviVersionName") as String?) ?: "1.0"
-        // Langues de l'interface ; le français reste la langue par défaut.
-        resourceConfigurations += listOf("fr", "en", "nl")
     }
 
     signingConfigs {
@@ -69,6 +67,8 @@ android {
     }
 
     androidResources {
+        // Langues de l'interface ; le français reste la langue par défaut.
+        localeFilters += listOf("fr", "en", "nl")
         // Déclare au système les langues proposées : Android 13 et au-delà
         // les offrent alors dans les réglages de l'application.
         generateLocaleConfig = true

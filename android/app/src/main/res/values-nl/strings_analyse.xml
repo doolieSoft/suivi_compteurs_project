@@ -27,7 +27,7 @@
     <string name="annee_incomplete">* onvolledig jaar</string>
     <string name="couts">Kosten</string>
     <string name="cout_variable">Verbruik</string>
-    <string name="cout_abonnement">Vaste vergoeding</string>
+    <string name="cout_abonnement">Vast</string>
     <string name="cout_total">Totaal</string>
     <string name="graphique_index">Meterstanden (%1$s)</string>
     <string name="compteur_n">Meter %1$d</string>

@@ -24,7 +24,7 @@
     <string name="depose_le">verwijderd op %1$s</string>
     <string name="tarifs">Tarieven</string>
     <string name="tarif">Tarief</string>
-    <string name="tarif_detail">€ %1$s per eenheid, € %2$s per maand</string>
+    <string name="tarif_detail">%1$s per eenheid, %2$s per maand</string>
     <string name="toutes_maisons">alle woningen</string>
     <string name="evenements">Gebeurtenissen</string>
     <string name="evenement">Gebeurtenis</string>
@@ -32,8 +32,8 @@
     <string name="energie">Energie</string>
     <string name="debut">Begin</string>
     <string name="fin">Einde (optioneel)</string>
-    <string name="prix_unitaire">Eenheidsprijs (€ per eenheid van de meter)</string>
-    <string name="abonnement_mensuel">Vaste vergoeding (€ per maand)</string>
+    <string name="prix_unitaire">Eenheidsprijs (%1$s per eenheid van de meter)</string>
+    <string name="abonnement_mensuel">Vaste vergoeding (%1$s per maand)</string>
     <string name="fournisseur">Leverancier</string>
     <string name="supprimer">Verwijderen</string>
     <string name="date">Datum</string>

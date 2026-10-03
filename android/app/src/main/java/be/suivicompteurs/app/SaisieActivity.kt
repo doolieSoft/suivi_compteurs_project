@@ -25,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import be.suivicompteurs.app.databinding.ActivitySaisieBinding
 import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.CompteurLocal
+import be.suivicompteurs.app.donnees.nomAffiche
 import be.suivicompteurs.app.donnees.ReleveHistorique
 import be.suivicompteurs.app.gestion.Gestion
 import be.suivicompteurs.app.gestion.Refus
@@ -129,7 +130,7 @@ class SaisieActivity : AppCompatActivity() {
             dernierIndexConnu = trouve.dernierIndex
             derniereDate = trouve.dernierReleve?.let { runCatching { formatIso.parse(it)?.time }.getOrNull() }
 
-            vues.titre.text = trouve.libelle
+            vues.titre.text = trouve.nomAffiche(this@SaisieActivity)
             vues.rappelIndex.text = dernierIndexConnu?.let {
                 getString(R.string.dernier_index, formater(it), trouve.unite)
             } ?: getString(R.string.aucun_index)

@@ -41,7 +41,7 @@ interface CompteurDao {
         TarifLocal::class,
         EvenementLocal::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = true,
 )
 abstract class BaseLocale : RoomDatabase() {
@@ -160,6 +160,17 @@ abstract class BaseLocale : RoomDatabase() {
             }
         }
 
+        /**
+         * L'énergie et la plage du compteur, pour composer son nom dans la
+         * langue de l'interface. La synchronisation suivante les remplit.
+         */
+        private val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `compteurs` ADD COLUMN `plage` TEXT NOT NULL DEFAULT 'UNIQUE'")
+                db.execSQL("ALTER TABLE `compteurs` ADD COLUMN `nomCompteur` TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
         @Volatile
         private var instance: BaseLocale? = null
 
@@ -169,7 +180,7 @@ abstract class BaseLocale : RoomDatabase() {
                     contexte.applicationContext,
                     BaseLocale::class.java,
                     "suivi-compteurs.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7).build().also { instance = it }
             }
     }
 }

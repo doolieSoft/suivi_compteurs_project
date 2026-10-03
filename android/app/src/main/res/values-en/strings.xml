@@ -75,7 +75,7 @@
     <string name="fourchette">range %1$s – %2$s</string>
     <string name="evolution_vs">%1$s compared with %2$d (%3$s %4$s)</string>
     <string name="evolution_climat_egal">%1$s at equal climate</string>
-    <string name="cout_estime">≈ €%1$s</string>
+    <string name="cout_estime">≈ %1$s</string>
     <string name="methode_employee">Method: %1$s</string>
     <string name="methode_thermique">thermal model (normal degree days)</string>
     <plurals name="methode_profil">
@@ -135,4 +135,8 @@
     <string name="meteo_mise_a_jour">Weather up to date</string>
     <string name="meteo_hors_ligne">No network: the weather will be updated later. Everything else works offline.</string>
     <string name="meteo_echec">Weather unavailable: %1$s</string>
+    <string name="devise">Tariff currency</string>
+    <string name="devise_actuelle">Currency: %1$s</string>
+    <string name="devise_region">From the region (%1$s)</string>
+    <string name="source_meteo">Weather data: Open-Meteo.com (CC BY 4.0)</string>
 </resources>

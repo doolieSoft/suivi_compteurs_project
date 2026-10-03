@@ -24,7 +24,7 @@
     <string name="depose_le">removed on %1$s</string>
     <string name="tarifs">Tariffs</string>
     <string name="tarif">Tariff</string>
-    <string name="tarif_detail">€%1$s per unit, €%2$s per month</string>
+    <string name="tarif_detail">%1$s per unit, %2$s per month</string>
     <string name="toutes_maisons">all houses</string>
     <string name="evenements">Events</string>
     <string name="evenement">Event</string>
@@ -32,8 +32,8 @@
     <string name="energie">Energy</string>
     <string name="debut">Start</string>
     <string name="fin">End (optional)</string>
-    <string name="prix_unitaire">Unit price (€ per meter unit)</string>
-    <string name="abonnement_mensuel">Standing charge (€ per month)</string>
+    <string name="prix_unitaire">Unit price (%1$s per meter unit)</string>
+    <string name="abonnement_mensuel">Standing charge (%1$s per month)</string>
     <string name="fournisseur">Supplier</string>
     <string name="supprimer">Delete</string>
     <string name="date">Date</string>

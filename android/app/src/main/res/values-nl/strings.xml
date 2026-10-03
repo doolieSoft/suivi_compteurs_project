@@ -75,7 +75,7 @@
     <string name="fourchette">marge %1$s – %2$s</string>
     <string name="evolution_vs">%1$s t.o.v. %2$d (%3$s %4$s)</string>
     <string name="evolution_climat_egal">%1$s bij gelijk klimaat</string>
-    <string name="cout_estime">≈ € %1$s</string>
+    <string name="cout_estime">≈ %1$s</string>
     <string name="methode_employee">Methode: %1$s</string>
     <string name="methode_thermique">thermisch model (normale graaddagen)</string>
     <plurals name="methode_profil">
@@ -135,4 +135,8 @@
     <string name="meteo_mise_a_jour">Weer is bijgewerkt</string>
     <string name="meteo_hors_ligne">Geen netwerk: het weer wordt later bijgewerkt. Al de rest werkt zonder netwerk.</string>
     <string name="meteo_echec">Weer niet beschikbaar: %1$s</string>
+    <string name="devise">Munt van de tarieven</string>
+    <string name="devise_actuelle">Munt: %1$s</string>
+    <string name="devise_region">Volgens de regio (%1$s)</string>
+    <string name="source_meteo">Weergegevens: Open-Meteo.com (CC BY 4.0)</string>
 </resources>
