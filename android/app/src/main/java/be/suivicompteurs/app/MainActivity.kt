@@ -109,7 +109,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun afficher(compteurs: List<CompteurLocal>) {
-        adaptateur.remplacer(compteurs)
+        // Ordre alphabétique des noms affichés, dans la langue de l'application.
+        val ordre = java.text.Collator.getInstance()
+        adaptateur.remplacer(compteurs.sortedWith(compareBy(ordre) { it.nomAffiche(this) }))
         vues.listeVide.visibility = if (compteurs.isEmpty()) View.VISIBLE else View.GONE
         vues.liste.visibility = if (compteurs.isEmpty()) View.GONE else View.VISIBLE
         vues.boutonConsulter.visibility = vues.liste.visibility

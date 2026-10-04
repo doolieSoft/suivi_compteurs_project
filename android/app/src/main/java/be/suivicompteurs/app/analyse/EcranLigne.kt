@@ -58,6 +58,8 @@ import kotlinx.coroutines.withContext
 
 /** Tout ce que montre le détail d'une énergie, calculé d'un bloc. */
 private class DetailLigne(
+    /** La maison du compteur : le même compteur peut exister dans plusieurs maisons. */
+    val maison: String,
     val ligne: Ligne,
     val prevision: Prevision?,
     val comparaison: ComparaisonGlissante?,
@@ -103,6 +105,7 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
             val aujourdhui = LocalDate.now()
             val normales = maison.normales(aujourdhui)
             DetailLigne(
+                maison = maison.maison.nom,
                 ligne = ligne,
                 prevision = prevoir(ligne, aujourdhui, normales),
                 comparaison = comparerAAnneePrecedente(ligne, aujourdhui),
@@ -131,7 +134,7 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
         )
     }
 
-    Cadre(titre = d?.let { textes.libelle(it.ligne) } ?: "", surRetour = surRetour, messages = messages) {
+    Cadre(titre = d?.let { "${it.maison} – ${textes.libelle(it.ligne)}" } ?: "", surRetour = surRetour, messages = messages) {
         if (d == null) {
             Chargement()
             return@Cadre

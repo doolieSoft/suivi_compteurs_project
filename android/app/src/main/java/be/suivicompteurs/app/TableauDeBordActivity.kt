@@ -91,7 +91,11 @@ class TableauDeBordActivity : AppCompatActivity() {
 
     private fun afficherMaison(maison: ResumeMaison, plusieurs: Boolean, historique: Boolean = false) {
         if (plusieurs) ajouterTitre(maison.nom)
-        for (resume in maison.lignes) afficherLigne(resume, maison.id, historique)
+        // Ordre alphabétique des noms affichés, comme sur l'accueil.
+        val ordre = java.text.Collator.getInstance()
+        for (resume in maison.lignes.sortedWith(compareBy(ordre) { textes.libelle(it.ligne) })) {
+            afficherLigne(resume, maison.id, historique)
+        }
     }
 
     private fun afficherLigne(resume: ResumeLigne, maisonId: Long, historique: Boolean = false) {

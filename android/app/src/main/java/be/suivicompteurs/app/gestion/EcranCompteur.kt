@@ -59,6 +59,8 @@ fun EcranCompteur(
     var remplacer by remember { mutableStateOf(false) }
     var confirmer by remember { mutableStateOf(false) }
     var version by remember { mutableIntStateOf(0) }
+    // La maison du compteur, pour le titre.
+    var nomMaison by remember { mutableStateOf("") }
 
     LaunchedEffect(compteurId, version) {
         if (compteurId == 0L) return@LaunchedEffect
@@ -68,6 +70,7 @@ fun EcranCompteur(
             unite = c.unite; coef = ecrireNombre(c.coefKwh); pose = c.datePose; depose = c.dateDepose
         }
         origine = c
+        nomMaison = gestion.maison(c.maisonId)?.nom.orEmpty()
         releves = gestion.releves(compteurId).sortedByDescending { it.date }
     }
 
@@ -82,7 +85,8 @@ fun EcranCompteur(
     }
 
     Cadre(
-        titre = if (compteurId == 0L) stringResource(R.string.nouveau_compteur) else origine?.let { libelleCompteur(it) }.orEmpty(),
+        titre = if (compteurId == 0L) stringResource(R.string.nouveau_compteur)
+            else origine?.let { listOf(nomMaison, libelleCompteur(it)).filter { t -> t.isNotEmpty() }.joinToString(" – ") }.orEmpty(),
         surRetour = surRetour,
         messages = messages,
         surSuppression = if (compteurId != 0L) ({ confirmer = true }) else null,
