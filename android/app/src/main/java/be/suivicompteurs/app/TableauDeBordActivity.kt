@@ -67,10 +67,10 @@ class TableauDeBordActivity : AppCompatActivity() {
             // relève plus (quittées) dans une partie « Historique », sans prévision.
             val (aPrevoir, historiques) = maisons.partition { m -> m.actuelle && m.lignes.any { it.prevision != null } }
             vues.barre.setTitle(if (aPrevoir.isEmpty()) R.string.titre_historique else R.string.titre_tableau_de_bord)
-            for (maison in aPrevoir) afficherMaison(maison, plusieurs = aPrevoir.size > 1)
+            for (maison in aPrevoir) afficherMaison(maison)
             if (historiques.isNotEmpty()) {
                 if (aPrevoir.isNotEmpty()) ajouterTitre(getString(R.string.titre_historique))
-                for (maison in historiques) afficherMaison(maison, plusieurs = true, historique = true)
+                for (maison in historiques) afficherMaison(maison, historique = true)
             }
         }
     }
@@ -89,8 +89,9 @@ class TableauDeBordActivity : AppCompatActivity() {
         vues.contenu.addView(titre)
     }
 
-    private fun afficherMaison(maison: ResumeMaison, plusieurs: Boolean, historique: Boolean = false) {
-        if (plusieurs) ajouterTitre(maison.nom)
+    private fun afficherMaison(maison: ResumeMaison, historique: Boolean = false) {
+        // Toujours le nom de la maison : on sait à quoi correspond chaque compteur.
+        ajouterTitre(maison.nom)
         // Ordre alphabétique des noms affichés, comme sur l'accueil.
         val ordre = java.text.Collator.getInstance()
         for (resume in maison.lignes.sortedWith(compareBy(ordre) { textes.libelle(it.ligne) })) {
