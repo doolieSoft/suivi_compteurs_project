@@ -34,6 +34,58 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
    téléphone (`adb install -r`, même clé : données conservées). Ne jamais
    toucher autrement au téléphone ; tester sur l'émulateur.
 
+## Façon de travailler
+
+- Ne pas pousser ni publier sans l'accord du développeur. Quand il le
+  demande, installer d'abord une construction d'essai sur son téléphone
+  (libre, `Release`, signée avec la clé, `-PsuiviLienDons=…` pour garder le
+  bouton de dons) avant de committer.
+- Il rédige ses demandes en plusieurs messages courts : attendre la fin de
+  l'idée avant d'agir, et revenir en arrière proprement s'il change d'avis.
+
+## Structure
+
+- `android/app/src/main/java/be/suivicompteurs/app/`
+  - `moteur/` : calculs en Kotlin pur (ventilation, modèle thermique, prévisions,
+    points à vérifier), sans Android ;
+  - `analyse/` : écrans d'analyse (Compose) ; `gestion/` : maisons, compteurs,
+    tarifs, événements (Compose) ; `classeur/` : import et export Excel ;
+    `donnees/` : base Room ; `reseau/OpenMeteo.kt` : météo et recherche de ville.
+  - Écrans classiques (XML) : `MainActivity` (accueil), `SaisieActivity`,
+    `TableauDeBordActivity` (prévisions), `ReglagesActivity`.
+- Textes en trois langues : `res/values`, `values-en`, `values-nl` (toujours
+  les trois ; échapper les apostrophes `\'`).
+- Icônes : Material Symbols (Apache 2.0) converties en vector drawables
+  `res/drawable/ic_*.xml`, servant aux écrans XML comme à Compose.
+- `fastlane/metadata/android/` : fiche des stores (titre, descriptions,
+  captures, notes de version). `fdroid/` : recette F-Droid.
+- `docs/` : page du projet (GitHub Pages) et politique de confidentialité.
+
+## Tests
+
+- `PariteReferenceTest` et `ImportClasseurTest` comparent le moteur à la
+  référence figée du moteur Python d'origine (`src/test/resources/`) : un
+  écart signifie que les chiffres changent, ce qui doit être délibéré.
+- Émulateur : AVD `Medium_Phone` ; le clavier de l'émulateur intercepte parfois
+  la saisie (`adb shell input text`), vérifier le champ après coup.
+
+## Captures d'écran des stores
+
+Refaire les 8 captures par langue (et les 4 de `docs/captures/`) quand
+l'interface change. Données de démonstration : le script générateur dépend de
+l'ancien site Django ; le lancer depuis une copie temporaire
+(`git worktree add <tmp> v1.2.2`, avec `db.sqlite3` copié pour la météo),
+importer les classeurs « Ma maison » / « My house » / « Mijn huis » sur
+l'émulateur, recadrer les captures en 1080 × 2150 (sans barres système).
+
+## Dons et réglages GitHub
+
+- Variable GitHub `LIEN_DONS` = `https://dooliesoft.github.io/suivi_compteurs_project/#soutenir`
+  (page qui propose Ko-fi en don unique et Liberapay en mensuel). L'AAB du
+  Play Store n'a pas de bouton de dons (règles de Google).
+- Secrets : `CLE_ANDROID_BASE64`, `CLE_ANDROID_MOTDEPASSE`, `CLE_ANDROID_ALIAS` ;
+  envoi au Play Store seulement si `PLAY_SERVICE_ACCOUNT_JSON` existe.
+
 ## Repères
 
 - Variantes : `complet` (ML Kit, Play Store et GitHub) et `libre` (F-Droid,
