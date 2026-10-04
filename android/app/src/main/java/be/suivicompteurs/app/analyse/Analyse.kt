@@ -19,6 +19,8 @@ import be.suivicompteurs.app.moteur.comparerAAnneePrecedente
 import be.suivicompteurs.app.moteur.detecterAnomalies
 import be.suivicompteurs.app.moteur.lignes
 import be.suivicompteurs.app.moteur.prevoir
+import be.suivicompteurs.app.moteur.prevoirAuRelevePrecedent
+import be.suivicompteurs.app.moteur.PrevisionPrecedente
 import be.suivicompteurs.app.moteur.valoriser
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +34,8 @@ data class ResumeLigne(
     val anomalies: List<Anomalie>,
     /** Coût de la prévision au tarif du jour, s'il est connu. */
     val cout: Double?,
+    /** La prévision au relevé précédent, pour la tendance. */
+    val previsionPrecedente: PrevisionPrecedente? = null,
 )
 
 data class ResumeMaison(
@@ -127,6 +131,7 @@ class Analyse(contexte: Context) {
                         // Seuls les points encore à vérifier : les autres sont traités.
                         anomalies = aVerifier(ligne.energie, ligne.plage, detecterAnomalies(ligne), chargee.pointsVerifies),
                         cout = prevision?.let { valoriser(ligne, chargee.tarifs, it.totalPrevu, aujourdhui) },
+                        previsionPrecedente = prevision?.let { prevoirAuRelevePrecedent(ligne, chargee.djs, it) },
                     )
                 }
                 // Une maison sans prévision possible (quittée) reste consultable :

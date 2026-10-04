@@ -49,6 +49,13 @@
                 android:textSize="26sp"
                 android:textStyle="bold" />
 
+            <!-- Tendance depuis le relevé précédent : ↑ plus pessimiste, ↓ plus optimiste. -->
+            <TextView
+                android:id="@+id/tendance"
+                style="@style/TexteTuile"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/periode"
                 style="@style/TexteTuile"

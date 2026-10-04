@@ -150,4 +150,7 @@
     <string name="titre_historique">Geschiedenis</string>
     <string name="consulter_historique">Geschiedenis bekijken</string>
     <string name="releves_jusqua">meterstanden tot %1$s</string>
+    <string name="tendance_stable">→ ongewijzigd sinds de meterstand van %1$s</string>
+    <string name="tendance_hausse">↑ +%1$s %2$s sinds de meterstand van %3$s</string>
+    <string name="tendance_baisse">↓ −%1$s %2$s sinds de meterstand van %3$s</string>
 </resources>

@@ -152,4 +152,7 @@
     <string name="titre_historique">Historique</string>
     <string name="consulter_historique">Consulter l\'historique</string>
     <string name="releves_jusqua">relevés jusqu\'au %1$s</string>
+    <string name="tendance_stable">→ stable depuis le relevé du %1$s</string>
+    <string name="tendance_hausse">↑ +%1$s %2$s depuis le relevé du %3$s</string>
+    <string name="tendance_baisse">↓ −%1$s %2$s depuis le relevé du %3$s</string>
 </resources>

@@ -150,4 +150,7 @@
     <string name="titre_historique">History</string>
     <string name="consulter_historique">View history</string>
     <string name="releves_jusqua">readings up to %1$s</string>
+    <string name="tendance_stable">→ unchanged since the reading of %1$s</string>
+    <string name="tendance_hausse">↑ +%1$s %2$s since the reading of %3$s</string>
+    <string name="tendance_baisse">↓ −%1$s %2$s since the reading of %3$s</string>
 </resources>

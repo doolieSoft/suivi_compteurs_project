@@ -126,6 +126,28 @@ class TableauDeBordActivity : AppCompatActivity() {
             masquer(tuile.detail, tuile.fourchette, tuile.evolution, tuile.cout, tuile.methode)
         } else {
             tuile.valeur.text = getString(R.string.valeur_unite, textes.nombre(p.totalPrevu), unite)
+            resume.previsionPrecedente?.let { avant ->
+                val ecart = p.totalPrevu - avant.prevision.totalPrevu
+                val depuis = textes.date(avant.releve)
+                // Moins de 1 % : la prévision n'a pas bougé.
+                val stable = avant.prevision.totalPrevu <= 0 || kotlin.math.abs(ecart) < avant.prevision.totalPrevu * 0.01
+                tuile.tendance.text = when {
+                    stable -> getString(R.string.tendance_stable, depuis)
+                    ecart > 0 -> getString(R.string.tendance_hausse, textes.nombre(ecart), unite, depuis)
+                    else -> getString(R.string.tendance_baisse, textes.nombre(-ecart), unite, depuis)
+                }
+                tuile.tendance.setTextColor(
+                    ContextCompat.getColor(
+                        this,
+                        when {
+                            stable -> R.color.encre_2
+                            ecart > 0 -> R.color.critique
+                            else -> R.color.bien
+                        },
+                    )
+                )
+                tuile.tendance.visibility = View.VISIBLE
+            }
             tuile.periode.text = if (p.surReleveAnnuel) {
                 getString(R.string.periode_releve_annuel, textes.date(p.borneDepart), textes.date(p.fin))
             } else {

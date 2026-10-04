@@ -3,6 +3,7 @@ package be.suivicompteurs.app.moteur
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
@@ -54,6 +55,30 @@ class PrevisionGazTest {
         val totalReel = djs.filterKeys { it.year == 2024 }.values.sumOf { BASE_VRAIE + K_VRAI * it }
         assertEquals(1.0, p.totalPrevu / totalReel, 0.08)
         assertEquals(Methode.Thermique, p.methode)
+    }
+
+    @Test
+    fun `la tendance compare a la prevision du releve precedent`() {
+        val jour = date("2024-06-30")
+        val ligneDuJour = ligne(masquerApres(compteur, jour))
+        val p = prevoir(ligneDuJour, jour, normales, annee = 2024)!!
+        val avant = prevoirAuRelevePrecedent(ligneDuJour, djs, p)!!
+        // Le relevé d'avant, sur la même année : seule l'information a changé.
+        assertTrue(avant.releve < jour)
+        assertEquals(p.debut, avant.prevision.debut)
+        assertEquals(p.fin, avant.prevision.fin)
+        assertTrue(avant.prevision.joursRealises < p.joursRealises)
+    }
+
+    @Test
+    fun `pas de tendance sans releve precedent dans la periode`() {
+        // Premier relevé de l'année : le précédent appartient à l'année d'avant.
+        val premier = compteur.releves.map { it.date }.filter { it.year == 2024 }.min()
+        val ligneDuJour = ligne(masquerApres(compteur, premier))
+        val p = prevoir(ligneDuJour, premier, normales, annee = 2024)!!
+        val precedent = compteur.releves.map { it.date }.filter { it < premier }.max()
+        assertTrue(precedent < p.debut.minusDays(1))
+        assertNull(prevoirAuRelevePrecedent(ligneDuJour, djs, p))
     }
 
     @Test
