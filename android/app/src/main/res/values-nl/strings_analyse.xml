@@ -56,4 +56,12 @@
     <string name="fourchette_court">Binnen de marge</string>
     <string name="oui">ja</string>
     <string name="non">nee</string>
+    <string name="marquer_resolu">Markeren als nagekeken en opgelost</string>
+    <string name="points_verifies">Nagekeken punten (%1$d)</string>
+    <string name="resolu_le">opgelost op %1$s</string>
+    <string name="point_resolu">Punt nagekeken en opgelost</string>
+    <string name="resolu_le_champ">Opgelost op</string>
+    <string name="ce_qui_a_ete_fait">Wat er gedaan is</string>
+    <string name="rouvrir">Heropenen</string>
+    <string name="modifier">Wijzigen</string>
 </resources>

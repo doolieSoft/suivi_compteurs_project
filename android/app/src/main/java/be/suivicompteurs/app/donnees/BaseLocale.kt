@@ -40,8 +40,9 @@ interface CompteurDao {
         DegreJourLocal::class,
         TarifLocal::class,
         EvenementLocal::class,
+        PointVerifie::class,
     ],
-    version = 8,
+    version = 9,
     exportSchema = true,
 )
 abstract class BaseLocale : RoomDatabase() {
@@ -178,6 +179,19 @@ abstract class BaseLocale : RoomDatabase() {
             }
         }
 
+        /** Points à vérifier déclarés résolus, avec ce qui a été fait. */
+        private val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `points_verifies` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `maisonId` INTEGER NOT NULL, " +
+                        "`energie` TEXT NOT NULL, `plage` TEXT NOT NULL, `genre` TEXT NOT NULL, " +
+                        "`debut` TEXT NOT NULL, `fin` TEXT NOT NULL, `description` TEXT NOT NULL, " +
+                        "`resoluLe` TEXT NOT NULL, `note` TEXT NOT NULL)"
+                )
+            }
+        }
+
         @Volatile
         private var instance: BaseLocale? = null
 
@@ -187,7 +201,7 @@ abstract class BaseLocale : RoomDatabase() {
                     contexte.applicationContext,
                     BaseLocale::class.java,
                     "suivi-compteurs.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9).build().also { instance = it }
             }
     }
 }

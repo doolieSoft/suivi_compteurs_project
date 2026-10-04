@@ -56,4 +56,12 @@
     <string name="fourchette_court">Dans la fourchette</string>
     <string name="oui">oui</string>
     <string name="non">non</string>
+    <string name="marquer_resolu">Marquer comme vérifié et résolu</string>
+    <string name="points_verifies">Points vérifiés (%1$d)</string>
+    <string name="resolu_le">résolu le %1$s</string>
+    <string name="point_resolu">Point vérifié et résolu</string>
+    <string name="resolu_le_champ">Résolu le</string>
+    <string name="ce_qui_a_ete_fait">Ce qui a été fait</string>
+    <string name="rouvrir">Rouvrir</string>
+    <string name="modifier">Modifier</string>
 </resources>

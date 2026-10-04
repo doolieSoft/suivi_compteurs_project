@@ -62,11 +62,30 @@ class ExportClasseurTest {
         assertTrue(apres.compteursASaisir.isEmpty())
     }
 
+    /** Les points vérifiés font partie de la sauvegarde. */
+    @Test
+    fun `les points verifies survivent a l'export`() {
+        val avant = synthetique().let { h ->
+            h.copy(
+                pointsVerifies = listOf(
+                    be.suivicompteurs.app.donnees.PointVerifie(
+                        maisonId = h.maisons.first().id, energie = "EAU", plage = "UNIQUE", genre = "surconsommation",
+                        debut = "2023-03-01", fin = "2023-05-31", description = "Consommation 3 fois l'habituelle",
+                        resoluLe = "2023-06-15", note = "Chasse d'eau réparée",
+                    ),
+                ),
+            )
+        }
+        val apres = importer(exporter(avant).inputStream()).historique
+        assertEquals(avant.pointsVerifies.map { it.copy(id = 0, maisonId = 0) }, apres.pointsVerifies.map { it.copy(id = 0, maisonId = 0) })
+        assertEquals(avant.maisons.first().nom, apres.maisons.single { it.id == apres.pointsVerifies.single().maisonId }.nom)
+    }
+
     @Test
     fun `la presentation est celle de l'export du serveur`() {
         val classeur = Classeur.lire(exporter(synthetique()).inputStream())
         assertEquals(
-            listOf("Eau", "Gaz", "Électricité", "Mazout", "Par année", "Maisons", "Compteurs", "Événements", "Tarifs", "Degrés-jours"),
+            listOf("Eau", "Gaz", "Électricité", "Mazout", "Par année", "Maisons", "Compteurs", "Événements", "Points vérifiés", "Tarifs", "Degrés-jours"),
             classeur.noms,
         )
         val gaz = classeur["Gaz"]!!

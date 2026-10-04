@@ -56,4 +56,12 @@
     <string name="fourchette_court">Within range</string>
     <string name="oui">yes</string>
     <string name="non">no</string>
+    <string name="marquer_resolu">Mark as checked and resolved</string>
+    <string name="points_verifies">Checked issues (%1$d)</string>
+    <string name="resolu_le">resolved on %1$s</string>
+    <string name="point_resolu">Issue checked and resolved</string>
+    <string name="resolu_le_champ">Resolved on</string>
+    <string name="ce_qui_a_ete_fait">What was done</string>
+    <string name="rouvrir">Reopen</string>
+    <string name="modifier">Edit</string>
 </resources>

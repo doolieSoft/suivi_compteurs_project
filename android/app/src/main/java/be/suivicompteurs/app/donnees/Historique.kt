@@ -98,6 +98,29 @@ data class EvenementLocal(
     val description: String = "",
 )
 
+/**
+ * Point à vérifier traité : ce qui a été fait, et quand. Il se reconnaît à sa
+ * maison, son énergie, sa plage, son genre et sa période ; [description] garde
+ * le texte du point tel qu'il était, même si les relevés changent ensuite.
+ */
+@Entity(tableName = "points_verifies")
+data class PointVerifie(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val maisonId: Long,
+    val energie: String,
+    val plage: String,
+    /** « lacune », « index_fige » ou « surconsommation ». */
+    val genre: String,
+    /** AAAA-MM-JJ : la période du point. */
+    val debut: String,
+    val fin: String,
+    val description: String,
+    /** AAAA-MM-JJ. */
+    val resoluLe: String,
+    /** Ce qui a été fait. */
+    val note: String,
+)
+
 @Entity(tableName = "degres_jours", primaryKeys = ["stationId", "date"])
 data class DegreJourLocal(
     val stationId: Long,
@@ -129,6 +152,7 @@ data class Historique(
     val degresJours: List<DegreJourLocal>,
     val tarifs: List<TarifLocal>,
     val evenements: List<EvenementLocal> = emptyList(),
+    val pointsVerifies: List<PointVerifie> = emptyList(),
 )
 
 @Dao
@@ -153,6 +177,9 @@ abstract class HistoriqueDao {
 
     @Query("SELECT * FROM evenements ORDER BY date")
     abstract suspend fun evenements(): List<EvenementLocal>
+
+    @Query("SELECT * FROM points_verifies ORDER BY resoluLe")
+    abstract suspend fun pointsVerifies(): List<PointVerifie>
 
     @Query("SELECT COUNT(*) FROM historique_releves")
     abstract suspend fun nombreReleves(): Int
@@ -197,12 +224,14 @@ abstract class HistoriqueDao {
     @Upsert abstract suspend fun enregistrerReleve(releve: ReleveHistorique)
     @Upsert abstract suspend fun enregistrerTarif(tarif: TarifLocal)
     @Upsert abstract suspend fun enregistrerEvenement(evenement: EvenementLocal)
+    @Upsert abstract suspend fun enregistrerPointVerifie(point: PointVerifie)
 
     @Query("DELETE FROM historique_releves WHERE compteurId = :compteurId AND date = :date")
     abstract suspend fun supprimerReleve(compteurId: Long, date: String)
 
     @Query("DELETE FROM tarifs WHERE id = :id") abstract suspend fun supprimerTarif(id: Long)
     @Query("DELETE FROM evenements WHERE id = :id") abstract suspend fun supprimerEvenement(id: Long)
+    @Query("DELETE FROM points_verifies WHERE id = :id") abstract suspend fun supprimerPointVerifie(id: Long)
 
     /** Un compteur part avec ses relevés. */
     @Transaction
@@ -211,12 +240,13 @@ abstract class HistoriqueDao {
         supprimerCompteurSeul(id)
     }
 
-    /** Une maison part avec ses compteurs, relevés, tarifs propres et événements. */
+    /** Une maison part avec ses compteurs, relevés, tarifs propres, événements et points vérifiés. */
     @Transaction
     open suspend fun supprimerMaison(id: Long) {
         compteursDe(id).forEach { supprimerCompteur(it.id) }
         supprimerTarifsDe(id)
         supprimerEvenementsDe(id)
+        supprimerPointsVerifiesDe(id)
         supprimerMaisonSeule(id)
     }
 
@@ -224,6 +254,7 @@ abstract class HistoriqueDao {
     @Query("DELETE FROM historique_compteurs WHERE id = :id") protected abstract suspend fun supprimerCompteurSeul(id: Long)
     @Query("DELETE FROM tarifs WHERE maisonId = :id") protected abstract suspend fun supprimerTarifsDe(id: Long)
     @Query("DELETE FROM evenements WHERE maisonId = :id") protected abstract suspend fun supprimerEvenementsDe(id: Long)
+    @Query("DELETE FROM points_verifies WHERE maisonId = :id") protected abstract suspend fun supprimerPointsVerifiesDe(id: Long)
     @Query("DELETE FROM maisons WHERE id = :id") protected abstract suspend fun supprimerMaisonSeule(id: Long)
 
     /** Toutes les données de l'appareil, pour l'export. */
@@ -237,6 +268,7 @@ abstract class HistoriqueDao {
         degresJours = tousDegresJours(),
         tarifs = tarifs(),
         evenements = evenements(),
+        pointsVerifies = pointsVerifies(),
     )
 
     @Query("SELECT * FROM degres_jours ORDER BY stationId, date")
@@ -255,6 +287,7 @@ abstract class HistoriqueDao {
         viderDegresJours()
         viderTarifs()
         viderEvenements()
+        viderPointsVerifies()
         insererMaisons(historique.maisons)
         insererStations(historique.stations)
         insererCompteurs(historique.compteurs)
@@ -262,6 +295,7 @@ abstract class HistoriqueDao {
         insererDegresJours(historique.degresJours)
         insererTarifs(historique.tarifs)
         insererEvenements(historique.evenements)
+        insererPointsVerifies(historique.pointsVerifies)
     }
 
     @Query("DELETE FROM maisons") protected abstract suspend fun viderMaisons()
@@ -271,6 +305,7 @@ abstract class HistoriqueDao {
     @Query("DELETE FROM degres_jours") protected abstract suspend fun viderDegresJours()
     @Query("DELETE FROM tarifs") protected abstract suspend fun viderTarifs()
     @Query("DELETE FROM evenements") protected abstract suspend fun viderEvenements()
+    @Query("DELETE FROM points_verifies") protected abstract suspend fun viderPointsVerifies()
 
     @Insert protected abstract suspend fun insererMaisons(liste: List<MaisonLocale>)
     @Insert protected abstract suspend fun insererStations(liste: List<StationLocale>)
@@ -279,4 +314,5 @@ abstract class HistoriqueDao {
     @Insert protected abstract suspend fun insererDegresJours(liste: List<DegreJourLocal>)
     @Insert protected abstract suspend fun insererTarifs(liste: List<TarifLocal>)
     @Insert protected abstract suspend fun insererEvenements(liste: List<EvenementLocal>)
+    @Insert protected abstract suspend fun insererPointsVerifies(liste: List<PointVerifie>)
 }

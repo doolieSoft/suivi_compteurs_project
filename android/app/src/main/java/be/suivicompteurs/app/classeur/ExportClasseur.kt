@@ -189,6 +189,18 @@ object ExportClasseur {
             largeurs = listOf(14, 12, 12, 40, 60),
         )
         tableau(
+            x, "Points vérifiés",
+            listOf("Maison", "Énergie", "Plage", "Genre", "Du", "Au", "Point", "Résolu le", "Ce qui a été fait"),
+            h.pointsVerifies.sortedBy { it.resoluLe }.map { p ->
+                listOf(
+                    Cellule(codesMaisons[p.maisonId]), Cellule(Energie.depuisCode(p.energie).libelle),
+                    Cellule(Plage.depuisCode(p.plage).libelle), Cellule(p.genre), date(p.debut), date(p.fin),
+                    Cellule(p.description), date(p.resoluLe), Cellule(p.note),
+                )
+            },
+            largeurs = listOf(14, 12, 14, 16, 12, 12, 60, 12, 60),
+        )
+        tableau(
             x, "Tarifs",
             listOf(
                 "Maison", "Énergie", "Fournisseur", "Début", "Fin", "Prix unitaire (€)",

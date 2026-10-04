@@ -1,22 +1,36 @@
 package be.suivicompteurs.app.analyse
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import be.suivicompteurs.app.Monnaie
 import be.suivicompteurs.app.R
 import be.suivicompteurs.app.donnees.EvenementLocal
+import be.suivicompteurs.app.donnees.PointVerifie
 import be.suivicompteurs.app.gestion.Cadre
+import be.suivicompteurs.app.gestion.ChampDate
+import be.suivicompteurs.app.gestion.ChampTexte
 import be.suivicompteurs.app.gestion.Couleurs
+import be.suivicompteurs.app.gestion.Gestion
 import be.suivicompteurs.app.moteur.AnneeComparee
 import be.suivicompteurs.app.moteur.Anomalie
 import be.suivicompteurs.app.moteur.ComparaisonGlissante
@@ -35,6 +49,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** Tout ce que montre le détail d'une énergie, calculé d'un bloc. */
@@ -44,7 +59,10 @@ private class DetailLigne(
     val comparaison: ComparaisonGlissante?,
     val annees: List<AnneeComparee>,
     val couts: List<CoutAnnuel>,
+    /** Points encore à vérifier. */
     val anomalies: List<Anomalie>,
+    /** Points déjà vérifiés et résolus : l'historique de la ligne. */
+    val verifies: List<PointVerifie>,
     val evenements: List<EvenementLocal>,
 )
 
@@ -64,8 +82,14 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
     val contexte = LocalContext.current
     val textes = remember { Textes(contexte) }
     var detail by remember { mutableStateOf<DetailLigne?>(null) }
+    // Un point résolu ou rouvert : on recalcule.
+    var version by remember { mutableIntStateOf(0) }
+    val portee = rememberCoroutineScope()
+    val gestion = remember { Gestion(contexte) }
+    // Point en cours de résolution, ou point vérifié en cours de modification.
+    var aResoudre by remember { mutableStateOf<PointVerifie?>(null) }
 
-    LaunchedEffect(maisonId, energie, plage) {
+    LaunchedEffect(maisonId, energie, plage, version) {
         val maison = Analyse(contexte).charger().firstOrNull { it.maison.id == maisonId } ?: return@LaunchedEffect
         detail = withContext(Dispatchers.Default) {
             val ligne = maison.ligne(energie, plage) ?: return@withContext null
@@ -77,13 +101,29 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
                 comparaison = comparerAAnneePrecedente(ligne, aujourdhui),
                 annees = comparerAnnees(ligne, normales),
                 couts = coutsParAnnee(ligne, maison.tarifs),
-                anomalies = detecterAnomalies(ligne),
+                anomalies = aVerifier(energie, plage, detecterAnomalies(ligne), maison.pointsVerifies),
+                verifies = maison.pointsVerifies.filter { it.energie == energie.code && it.plage == plage.code }
+                    .sortedByDescending { it.resoluLe },
                 evenements = maison.evenements.filter { it.energie.isEmpty() || it.energie == energie.code },
             )
         }
     }
 
     val d = detail
+    aResoudre?.let { point ->
+        DialoguePointVerifie(
+            point,
+            surFermeture = { aResoudre = null },
+            surEnregistrement = { p ->
+                portee.launch { gestion.enregistrerPointVerifie(p); aResoudre = null; version++ }
+            },
+            // Un point déjà vérifié peut être rouvert : il redevient à vérifier.
+            surReouverture = if (point.id != 0L) ({
+                portee.launch { gestion.supprimerPointVerifie(point.id); aResoudre = null; version++ }
+            }) else null,
+        )
+    }
+
     Cadre(titre = d?.let { textes.libelle(it.ligne) } ?: "", surRetour = surRetour) {
         if (d == null) {
             Chargement()
@@ -287,8 +327,36 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
         // --- points à vérifier et événements -----------------------------------
         if (d.anomalies.isNotEmpty()) {
             Carte(pluralStringResource(R.plurals.points_a_verifier, d.anomalies.size, d.anomalies.size)) {
-                d.anomalies.sortedByDescending { it.debut }.forEach {
-                    Text("• " + textes.anomalie(it), style = MaterialTheme.typography.bodySmall, color = Couleurs.encre2)
+                d.anomalies.sortedByDescending { it.debut }.forEach { a ->
+                    Text("• " + textes.anomalie(a), style = MaterialTheme.typography.bodySmall, color = Couleurs.encre2)
+                    TextButton(onClick = {
+                        aResoudre = PointVerifie(
+                            maisonId = maisonId, energie = energie.code, plage = plage.code, genre = a.genre,
+                            debut = a.debut.toString(), fin = a.fin.toString(), description = textes.anomalie(a),
+                            resoluLe = LocalDate.now().toString(), note = "",
+                        )
+                    }) { Text(stringResource(R.string.marquer_resolu)) }
+                }
+            }
+        }
+        // L'historique : ce qui a été vérifié, quand, et ce qui a été fait.
+        if (d.verifies.isNotEmpty()) {
+            Carte(stringResource(R.string.points_verifies, d.verifies.size)) {
+                d.verifies.forEach { p ->
+                    Column(Modifier.padding(vertical = 4.dp)) {
+                        Text("✓ " + p.description, style = MaterialTheme.typography.bodySmall, color = Couleurs.encre2)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                listOfNotNull(
+                                    stringResource(R.string.resolu_le, textes.date(LocalDate.parse(p.resoluLe))),
+                                    p.note.ifEmpty { null },
+                                ).joinToString(" — "),
+                                style = MaterialTheme.typography.bodySmall, color = Couleurs.encre3,
+                                modifier = Modifier.weight(1f),
+                            )
+                            TextButton(onClick = { aResoudre = p }) { Text(stringResource(R.string.modifier)) }
+                        }
+                    }
                 }
             }
         }
@@ -300,4 +368,38 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
             }
         }
     }
+}
+
+/** Déclarer un point vérifié et résolu : la date, et ce qui a été fait. */
+@Composable
+private fun DialoguePointVerifie(
+    point: PointVerifie,
+    surFermeture: () -> Unit,
+    surEnregistrement: (PointVerifie) -> Unit,
+    surReouverture: (() -> Unit)?,
+) {
+    var resoluLe by remember { mutableStateOf<String?>(point.resoluLe) }
+    var note by remember { mutableStateOf(point.note) }
+    AlertDialog(
+        onDismissRequest = surFermeture,
+        title = { Text(stringResource(R.string.point_resolu)) },
+        text = {
+            Column {
+                Text(point.description, style = MaterialTheme.typography.bodySmall, color = Couleurs.encre2)
+                ChampDate(stringResource(R.string.resolu_le_champ), resoluLe, { resoluLe = it })
+                ChampTexte(stringResource(R.string.ce_qui_a_ete_fait), note, { note = it }, lignes = 3)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                surEnregistrement(point.copy(resoluLe = resoluLe ?: point.resoluLe, note = note))
+            }) { Text(stringResource(R.string.enregistrer)) }
+        },
+        dismissButton = {
+            Row {
+                surReouverture?.let { TextButton(onClick = it) { Text(stringResource(R.string.rouvrir), color = Couleurs.critique) } }
+                TextButton(onClick = surFermeture) { Text(stringResource(R.string.annuler)) }
+            }
+        },
+    )
 }

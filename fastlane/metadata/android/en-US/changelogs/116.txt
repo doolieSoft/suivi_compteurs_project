@@ -1,0 +1,1 @@
+• Issues to check: mark them as checked and resolved, with the date and what was done. They stay in the meter's history and in the Excel export.

@@ -4,6 +4,7 @@ import android.content.Context
 import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.EvenementLocal
 import be.suivicompteurs.app.donnees.MaisonLocale
+import be.suivicompteurs.app.donnees.PointVerifie
 import be.suivicompteurs.app.moteur.Anomalie
 import be.suivicompteurs.app.moteur.ComparaisonGlissante
 import be.suivicompteurs.app.moteur.Compteur
@@ -47,6 +48,8 @@ class MaisonChargee(
     val djs: Map<LocalDate, Double>,
     val tarifs: List<Tarif>,
     val evenements: List<EvenementLocal>,
+    /** Points à vérifier déjà traités. */
+    val pointsVerifies: List<PointVerifie> = emptyList(),
 ) {
     val lignes: List<Ligne> by lazy { lignes(compteurs, djs).filter { it.serie.jours.isNotEmpty() } }
 
@@ -69,6 +72,7 @@ class Analyse(contexte: Context) {
         val releves = historique.releves().groupBy { it.compteurId }
         val tarifs = historique.tarifs()
         val evenements = historique.evenements()
+        val pointsVerifies = historique.pointsVerifies()
         val djsParStation = historique.stations().associate { station ->
             station.id to historique.degresJours(station.id)
                 .associateTo(LinkedHashMap()) { LocalDate.parse(it.date) to it.dj }
@@ -100,6 +104,7 @@ class Analyse(contexte: Context) {
                     )
                 },
                 evenements = evenements.filter { it.maisonId == maison.id },
+                pointsVerifies = pointsVerifies.filter { it.maisonId == maison.id },
             )
         }
     }
@@ -115,7 +120,8 @@ class Analyse(contexte: Context) {
                         ligne = ligne,
                         prevision = prevision,
                         comparaison = comparerAAnneePrecedente(ligne, aujourdhui),
-                        anomalies = detecterAnomalies(ligne),
+                        // Seuls les points encore à vérifier : les autres sont traités.
+                        anomalies = aVerifier(ligne.energie, ligne.plage, detecterAnomalies(ligne), chargee.pointsVerifies),
                         cout = prevision?.let { valoriser(ligne, chargee.tarifs, it.totalPrevu, aujourdhui) },
                     )
                 }

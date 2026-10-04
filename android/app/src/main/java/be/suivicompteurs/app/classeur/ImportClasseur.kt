@@ -6,6 +6,7 @@ import be.suivicompteurs.app.donnees.DegreJourLocal
 import be.suivicompteurs.app.donnees.EvenementLocal
 import be.suivicompteurs.app.donnees.Historique
 import be.suivicompteurs.app.donnees.MaisonLocale
+import be.suivicompteurs.app.donnees.PointVerifie
 import be.suivicompteurs.app.donnees.ReleveHistorique
 import be.suivicompteurs.app.donnees.StationLocale
 import be.suivicompteurs.app.donnees.TarifLocal
@@ -41,8 +42,10 @@ object ImportClasseur {
     private const val FEUILLE_TARIFS = "Tarifs"
     private const val FEUILLE_DJ = "Degrés-jours"
     private const val FEUILLE_EVENEMENTS = "Événements"
+    private const val FEUILLE_POINTS_VERIFIES = "Points vérifiés"
     private val FEUILLES_TABLEAUX = setOf(
-        FEUILLE_MAISONS, FEUILLE_COMPTEURS, FEUILLE_TARIFS, FEUILLE_DJ, FEUILLE_EVENEMENTS, "Par année",
+        FEUILLE_MAISONS, FEUILLE_COMPTEURS, FEUILLE_TARIFS, FEUILLE_DJ, FEUILLE_EVENEMENTS,
+        FEUILLE_POINTS_VERIFIES, "Par année",
     )
 
     /** Libellés des sources de relevé, tels que le serveur les écrit. */
@@ -196,6 +199,28 @@ object ImportClasseur {
             }
         }.orEmpty()
 
+        // --- points à vérifier déjà traités -----------------------------------
+        val pointsVerifies = classeur[FEUILLE_POINTS_VERIFIES]?.let { feuille ->
+            tableau(feuille).mapNotNull { l ->
+                val maison = maisons[enTexte(l["Maison"])] ?: return@mapNotNull null
+                val energie = choix(enTexte(l["Énergie"]), Energie.entries.map { it.code to it.libelle }) ?: return@mapNotNull null
+                val debut = enDate(l["Du"]) ?: return@mapNotNull null
+                val fin = enDate(l["Au"]) ?: return@mapNotNull null
+                val resoluLe = enDate(l["Résolu le"]) ?: return@mapNotNull null
+                PointVerifie(
+                    maisonId = maison.id,
+                    energie = energie,
+                    plage = choix(enTexte(l["Plage"]), Plage.entries.map { it.code to it.libelle }) ?: Plage.UNIQUE.code,
+                    genre = enTexte(l["Genre"]),
+                    debut = debut.toString(),
+                    fin = fin.toString(),
+                    description = enTexte(l["Point"]),
+                    resoluLe = resoluLe.toString(),
+                    note = enTexte(l["Ce qui a été fait"]),
+                )
+            }
+        }.orEmpty()
+
         // --- degrés-jours ----------------------------------------------------
         val djs = LinkedHashMap<Pair<Long, String>, DegreJourLocal>()
         classeur[FEUILLE_DJ]?.let { feuille ->
@@ -216,6 +241,7 @@ object ImportClasseur {
             degresJours = djs.values.sortedWith(compareBy({ it.stationId }, { it.date })),
             tarifs = tarifs,
             evenements = evenements,
+            pointsVerifies = pointsVerifies,
         )
         return ResultatImport(historique, compteursASaisir(historique), historique.releves.size)
     }

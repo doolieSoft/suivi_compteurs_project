@@ -7,6 +7,7 @@ import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.CompteurHistorique
 import be.suivicompteurs.app.donnees.EvenementLocal
 import be.suivicompteurs.app.donnees.MaisonLocale
+import be.suivicompteurs.app.donnees.PointVerifie
 import be.suivicompteurs.app.donnees.ReleveHistorique
 import be.suivicompteurs.app.donnees.StationLocale
 import be.suivicompteurs.app.donnees.TarifLocal
@@ -175,6 +176,15 @@ class Gestion(contexte: Context) {
     }
 
     suspend fun supprimerEvenement(id: Long) = dao.supprimerEvenement(id)
+
+    // --- points à vérifier ----------------------------------------------------
+
+    /** Déclare un point vérifié et résolu, avec ce qui a été fait. */
+    suspend fun enregistrerPointVerifie(point: PointVerifie) =
+        dao.enregistrerPointVerifie(point.copy(note = point.note.trim()))
+
+    /** Rouvre le point : il redevient à vérifier. */
+    suspend fun supprimerPointVerifie(id: Long) = dao.supprimerPointVerifie(id)
 
     /** La liste de l'écran d'accueil suit les maisons et compteurs actifs. */
     private suspend fun rafraichirSaisie() {
