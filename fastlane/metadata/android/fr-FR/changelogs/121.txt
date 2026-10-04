@@ -1,0 +1,3 @@
+• Prévisions nettement plus justes : météo complétée sur dix ans, relevés d'avant l'emménagement ignorés, années de consommation anormale écartées.
+• Une flèche indique si la prévision a monté ou baissé depuis le relevé précédent.
+• Comparaison et justesse : compteurs par ordre alphabétique.

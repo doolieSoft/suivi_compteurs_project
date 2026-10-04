@@ -1,0 +1,3 @@
+• Much more accurate forecasts: ten years of weather, readings from before moving in ignored, years with abnormal consumption left out.
+• An arrow shows whether the forecast went up or down since the previous reading.
+• Comparison and accuracy: meters in alphabetical order.

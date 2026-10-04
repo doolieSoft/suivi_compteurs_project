@@ -1,0 +1,3 @@
+• Veel nauwkeurigere voorspellingen: tien jaar weergegevens, meterstanden van vóór de verhuis genegeerd, jaren met abnormaal verbruik weggelaten.
+• Een pijl toont of de voorspelling sinds de vorige meterstand gestegen of gedaald is.
+• Vergelijking en nauwkeurigheid: meters in alfabetische volgorde.

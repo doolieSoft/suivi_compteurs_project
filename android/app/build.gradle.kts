@@ -32,8 +32,8 @@ android {
         // l'étiquette sans son « v ». F-Droid lit ces deux lignes pour repérer
         // les nouvelles versions ; la publication automatique refuse une
         // étiquette qui ne correspond pas.
-        versionCode = 120
-        versionName = "1.3.6"
+        versionCode = 121
+        versionName = "1.3.7"
         // Surchargeables pour un essai :
         //   ./gradlew assembleCompletRelease -PsuiviVersionCode=7 -PsuiviVersionName=1.3
         (findProperty("suiviVersionCode") as String?)?.let { versionCode = it.toInt() }
