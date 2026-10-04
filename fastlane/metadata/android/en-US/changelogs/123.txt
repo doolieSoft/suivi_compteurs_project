@@ -1,0 +1,2 @@
+• New look: light green background, with a matching icon.
+• The menu moves to the bottom right of the home screen (☰ button), within thumb reach.

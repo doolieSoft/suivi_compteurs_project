@@ -157,4 +157,5 @@
     <string name="prochain_rappel_apres_enregistrement">The next reminder date will be set when you save.</string>
     <string name="reglages_enregistres_rappel">Settings saved. Next reminder on %1$s.</string>
     <string name="estime_avant_premier_releve">of which %1$s %2$s estimated over the %3$d days before your first reading</string>
+    <string name="menu">Menu</string>
 </resources>

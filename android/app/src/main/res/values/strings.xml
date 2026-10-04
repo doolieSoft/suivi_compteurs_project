@@ -159,4 +159,5 @@
     <string name="prochain_rappel_apres_enregistrement">La date du prochain rappel sera fixée à l\'enregistrement.</string>
     <string name="reglages_enregistres_rappel">Réglages enregistrés. Prochain rappel le %1$s.</string>
     <string name="estime_avant_premier_releve">dont %1$s %2$s estimés sur les %3$d jours d\'avant votre premier relevé</string>
+    <string name="menu">Menu</string>
 </resources>

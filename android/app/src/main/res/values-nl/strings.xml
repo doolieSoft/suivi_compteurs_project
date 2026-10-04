@@ -157,4 +157,5 @@
     <string name="prochain_rappel_apres_enregistrement">De datum van de volgende herinnering wordt vastgelegd bij het opslaan.</string>
     <string name="reglages_enregistres_rappel">Instellingen opgeslagen. Volgende herinnering op %1$s.</string>
     <string name="estime_avant_premier_releve">waarvan %1$s %2$s geschat over de %3$d dagen vóór je eerste meterstand</string>
+    <string name="menu">Menu</string>
 </resources>

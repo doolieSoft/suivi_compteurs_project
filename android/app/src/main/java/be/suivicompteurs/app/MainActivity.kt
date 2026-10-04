@@ -7,12 +7,13 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.DocumentsContract
 import android.view.LayoutInflater
-import android.view.Menu
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -76,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         vues.boutonImporter.setOnClickListener { importer() }
         vues.boutonConsulter.setOnClickListener { consulter() }
         vues.boutonCreer.setOnClickListener { ouvrirGestion(nouvelleMaison = true) }
+        vues.boutonMenu.setOnClickListener { ouvrirMenu() }
 
         observerDonnees()
         demanderNotificationsSiNecessaire()
@@ -234,10 +236,13 @@ class MainActivity : AppCompatActivity() {
         synchroniser(manuel = false)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.principal, menu)
-        menu.afficherIcones()
-        return true
+    /** Le menu s'ouvre depuis le bouton flottant, au-dessus de lui. */
+    private fun ouvrirMenu() {
+        val menu = PopupMenu(this, vues.boutonMenu, Gravity.END)
+        menu.inflate(R.menu.principal)
+        menu.menu.afficherIcones()
+        menu.setOnMenuItemClickListener { onOptionsItemSelected(it) }
+        menu.show()
     }
 
     // --- import d'un classeur ------------------------------------------------

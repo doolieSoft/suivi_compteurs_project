@@ -62,7 +62,8 @@ object Couleurs {
     val encre = Color(0xFF0B0B0B)
     val encre2 = Color(0xFF52514E)
     val encre3 = Color(0xFF898781)
-    val plan = Color(0xFFF9F9F7)
+    val plan = Color(0xFFE8F3E4)
+    val trait = Color(0xFFF0F0EC)
     val surface = Color(0xFFFCFCFB)
     val critique = Color(0xFFD03B3B)
     val bien = Color(0xFF006300)
@@ -265,7 +266,7 @@ fun LigneListe(
         }
         Text("›", color = Couleurs.encre3, style = MaterialTheme.typography.titleLarge)
     }
-    HorizontalDivider(color = Couleurs.plan)
+    HorizontalDivider(color = Couleurs.trait)
 }
 
 @Composable

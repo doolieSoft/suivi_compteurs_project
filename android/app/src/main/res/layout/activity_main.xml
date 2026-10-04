@@ -39,7 +39,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingVertical="8dp" />
+                android:paddingTop="8dp"
+                android:paddingBottom="88dp" />
 
             <LinearLayout
                 android:id="@+id/listeVide"
@@ -87,6 +88,18 @@
                     android:textColor="@color/encre_3"
                     android:textSize="13sp" />
             </LinearLayout>
+
+            <!-- Le menu, sous le pouce : en bas à droite plutôt qu'en haut. -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/boutonMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                android:contentDescription="@string/menu"
+                app:backgroundTint="@color/primaire"
+                app:srcCompat="@drawable/ic_menu"
+                app:tint="@android:color/white" />
         </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
