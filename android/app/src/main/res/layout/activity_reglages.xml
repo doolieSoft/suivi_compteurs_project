@@ -99,6 +99,16 @@
                 android:text="@string/source_meteo"
                 android:textColor="@color/encre_3"
                 android:textSize="12sp" />
+
+            <!-- Pour qu'un utilisateur puisse dire quelle version il a. -->
+            <TextView
+                android:id="@+id/texteVersion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:textColor="@color/encre_3"
+                android:textSize="12sp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

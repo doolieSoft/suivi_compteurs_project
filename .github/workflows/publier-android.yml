@@ -136,7 +136,7 @@ jobs:
             git tag "$ETIQUETTE" && git push origin "$ETIQUETTE"
           fi
           gh release create "$ETIQUETTE" suivi-compteurs.apk suivi-compteurs-libre.apk \
-            --title "$ETIQUETTE" \
+            --title "Suivi compteurs ${{ steps.version.outputs.nom }}" \
             --generate-notes
 
       # Envoi au Play Store, seulement une fois le compte de service déposé

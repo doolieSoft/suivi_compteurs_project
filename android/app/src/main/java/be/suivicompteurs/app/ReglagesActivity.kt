@@ -114,6 +114,7 @@ class ReglagesActivity : AppCompatActivity() {
         configurerLangue()
         configurerDevise()
         configurerDons()
+        vues.texteVersion.text = getString(R.string.version_application, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
         vues.interrupteurRappel.isChecked = reglages.rappelActif
         vues.champJours.setText(reglages.rappelJours.toString())
         majVisibiliteRappel()
