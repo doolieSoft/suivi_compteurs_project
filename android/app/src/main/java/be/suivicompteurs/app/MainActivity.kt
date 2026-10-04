@@ -210,6 +210,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.principal, menu)
+        menu.afficherIcones()
         return true
     }
 
@@ -270,7 +271,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_consulter -> { consulter(); true }
-        R.id.action_synchroniser -> { synchroniser(manuel = true); true }
         R.id.action_exporter -> { exporter(); true }
         R.id.action_gerer -> { ouvrirGestion(); true }
         R.id.action_importer -> { importer(); true }
@@ -316,14 +316,14 @@ class CompteurAdapter(
         cellule.vues.date.text = compteur.dernierReleve?.let {
             contexte.getString(R.string.releve_du, formaterDate(it))
         } ?: ""
-        cellule.vues.pastille.setBackgroundResource(
-            when (compteur.energie) {
-                "EAU" -> R.color.eau
-                "GAZ" -> R.color.gaz
-                "MAZ" -> R.color.mazout
-                else -> R.color.elec
-            }
-        )
+        val (icone, couleur) = when (compteur.energie) {
+            "EAU" -> R.drawable.ic_eau to R.color.eau
+            "GAZ" -> R.drawable.ic_gaz to R.color.gaz
+            "MAZ" -> R.drawable.ic_mazout to R.color.mazout
+            else -> R.drawable.ic_electricite to R.color.elec
+        }
+        cellule.vues.pastille.setImageResource(icone)
+        cellule.vues.pastille.imageTintList = androidx.core.content.ContextCompat.getColorStateList(contexte, couleur)
         cellule.vues.root.setOnClickListener { auClic(compteur) }
     }
 

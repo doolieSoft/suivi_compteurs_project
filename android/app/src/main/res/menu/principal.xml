@@ -2,27 +2,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_synchroniser"
-        android:title="@string/mettre_a_jour_meteo"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_consulter"
+        android:icon="@drawable/ic_consulter"
         android:title="@string/consulter"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_gerer"
+        android:icon="@drawable/ic_gerer"
         android:title="@string/gerer_donnees"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_exporter"
+        android:icon="@drawable/ic_exporter"
         android:title="@string/exporter"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_importer"
+        android:icon="@drawable/ic_importer"
         android:title="@string/importer"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_reglages"
+        android:icon="@drawable/ic_reglages"
         android:title="@string/reglages"
         app:showAsAction="never" />
 </menu>

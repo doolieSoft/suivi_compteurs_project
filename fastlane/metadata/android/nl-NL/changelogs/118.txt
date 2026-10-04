@@ -1,0 +1,4 @@
+• Overal pictogrammen: energieën, menu's, knoppen, beheer en analyse.
+• Een bericht bevestigt elke opslag.
+• Onder het pictogram van de telefoon heet de app "Compteurs".
+• Het weer wordt vanzelf bijgewerkt bij het openen (of door het startscherm omlaag te trekken); het menu-item verdwijnt.

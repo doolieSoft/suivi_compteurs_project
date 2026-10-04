@@ -1,5 +1,8 @@
 package be.suivicompteurs.app.gestion
 
+import androidx.compose.material3.SnackbarHostState
+import be.suivicompteurs.app.gestion.BoutonIcone
+import be.suivicompteurs.app.gestion.IconeTexte
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -52,6 +55,7 @@ fun EcranMaisons(gestion: Gestion, surRetour: () -> Unit, surMaison: (Long) -> U
                     m.dateSortie?.let { stringResource(R.string.quittee_le, jour(it)) },
                     if (!m.actuelle && m.dateSortie == null) stringResource(R.string.non_relevee) else null,
                 ).joinToString(" · "),
+                icone = R.drawable.ic_maison,
                 surAppui = { surMaison(m.id) },
             )
         }
@@ -89,6 +93,9 @@ fun EcranMaison(
     surCompteur: (compteur: Long, maison: Long) -> Unit,
 ) {
     val portee = rememberCoroutineScope()
+    // Confirmation brève après un enregistrement : l'écran ne change pas.
+    val messages = remember { SnackbarHostState() }
+    val enregistre = stringResource(R.string.enregistre)
     val contexte = LocalContext.current
     var maisonId by remember { mutableStateOf(id) }
     var nom by remember { mutableStateOf("") }
@@ -140,6 +147,7 @@ fun EcranMaison(
             ville = ville.trim(),
         )
         maisonId = gestion.enregistrerMaison(m, lireNombre(latitude), lireNombre(longitude))
+        portee.launch { messages.showSnackbar(enregistre) }
         version++
         ensuite(maisonId)
     }
@@ -170,6 +178,7 @@ fun EcranMaison(
     Cadre(
         titre = if (maisonId == 0L) stringResource(R.string.nouvelle_maison) else nom,
         surRetour = surRetour,
+        messages = messages,
         surSuppression = if (maisonId != 0L) ({ confirmer = true }) else null,
     ) {
         ChampTexte(stringResource(R.string.nom), nom, { nom = it }, erreur = if (erreurNom) stringResource(R.string.nom_obligatoire) else null)
@@ -181,14 +190,14 @@ fun EcranMaison(
                 Modifier.weight(1f).padding(end = 8.dp),
                 surRecherche = { if (ville.isNotBlank()) chercherLieu() },
             )
-            TextButton(enabled = ville.isNotBlank() && !rechercheEnCours, onClick = { chercherLieu() }) {
-                Text(stringResource(R.string.chercher))
-            }
+            BoutonIcone(stringResource(R.string.chercher), R.drawable.ic_chercher, { chercherLieu() },
+                actif = ville.isNotBlank() && !rechercheEnCours)
         }
         lieux.forEach { l ->
             LigneListe(
                 titre = l.libelle,
                 detail = stringResource(R.string.coordonnees, textes4(l.latitude), textes4(l.longitude)),
+                icone = R.drawable.ic_maison,
                 surAppui = {
                     latitude = textes4(l.latitude); longitude = textes4(l.longitude)
                     ville = l.libelle; lieux = emptyList()
@@ -215,12 +224,12 @@ fun EcranMaison(
         Text(stringResource(R.string.compteurs_a_relever_aide), style = androidx.compose.material3.MaterialTheme.typography.bodySmall, color = Couleurs.encre3)
         ChampTexte(stringResource(R.string.notes), notes, { notes = it }, lignes = 3)
         Button(onClick = { enregistrer() }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-            Text(stringResource(R.string.enregistrer))
+            IconeTexte(R.drawable.ic_valider, stringResource(R.string.enregistrer))
         }
 
         if (maisonId != 0L) {
-            TitreSection(stringResource(R.string.compteurs), action = {
-                TextButton(onClick = { surCompteur(0L, maisonId) }) { Text(stringResource(R.string.ajouter)) }
+            TitreSection(stringResource(R.string.compteurs), icone = R.drawable.ic_compteur, action = {
+                BoutonIcone(stringResource(R.string.ajouter), R.drawable.ic_ajouter, { surCompteur(0L, maisonId) })
             })
             compteurs.forEach { c ->
                 LigneListe(
@@ -230,14 +239,15 @@ fun EcranMaison(
                         c.dateDepose?.let { stringResource(R.string.depose_le, jour(it)) },
                     ).joinToString(" · "),
                     couleur = Couleurs.energie(c.energie),
+                    icone = iconeEnergie(c.energie),
                     surAppui = { surCompteur(c.id, maisonId) },
                 )
             }
 
-            TitreSection(stringResource(R.string.tarifs), action = {
+            TitreSection(stringResource(R.string.tarifs), icone = R.drawable.ic_tarif, action = {
                 TextButton(onClick = {
                     tarifEdite = TarifLocal(maisonId = maisonId, energie = "GAZ", debut = java.time.LocalDate.now().toString(), fin = null, prix = 0.0, abonnement = 0.0)
-                }) { Text(stringResource(R.string.ajouter)) }
+                }) { IconeTexte(R.drawable.ic_ajouter, stringResource(R.string.ajouter)) }
             })
             tarifs.forEach { t ->
                 LigneListe(
@@ -252,17 +262,18 @@ fun EcranMaison(
                         if (t.maisonId == null) stringResource(R.string.toutes_maisons) else null,
                     ).joinToString(" · "),
                     couleur = Couleurs.energie(t.energie),
+                    icone = R.drawable.ic_tarif,
                     surAppui = { tarifEdite = t },
                 )
             }
 
-            TitreSection(stringResource(R.string.evenements), action = {
+            TitreSection(stringResource(R.string.evenements), icone = R.drawable.ic_evenement, action = {
                 TextButton(onClick = {
                     evenementEdite = EvenementLocal(maisonId = maisonId, date = java.time.LocalDate.now().toString(), energie = "", libelle = "")
-                }) { Text(stringResource(R.string.ajouter)) }
+                }) { IconeTexte(R.drawable.ic_ajouter, stringResource(R.string.ajouter)) }
             })
             evenements.forEach { e ->
-                LigneListe(titre = e.libelle, detail = jour(e.date), surAppui = { evenementEdite = e })
+                LigneListe(titre = e.libelle, detail = jour(e.date), icone = R.drawable.ic_evenement, surAppui = { evenementEdite = e })
             }
         }
     }
@@ -276,12 +287,12 @@ fun EcranMaison(
     }
     tarifEdite?.let { t ->
         DialogueTarif(t, surFermeture = { tarifEdite = null }, surEnregistrement = {
-            portee.launch { gestion.enregistrerTarif(it); tarifEdite = null; version++ }
+            portee.launch { gestion.enregistrerTarif(it); tarifEdite = null; version++; portee.launch { messages.showSnackbar(enregistre) } }
         }, surSuppression = if (t.id != 0L) ({ portee.launch { gestion.supprimerTarif(t.id); tarifEdite = null; version++ } }) else null)
     }
     evenementEdite?.let { e ->
         DialogueEvenement(e, surFermeture = { evenementEdite = null }, surEnregistrement = {
-            portee.launch { gestion.enregistrerEvenement(it); evenementEdite = null; version++ }
+            portee.launch { gestion.enregistrerEvenement(it); evenementEdite = null; version++; portee.launch { messages.showSnackbar(enregistre) } }
         }, surSuppression = if (e.id != 0L) ({ portee.launch { gestion.supprimerEvenement(e.id); evenementEdite = null; version++ } }) else null)
     }
 }

@@ -88,17 +88,14 @@ class TableauDeBordActivity : AppCompatActivity() {
         val tuile = ItemTuileBinding.inflate(layoutInflater, vues.contenu, false)
         val ligne = resume.ligne
         val unite = ligne.unite
-        tuile.pastille.setBackgroundColor(
-            ContextCompat.getColor(
-                this,
-                when (ligne.energie) {
-                    Energie.EAU -> R.color.eau
-                    Energie.GAZ -> R.color.gaz
-                    Energie.ELECTRICITE -> R.color.elec
-                    Energie.MAZOUT -> R.color.mazout
-                },
-            )
-        )
+        val (icone, couleur) = when (ligne.energie) {
+            Energie.EAU -> R.drawable.ic_eau to R.color.eau
+            Energie.GAZ -> R.drawable.ic_gaz to R.color.gaz
+            Energie.ELECTRICITE -> R.drawable.ic_electricite to R.color.elec
+            Energie.MAZOUT -> R.drawable.ic_mazout to R.color.mazout
+        }
+        tuile.pastille.setImageResource(icone)
+        tuile.pastille.imageTintList = ContextCompat.getColorStateList(this, couleur)
         tuile.titre.text = textes.libelle(ligne)
 
         val p = resume.prevision
@@ -190,6 +187,7 @@ class TableauDeBordActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.tableau_de_bord, menu)
+        menu.afficherIcones()
         return true
     }
 

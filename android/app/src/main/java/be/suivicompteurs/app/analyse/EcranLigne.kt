@@ -1,5 +1,9 @@
 package be.suivicompteurs.app.analyse
 
+import androidx.compose.material3.SnackbarHostState
+import be.suivicompteurs.app.gestion.iconeEnergie
+import be.suivicompteurs.app.gestion.BoutonIcone
+import be.suivicompteurs.app.gestion.IconeTexte
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -85,6 +89,9 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
     // Un point résolu ou rouvert : on recalcule.
     var version by remember { mutableIntStateOf(0) }
     val portee = rememberCoroutineScope()
+    // Confirmation brève après un enregistrement : l'écran ne change pas.
+    val messages = remember { SnackbarHostState() }
+    val enregistre = stringResource(R.string.enregistre)
     val gestion = remember { Gestion(contexte) }
     // Point en cours de résolution, ou point vérifié en cours de modification.
     var aResoudre by remember { mutableStateOf<PointVerifie?>(null) }
@@ -115,7 +122,7 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
             point,
             surFermeture = { aResoudre = null },
             surEnregistrement = { p ->
-                portee.launch { gestion.enregistrerPointVerifie(p); aResoudre = null; version++ }
+                portee.launch { gestion.enregistrerPointVerifie(p); aResoudre = null; version++; portee.launch { messages.showSnackbar(enregistre) } }
             },
             // Un point déjà vérifié peut être rouvert : il redevient à vérifier.
             surReouverture = if (point.id != 0L) ({
@@ -124,7 +131,7 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
         )
     }
 
-    Cadre(titre = d?.let { textes.libelle(it.ligne) } ?: "", surRetour = surRetour) {
+    Cadre(titre = d?.let { textes.libelle(it.ligne) } ?: "", surRetour = surRetour, messages = messages) {
         if (d == null) {
             Chargement()
             return@Cadre
@@ -172,7 +179,7 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
         // --- cumul depuis le 1er janvier, une courbe par année ---------------
         val tracees = d.annees.filter { it.joursCouverts >= 30 }.map { it.annee }.takeLast(6)
         if (tracees.isNotEmpty()) {
-            Carte(stringResource(R.string.graphique_cumul)) {
+            Carte(stringResource(R.string.graphique_cumul), icone = iconeEnergie(ligne.energie.code), couleurIcone = couleur) {
                 val mois = DateTimeFormatter.ofPattern("MMM")
                 // Les relevés de l'année en cours, sur sa courbe : entre deux, la
                 // consommation est répartie (selon le froid, ou uniformément),
@@ -281,7 +288,7 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
 
         // --- coûts ------------------------------------------------------------
         if (d.couts.isNotEmpty()) {
-            Carte(stringResource(R.string.couts)) {
+            Carte(stringResource(R.string.couts), icone = R.drawable.ic_tarif) {
                 Tableau(
                     entetes = listOf(
                         stringResource(R.string.annee), stringResource(R.string.cout_variable),
@@ -326,7 +333,10 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
 
         // --- points à vérifier et événements -----------------------------------
         if (d.anomalies.isNotEmpty()) {
-            Carte(pluralStringResource(R.plurals.points_a_verifier, d.anomalies.size, d.anomalies.size)) {
+            Carte(
+                pluralStringResource(R.plurals.points_a_verifier, d.anomalies.size, d.anomalies.size).removePrefix("⚠ "),
+                icone = R.drawable.ic_attention, couleurIcone = Couleurs.critique,
+            ) {
                 d.anomalies.sortedByDescending { it.debut }.forEach { a ->
                     Text("• " + textes.anomalie(a), style = MaterialTheme.typography.bodySmall, color = Couleurs.encre2)
                     TextButton(onClick = {
@@ -335,13 +345,13 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
                             debut = a.debut.toString(), fin = a.fin.toString(), description = textes.anomalie(a),
                             resoluLe = LocalDate.now().toString(), note = "",
                         )
-                    }) { Text(stringResource(R.string.marquer_resolu)) }
+                    }) { IconeTexte(R.drawable.ic_verifie, stringResource(R.string.marquer_resolu)) }
                 }
             }
         }
         // L'historique : ce qui a été vérifié, quand, et ce qui a été fait.
         if (d.verifies.isNotEmpty()) {
-            Carte(stringResource(R.string.points_verifies, d.verifies.size)) {
+            Carte(stringResource(R.string.points_verifies, d.verifies.size), icone = R.drawable.ic_verifie, couleurIcone = Couleurs.bien) {
                 d.verifies.forEach { p ->
                     Column(Modifier.padding(vertical = 4.dp)) {
                         Text("✓ " + p.description, style = MaterialTheme.typography.bodySmall, color = Couleurs.encre2)
@@ -354,14 +364,14 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
                                 style = MaterialTheme.typography.bodySmall, color = Couleurs.encre3,
                                 modifier = Modifier.weight(1f),
                             )
-                            TextButton(onClick = { aResoudre = p }) { Text(stringResource(R.string.modifier)) }
+                            BoutonIcone(stringResource(R.string.modifier), R.drawable.ic_modifier, { aResoudre = p })
                         }
                     }
                 }
             }
         }
         if (d.evenements.isNotEmpty()) {
-            Carte(stringResource(R.string.evenements)) {
+            Carte(stringResource(R.string.evenements), icone = R.drawable.ic_evenement) {
                 d.evenements.sortedByDescending { it.date }.forEach {
                     Text("${textes.date(LocalDate.parse(it.date))} · ${it.libelle}", style = MaterialTheme.typography.bodySmall)
                 }
@@ -397,7 +407,7 @@ private fun DialoguePointVerifie(
         },
         dismissButton = {
             Row {
-                surReouverture?.let { TextButton(onClick = it) { Text(stringResource(R.string.rouvrir), color = Couleurs.critique) } }
+                surReouverture?.let { BoutonIcone(stringResource(R.string.rouvrir), R.drawable.ic_rouvrir, it, couleur = Couleurs.critique) }
                 TextButton(onClick = surFermeture) { Text(stringResource(R.string.annuler)) }
             }
         },

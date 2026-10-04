@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Suivi compteurs</string>
+    <!-- Sous l'icône du téléphone, où la place manque. -->
+    <string name="nom_lanceur" translatable="false">Compteurs</string>
 
     <!-- Accueil -->
     <string name="index_avec_unite">%1$s %2$s</string>
@@ -131,7 +133,6 @@
     <string name="reprendre_sauvegarde">Importer un fichier Excel</string>
     <string name="reprendre_sauvegarde_aide">Vous avez exporté vos données depuis une version précédente ou un autre téléphone ? Importez ce fichier pour les retrouver.</string>
     <string name="creer_maison">Créer ma maison</string>
-    <string name="mettre_a_jour_meteo">Mettre à jour la météo</string>
     <string name="donnees_sur_appareil">Vos données restent sur cet appareil</string>
     <string name="meteo_a_jour">Météo mise à jour le %1$s</string>
     <string name="meteo_mise_a_jour">Météo à jour</string>
@@ -143,4 +144,6 @@
     <string name="source_meteo">Données météo : Open-Meteo.com (CC BY 4.0)</string>
     <string name="soutenir">♥ Soutenir le développement (don libre)</string>
     <string name="version_application">Version %1$s (%2$d)</string>
+    <string name="enregistre">Enregistré</string>
+    <string name="reglages_enregistres">Réglages enregistrés</string>
 </resources>

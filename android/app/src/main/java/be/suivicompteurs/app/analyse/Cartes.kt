@@ -1,5 +1,8 @@
 package be.suivicompteurs.app.analyse
 
+import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +26,7 @@ import be.suivicompteurs.app.gestion.Couleurs
 
 /** Carte blanche titrée, comme les « cartes » du site. */
 @Composable
-fun Carte(titre: String? = null, contenu: @Composable () -> Unit) {
+fun Carte(titre: String? = null, icone: Int? = null, couleurIcone: Color? = null, contenu: @Composable () -> Unit) {
     Card(
         Modifier.fillMaxWidth().padding(vertical = 6.dp),
         colors = CardDefaults.cardColors(containerColor = Couleurs.surface),
@@ -31,7 +34,12 @@ fun Carte(titre: String? = null, contenu: @Composable () -> Unit) {
     ) {
         Column(Modifier.padding(16.dp)) {
             titre?.let {
-                Text(it, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (icone != null) {
+                        Icon(painterResource(icone), null, Modifier.padding(end = 8.dp).size(22.dp), tint = couleurIcone ?: Couleurs.encre2)
+                    }
+                    Text(it, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                }
                 Box(Modifier.padding(top = 8.dp))
             }
             contenu()

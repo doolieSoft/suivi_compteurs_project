@@ -137,6 +137,7 @@ class ReglagesActivity : AppCompatActivity() {
         reglages.rappelActif = vues.interrupteurRappel.isChecked
         vues.champJours.text?.toString()?.toIntOrNull()?.let { reglages.rappelJours = it }
         Rappels.appliquer(this)
+        android.widget.Toast.makeText(this, R.string.reglages_enregistres, android.widget.Toast.LENGTH_SHORT).show()
         finish()
     }
 }

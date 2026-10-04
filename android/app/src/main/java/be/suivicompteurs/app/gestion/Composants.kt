@@ -1,5 +1,9 @@
 package be.suivicompteurs.app.gestion
 
+import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -213,11 +217,14 @@ fun ChampChoix(
 }
 
 @Composable
-fun TitreSection(texte: String, action: (@Composable () -> Unit)? = null) {
+fun TitreSection(texte: String, icone: Int? = null, action: (@Composable () -> Unit)? = null) {
     Row(
         Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        if (icone != null) {
+            Icon(painterResource(icone), null, Modifier.padding(end = 8.dp).size(22.dp), tint = Couleurs.encre2)
+        }
         Text(
             texte,
             style = MaterialTheme.typography.titleMedium,
@@ -235,6 +242,8 @@ fun LigneListe(
     titre: String,
     detail: String? = null,
     couleur: Color? = null,
+    /** Icône en tête de ligne, dans [couleur] s'il y en a une ; sinon, la barre de couleur. */
+    icone: Int? = null,
     surAppui: () -> Unit,
 ) {
     Row(
@@ -242,7 +251,9 @@ fun LigneListe(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        if (couleur != null) {
+        if (icone != null) {
+            Icon(painterResource(icone), null, Modifier.size(26.dp), tint = couleur ?: Couleurs.encre2)
+        } else if (couleur != null) {
             Box(Modifier.width(4.dp).height(36.dp).background(couleur))
         }
         Column(Modifier.weight(1f)) {
@@ -272,3 +283,35 @@ fun ConfirmerSuppression(message: String, surConfirmation: () -> Unit, surAbando
 
 @Composable
 fun Espace() = Spacer(Modifier.padding(4.dp))
+
+/** Icône d'une énergie, d'après son code. */
+fun iconeEnergie(code: String): Int = when (code) {
+    "EAU" -> R.drawable.ic_eau
+    "GAZ" -> R.drawable.ic_gaz
+    "MAZ" -> R.drawable.ic_mazout
+    else -> R.drawable.ic_electricite
+}
+
+/** Bouton texte précédé d'une icône. */
+@Composable
+fun BoutonIcone(
+    texte: String,
+    icone: Int,
+    surAppui: () -> Unit,
+    couleur: Color? = null,
+    actif: Boolean = true,
+) {
+    TextButton(onClick = surAppui, enabled = actif) {
+        Icon(painterResource(icone), null, Modifier.size(18.dp), tint = couleur ?: LocalContentColor.current)
+        Spacer(Modifier.width(6.dp))
+        Text(texte, color = couleur ?: Color.Unspecified)
+    }
+}
+
+/** Icône puis texte, à placer dans un bouton. */
+@Composable
+fun IconeTexte(icone: Int, texte: String) {
+    Icon(painterResource(icone), null, Modifier.size(18.dp))
+    Spacer(Modifier.width(6.dp))
+    Text(texte)
+}

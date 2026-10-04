@@ -131,7 +131,6 @@
     <string name="reprendre_sauvegarde">Een Excel-bestand importeren</string>
     <string name="reprendre_sauvegarde_aide">Heb je je gegevens geëxporteerd uit een vorige versie of van een andere telefoon? Importeer dat bestand om ze terug te krijgen.</string>
     <string name="creer_maison">Mijn woning aanmaken</string>
-    <string name="mettre_a_jour_meteo">Weer bijwerken</string>
     <string name="donnees_sur_appareil">Je gegevens blijven op dit toestel</string>
     <string name="meteo_a_jour">Weer bijgewerkt op %1$s</string>
     <string name="meteo_mise_a_jour">Weer is bijgewerkt</string>
@@ -143,4 +142,6 @@
     <string name="source_meteo">Weergegevens: Open-Meteo.com (CC BY 4.0)</string>
     <string name="soutenir">♥ Steun de ontwikkeling (vrije gift)</string>
     <string name="version_application">Versie %1$s (%2$d)</string>
+    <string name="enregistre">Opgeslagen</string>
+    <string name="reglages_enregistres">Instellingen opgeslagen</string>
 </resources>

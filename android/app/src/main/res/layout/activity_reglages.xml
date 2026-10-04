@@ -28,6 +28,9 @@
 
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/interrupteurRappel"
+                android:drawableStart="@drawable/ic_rappel"
+                android:drawablePadding="12dp"
+                app:drawableTint="@color/encre_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/rappel_titre_reglage"
@@ -62,12 +65,14 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/boutonLangue"
+                app:icon="@drawable/ic_langue"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/boutonDevise"
+                app:icon="@drawable/ic_devise"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -75,6 +80,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/boutonEnregistrer"
+                app:icon="@drawable/ic_valider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
@@ -83,6 +89,7 @@
             <!-- Seulement dans la version GitHub, voir BuildConfig.LIEN_DONS. -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/boutonDons"
+                app:icon="@drawable/ic_dons"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

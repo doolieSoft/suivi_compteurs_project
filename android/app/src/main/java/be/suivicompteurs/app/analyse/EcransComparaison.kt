@@ -1,5 +1,6 @@
 package be.suivicompteurs.app.analyse
 
+import be.suivicompteurs.app.gestion.iconeEnergie
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -78,7 +79,7 @@ fun EcranComparaison(surRetour: () -> Unit, surLigne: (Long, Energie, Plage) -> 
             val retenues = c.annees.filter { it.joursCouverts >= 30 }
             if (retenues.isEmpty()) continue
             val couleur = Couleurs.energie(c.ligne.energie.code)
-            Carte("${c.maison} – ${textes.libelle(c.ligne)} (${c.ligne.unite})") {
+            Carte("${c.maison} – ${textes.libelle(c.ligne)} (${c.ligne.unite})", icone = iconeEnergie(c.ligne.energie.code), couleurIcone = Couleurs.energie(c.ligne.energie.code)) {
                 GraphiqueBarres(
                     categories = retenues.map { it.annee.toString() + if (it.complete) "" else "*" },
                     groupes = listOfNotNull(
@@ -99,7 +100,7 @@ fun EcranComparaison(surRetour: () -> Unit, surLigne: (Long, Energie, Plage) -> 
             }
         }
         climat?.takeIf { it.annuels.isNotEmpty() }?.let { cl ->
-            Carte(stringResource(R.string.titre_climat)) {
+            Carte(stringResource(R.string.titre_climat), icone = R.drawable.ic_meteo) {
                 GraphiqueBarres(
                     categories = cl.annuels.map { it.first.toString() },
                     groupes = listOf(GroupeBarres(stringResource(R.string.degres_jours), Couleurs.primaire, cl.annuels.map { it.second })),
@@ -162,7 +163,7 @@ fun EcranJustesse(surRetour: () -> Unit) {
         }
         for (j in liste) {
             val r = j.rejeu
-            Carte("${j.maison} – ${textes.libelle(j.ligne)}") {
+            Carte("${j.maison} – ${textes.libelle(j.ligne)}", icone = iconeEnergie(j.ligne.energie.code), couleurIcone = Couleurs.energie(j.ligne.energie.code)) {
                 Text(
                     stringResource(R.string.reel_et_ecart, textes.nombre(r.reel), j.unite, r.ecartMoyenPct?.let { textes.nombre(it, 1) } ?: "—"),
                     fontWeight = FontWeight.Bold,

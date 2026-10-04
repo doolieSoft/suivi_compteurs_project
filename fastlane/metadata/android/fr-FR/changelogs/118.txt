@@ -1,0 +1,4 @@
+• Des icônes partout : énergies, menus, boutons, gestion et analyse.
+• Un message confirme chaque enregistrement.
+• Sous l'icône du téléphone, l'application s'appelle « Compteurs ».
+• La météo se met à jour seule à l'ouverture (ou en tirant l'accueil vers le bas) ; l'entrée de menu disparaît.

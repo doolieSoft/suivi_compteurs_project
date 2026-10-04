@@ -1,0 +1,4 @@
+• Icons everywhere: energies, menus, buttons, management and analysis.
+• A message confirms every save.
+• Under the phone icon, the app is called "Compteurs".
+• Weather updates by itself when the app opens (or by pulling the home screen down); the menu entry is gone.

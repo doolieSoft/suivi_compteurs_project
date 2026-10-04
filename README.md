@@ -137,3 +137,6 @@ le site retiré du dépôt. Il reste dans l'historique Git, jusqu'à l'étiquett
 [LICENSE](LICENSE). Vous pouvez utiliser, modifier et redistribuer
 ce logiciel, y compris le vendre, à condition de publier sous la même licence
 le code de toute version modifiée que vous distribuez.
+
+Icônes : [Material Symbols](https://fonts.google.com/icons) de Google, sous
+licence Apache 2.0.

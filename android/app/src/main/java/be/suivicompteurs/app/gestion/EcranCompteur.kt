@@ -1,5 +1,6 @@
 package be.suivicompteurs.app.gestion
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,6 +41,9 @@ fun EcranCompteur(
     surCompteur: (Long) -> Unit,
 ) {
     val portee = rememberCoroutineScope()
+    // Confirmation brève après un enregistrement : l'écran ne change pas.
+    val messages = remember { SnackbarHostState() }
+    val enregistre = stringResource(R.string.enregistre)
     var compteurId by remember { mutableStateOf(id) }
     var origine by remember { mutableStateOf<CompteurHistorique?>(null) }
     var energie by remember { mutableStateOf("GAZ") }
@@ -73,12 +77,14 @@ fun EcranCompteur(
             coefKwh = lireNombre(coef) ?: 1.0, datePose = pose, dateDepose = depose,
         )
         compteurId = gestion.enregistrerCompteur(c)
+        portee.launch { messages.showSnackbar(enregistre) }
         version++
     }
 
     Cadre(
         titre = if (compteurId == 0L) stringResource(R.string.nouveau_compteur) else origine?.let { libelleCompteur(it) }.orEmpty(),
         surRetour = surRetour,
+        messages = messages,
         surSuppression = if (compteurId != 0L) ({ confirmer = true }) else null,
     ) {
         ChampChoix(stringResource(R.string.energie), energies(), energie) {
@@ -100,19 +106,19 @@ fun EcranCompteur(
         ChampDate(stringResource(R.string.pose_le), pose, { pose = it }, facultatif = true)
         ChampDate(stringResource(R.string.depose_le_champ), depose, { depose = it }, facultatif = true)
         Button(onClick = { enregistrer() }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-            Text(stringResource(R.string.enregistrer))
+            IconeTexte(R.drawable.ic_valider, stringResource(R.string.enregistrer))
         }
         if (compteurId != 0L && depose == null) {
             OutlinedButton(onClick = { remplacer = true }, Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.remplacer_compteur))
+                IconeTexte(R.drawable.ic_compteur, stringResource(R.string.remplacer_compteur))
             }
         }
 
         if (compteurId != 0L) {
-            TitreSection(stringResource(R.string.releves_titre, releves.size), action = {
+            TitreSection(stringResource(R.string.releves_titre, releves.size), icone = R.drawable.ic_releve, action = {
                 TextButton(onClick = {
                     releveEdite = ReleveHistorique(compteurId, LocalDate.now().toString(), releves.firstOrNull()?.index ?: 0.0, false) to null
-                }) { Text(stringResource(R.string.ajouter)) }
+                }) { IconeTexte(R.drawable.ic_ajouter, stringResource(R.string.ajouter)) }
             })
             releves.forEach { r ->
                 LigneListe(
@@ -136,6 +142,7 @@ fun EcranCompteur(
                     gestion.enregistrerReleve(nouveau, dateAvant)
                     releveEdite = null
                     version++
+                    portee.launch { messages.showSnackbar(enregistre) }
                     null
                 } catch (refus: Refus) {
                     refus

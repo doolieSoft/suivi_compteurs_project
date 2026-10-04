@@ -64,6 +64,7 @@
                      utilisateur n'a pas de classeur. -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/boutonCreer"
+                app:icon="@drawable/ic_creer_maison"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
@@ -71,6 +72,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/boutonImporter"
+                app:icon="@drawable/ic_importer"
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -91,6 +93,7 @@
     <!-- L'analyse, à portée de main sous les compteurs (aussi dans le menu). -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/boutonConsulter"
+                app:icon="@drawable/ic_consulter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"

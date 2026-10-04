@@ -3,10 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_comparaison"
+        android:icon="@drawable/ic_comparaison"
         android:title="@string/comparaison_climat"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_justesse"
+        android:icon="@drawable/ic_justesse"
         android:title="@string/justesse_previsions"
         app:showAsAction="never" />
 </menu>
