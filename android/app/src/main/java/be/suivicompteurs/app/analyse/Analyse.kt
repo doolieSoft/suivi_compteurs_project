@@ -79,6 +79,9 @@ class Analyse(contexte: Context) {
         }
 
         return maisons.map { maison ->
+            // Avant l'emménagement, la maison était vide ou habitée par d'autres :
+            // ces relevés fausseraient le modèle et les profils saisonniers.
+            val entree = maison.dateEntree
             MaisonChargee(
                 maison = maison,
                 compteurs = compteurs.filter { it.maisonId == maison.id }.map { c ->
@@ -89,6 +92,7 @@ class Analyse(contexte: Context) {
                         unite = c.unite,
                         datePose = c.datePose?.let(LocalDate::parse),
                         releves = releves[c.id].orEmpty()
+                            .filter { entree == null || it.date >= entree }
                             .map { Releve(LocalDate.parse(it.date), it.index, it.annuel) },
                     )
                 },

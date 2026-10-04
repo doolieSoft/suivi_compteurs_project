@@ -47,19 +47,34 @@ class Synchroniseur(contexte: Context) {
         var echec: Resultat.Echec? = null
         val hier = LocalDate.now().minusDays(1)
         for (station in historique.stations()) {
+            // La météo doit couvrir tous les relevés des maisons de la station (le
+            // modèle thermique écarte une période sans météo) et les dix ans de la
+            // normale climatique. Une station neuve, ou créée en changeant la
+            // position d'une maison, est donc complétée vers le passé aussi.
+            val premierReleve = historique.premierReleveDeStation(station.id)?.let(LocalDate::parse)
+            val necessaire = listOfNotNull(premierReleve, hier.minusYears(DegresJours.ANNEES_NORMALE.toLong())).min()
+            val premier = historique.premierDegreJour(station.id)?.let(LocalDate::parse)
             val dernier = historique.dernierDegreJour(station.id)?.let(LocalDate::parse)
-            // Sans historique météo, deux ans suffisent à une première normale.
-            val debut = dernier?.plusDays(1) ?: hier.minusYears(2)
-            when (val reponse = OpenMeteo().temperatures(station.latitude, station.longitude, debut, hier)) {
-                is Resultat.Succes -> {
-                    historique.enregistrerDegresJours(
-                        reponse.valeur.map { (jour, t) ->
-                            DegreJourLocal(station.id, jour.toString(), DegresJours.calculer(t, station.base))
-                        }
-                    )
-                    joursMeteo += reponse.valeur.size
+            val manquants = if (premier == null || dernier == null) {
+                listOf(necessaire to hier)
+            } else {
+                listOfNotNull(
+                    (necessaire to premier.minusDays(1)).takeIf { necessaire < premier },
+                    (dernier.plusDays(1) to hier).takeIf { dernier < hier },
+                )
+            }
+            for ((debut, fin) in manquants) {
+                when (val reponse = OpenMeteo().temperatures(station.latitude, station.longitude, debut, fin)) {
+                    is Resultat.Succes -> {
+                        historique.enregistrerDegresJours(
+                            reponse.valeur.map { (jour, t) ->
+                                DegreJourLocal(station.id, jour.toString(), DegresJours.calculer(t, station.base))
+                            }
+                        )
+                        joursMeteo += reponse.valeur.size
+                    }
+                    is Resultat.Echec -> echec = reponse
                 }
-                is Resultat.Echec -> echec = reponse
             }
         }
 

@@ -187,6 +187,17 @@ abstract class HistoriqueDao {
     @Query("SELECT MAX(date) FROM degres_jours WHERE stationId = :stationId")
     abstract suspend fun dernierDegreJour(stationId: Long): String?
 
+    @Query("SELECT MIN(date) FROM degres_jours WHERE stationId = :stationId")
+    abstract suspend fun premierDegreJour(stationId: Long): String?
+
+    /** Le plus ancien relevé des maisons qui utilisent cette station météo. */
+    @Query(
+        "SELECT MIN(r.date) FROM historique_releves r " +
+            "JOIN historique_compteurs c ON c.id = r.compteurId " +
+            "JOIN maisons m ON m.id = c.maisonId WHERE m.stationId = :stationId"
+    )
+    abstract suspend fun premierReleveDeStation(stationId: Long): String?
+
     /** Mode autonome : un relevé saisi sur l'appareil rejoint directement l'historique. */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun enregistrerReleves(liste: List<ReleveHistorique>)
