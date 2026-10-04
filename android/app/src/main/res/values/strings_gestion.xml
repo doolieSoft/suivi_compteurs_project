@@ -66,8 +66,8 @@
     <string name="releves_titre">Relevés (%1$d)</string>
     <string name="releve">Relevé</string>
     <string name="supprimer_compteur_confirmation">Supprimer ce compteur et ses %1$d relevés ? C\'est définitif : pensez à exporter d\'abord.</string>
-    <string name="refus_index_recule">Inférieur au relevé du %1$s (%2$s) : un compteur ne recule pas.</string>
-    <string name="refus_index_depasse">Supérieur au relevé suivant, du %1$s (%2$s).</string>
+    <string name="refus_index_recule">Inférieur au relevé du %1$s (%2$s) : un compteur ne recule pas. Le compteur a-t-il été remplacé ? Utilisez « Remplacer ce compteur » sur sa fiche.</string>
+    <string name="refus_index_depasse">Supérieur au relevé suivant, du %1$s (%2$s). Le compteur a-t-il été remplacé ? Utilisez « Remplacer ce compteur » sur sa fiche.</string>
     <string name="refus_date_deja_relevee">Il existe déjà un relevé le %1$s.</string>
     <string name="date_obligatoire">La date est obligatoire.</string>
     <string name="index_unite">Index (%1$s)</string>
@@ -79,4 +79,10 @@
     <string name="ok">OK</string>
     <string name="effacer">Effacer</string>
     <string name="retour">Retour</string>
+    <string name="index_passes">Ajouter des index passés</string>
+    <string name="index_passes_astuce">Astuce : vos anciennes factures annuelles indiquent l\'index relevé chaque année. Reprenez-les ici : les prévisions seront justes tout de suite.</string>
+    <string name="index_passes_explication">Recopiez l\'index et la date de relevé de vos factures annuelles (décompte de régularisation). Les lignes laissées vides sont ignorées.</string>
+    <string name="index_passes_annuels">Relevés annuels (factures)</string>
+    <string name="index_passes_ajoutes">%1$d index ajoutés</string>
+    <string name="ajouter_une_ligne">Ajouter une ligne</string>
 </resources>

@@ -151,6 +151,9 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
                 valeur = stringResource(R.string.valeur_unite, nombre(p.totalPrevu), unite),
                 details = listOfNotNull(
                     stringResource(R.string.detail_realise, nombre(p.realise), unite, p.joursRealises, nombre(p.estimeRestant), p.joursRestants),
+                    if (p.joursEstimesAvant > 0) {
+                        stringResource(R.string.estime_avant_premier_releve, nombre(p.estimeAvant), unite, p.joursEstimesAvant)
+                    } else null,
                     if (p.surReleveAnnuel) stringResource(R.string.periode_releve_annuel, textes.date(p.borneDepart), textes.date(p.fin)) else null,
                     p.borneBasse?.let { stringResource(R.string.fourchette, nombre(it), nombre(p.borneHaute!!)) },
                     stringResource(R.string.methode_employee, textes.methode(p.methode)),

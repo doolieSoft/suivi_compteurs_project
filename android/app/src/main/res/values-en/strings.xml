@@ -127,7 +127,7 @@
     <string name="canal_rappels_description">Periodic notification inviting you to read the meters.</string>
     <string name="rappel_titre">Meter reading</string>
     <string name="rappel_texte">Time to note your meter readings.</string>
-    <string name="accueil_vide">Welcome! To get started, create your house and its meters. Then just read the meters from time to time.</string>
+    <string name="accueil_vide">Welcome! To get started, create your house and its meters.\n\nTip: enter the readings from your past annual bills (“Add past readings” on each meter): forecasts will be accurate right away. Then take a reading once a week during the first month.</string>
     <string name="reprendre_sauvegarde">Import an Excel file</string>
     <string name="reprendre_sauvegarde_aide">Exported your data from a previous version or another phone? Import that file to get it back.</string>
     <string name="creer_maison">Create my house</string>
@@ -156,4 +156,5 @@
     <string name="prochain_rappel">Next reminder: %1$s</string>
     <string name="prochain_rappel_apres_enregistrement">The next reminder date will be set when you save.</string>
     <string name="reglages_enregistres_rappel">Settings saved. Next reminder on %1$s.</string>
+    <string name="estime_avant_premier_releve">of which %1$s %2$s estimated over the %3$d days before your first reading</string>
 </resources>

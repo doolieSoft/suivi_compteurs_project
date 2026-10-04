@@ -100,6 +100,7 @@ class SaisieActivity : AppCompatActivity() {
         }
 
         vues.champDate.setText(formatAffichage.format(dateChoisie))
+        vues.champDate.setOnClickListener { choisirDate() }
         vues.boutonDeclencher.setOnClickListener { capturer() }
         vues.boutonReprendre.setOnClickListener { reprendrePhoto() }
         vues.boutonSansPhoto.setOnClickListener { basculerSaisieManuelle() }
@@ -513,6 +514,27 @@ class SaisieActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         lecteur.fermer()
+    }
+
+    /** Un relevé oublié se note à sa vraie date, jamais après aujourd'hui. */
+    private fun choisirDate() {
+        // Le calendrier travaille en minuit UTC du jour choisi.
+        val jour = java.time.Instant.ofEpochMilli(dateChoisie.time).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+        val selecteur = com.google.android.material.datepicker.MaterialDatePicker.Builder.datePicker()
+            .setTitleText(R.string.date_du_releve)
+            .setSelection(jour.atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli())
+            .setCalendarConstraints(
+                com.google.android.material.datepicker.CalendarConstraints.Builder()
+                    .setValidator(com.google.android.material.datepicker.DateValidatorPointBackward.now())
+                    .build()
+            )
+            .build()
+        selecteur.addOnPositiveButtonClickListener { millis ->
+            val choisi = java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneOffset.UTC).toLocalDate()
+            dateChoisie = Date.from(choisi.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant())
+            vues.champDate.setText(formatAffichage.format(dateChoisie))
+        }
+        selecteur.show(supportFragmentManager, "date")
     }
 
     companion object {

@@ -127,7 +127,7 @@
     <string name="canal_rappels_description">Periodieke melding om de meters op te nemen.</string>
     <string name="rappel_titre">Meteropname</string>
     <string name="rappel_texte">Tijd om je meterstanden te noteren.</string>
-    <string name="accueil_vide">Welkom! Maak om te beginnen je woning en haar meters aan. Daarna lees je af en toe de meterstanden af.</string>
+    <string name="accueil_vide">Welkom! Maak om te beginnen je woning en haar meters aan.\n\nTip: neem de meterstanden van je oude jaarafrekeningen over (“Vroegere meterstanden toevoegen” bij elke meter): de voorspellingen kloppen dan meteen. Lees daarna de eerste maand één keer per week af.</string>
     <string name="reprendre_sauvegarde">Een Excel-bestand importeren</string>
     <string name="reprendre_sauvegarde_aide">Heb je je gegevens geëxporteerd uit een vorige versie of van een andere telefoon? Importeer dat bestand om ze terug te krijgen.</string>
     <string name="creer_maison">Mijn woning aanmaken</string>
@@ -156,4 +156,5 @@
     <string name="prochain_rappel">Volgende herinnering: %1$s</string>
     <string name="prochain_rappel_apres_enregistrement">De datum van de volgende herinnering wordt vastgelegd bij het opslaan.</string>
     <string name="reglages_enregistres_rappel">Instellingen opgeslagen. Volgende herinnering op %1$s.</string>
+    <string name="estime_avant_premier_releve">waarvan %1$s %2$s geschat over de %3$d dagen vóór je eerste meterstand</string>
 </resources>

@@ -129,7 +129,7 @@
     <string name="canal_rappels_description">Notification périodique invitant à relever les compteurs.</string>
     <string name="rappel_titre">Relevé des compteurs</string>
     <string name="rappel_texte">Il est temps de noter vos index.</string>
-    <string name="accueil_vide">Bienvenue ! Pour commencer, créez votre maison et ses compteurs. Il suffira ensuite de relever les index de temps en temps.</string>
+    <string name="accueil_vide">Bienvenue ! Pour commencer, créez votre maison et ses compteurs.\n\nAstuce : reprenez les index de vos anciennes factures annuelles (« Ajouter des index passés » sur chaque compteur) : les prévisions seront justes tout de suite. Ensuite, relevez une fois par semaine le premier mois.</string>
     <string name="reprendre_sauvegarde">Importer un fichier Excel</string>
     <string name="reprendre_sauvegarde_aide">Vous avez exporté vos données depuis une version précédente ou un autre téléphone ? Importez ce fichier pour les retrouver.</string>
     <string name="creer_maison">Créer ma maison</string>
@@ -158,4 +158,5 @@
     <string name="prochain_rappel">Prochain rappel : le %1$s</string>
     <string name="prochain_rappel_apres_enregistrement">La date du prochain rappel sera fixée à l\'enregistrement.</string>
     <string name="reglages_enregistres_rappel">Réglages enregistrés. Prochain rappel le %1$s.</string>
+    <string name="estime_avant_premier_releve">dont %1$s %2$s estimés sur les %3$d jours d\'avant votre premier relevé</string>
 </resources>

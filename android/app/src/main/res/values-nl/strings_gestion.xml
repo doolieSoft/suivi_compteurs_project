@@ -66,8 +66,8 @@
     <string name="releves_titre">Meterstanden (%1$d)</string>
     <string name="releve">Meterstand</string>
     <string name="supprimer_compteur_confirmation">Deze meter en zijn %1$d meterstanden verwijderen? Dit is definitief: exporteer eerst.</string>
-    <string name="refus_index_recule">Lager dan de stand van %1$s (%2$s): een meter loopt nooit terug.</string>
-    <string name="refus_index_depasse">Hoger dan de volgende stand, van %1$s (%2$s).</string>
+    <string name="refus_index_recule">Lager dan de stand van %1$s (%2$s): een meter loopt nooit terug. Werd de meter vervangen? Gebruik “Deze meter vervangen” op de fiche.</string>
+    <string name="refus_index_depasse">Hoger dan de volgende stand, van %1$s (%2$s). Werd de meter vervangen? Gebruik “Deze meter vervangen” op de fiche.</string>
     <string name="refus_date_deja_relevee">Er is al een meterstand op %1$s.</string>
     <string name="date_obligatoire">De datum is verplicht.</string>
     <string name="index_unite">Stand (%1$s)</string>
@@ -79,4 +79,10 @@
     <string name="ok">OK</string>
     <string name="effacer">Wissen</string>
     <string name="retour">Terug</string>
+    <string name="index_passes">Vroegere meterstanden toevoegen</string>
+    <string name="index_passes_astuce">Tip: je oude jaarafrekeningen vermelden de meterstand van elk jaar. Neem ze hier over: de voorspellingen kloppen dan meteen.</string>
+    <string name="index_passes_explication">Neem de meterstand en de datum over van je jaarafrekeningen. Lege regels worden genegeerd.</string>
+    <string name="index_passes_annuels">Jaarlijkse meterstanden (afrekeningen)</string>
+    <string name="index_passes_ajoutes">%1$d meterstanden toegevoegd</string>
+    <string name="ajouter_une_ligne">Regel toevoegen</string>
 </resources>

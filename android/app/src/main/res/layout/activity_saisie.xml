@@ -201,13 +201,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:hint="@string/date_du_releve">
+                android:hint="@string/date_du_releve"
+                app:endIconDrawable="@drawable/ic_evenement"
+                app:endIconMode="custom">
 
+                <!-- Un appui ouvre le calendrier : un relevé oublié se note à sa date. -->
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/champDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:enabled="false"
+                    android:cursorVisible="false"
+                    android:focusable="false"
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 

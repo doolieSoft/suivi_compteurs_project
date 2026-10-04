@@ -66,8 +66,8 @@
     <string name="releves_titre">Readings (%1$d)</string>
     <string name="releve">Reading</string>
     <string name="supprimer_compteur_confirmation">Delete this meter and its %1$d readings? This cannot be undone: export first.</string>
-    <string name="refus_index_recule">Lower than the reading of %1$s (%2$s): a meter never goes backwards.</string>
-    <string name="refus_index_depasse">Higher than the next reading, of %1$s (%2$s).</string>
+    <string name="refus_index_recule">Lower than the reading of %1$s (%2$s): a meter never goes backwards. Was the meter replaced? Use “Replace this meter” on its page.</string>
+    <string name="refus_index_depasse">Higher than the next reading, of %1$s (%2$s). Was the meter replaced? Use “Replace this meter” on its page.</string>
     <string name="refus_date_deja_relevee">There is already a reading on %1$s.</string>
     <string name="date_obligatoire">The date is required.</string>
     <string name="index_unite">Reading (%1$s)</string>
@@ -79,4 +79,10 @@
     <string name="ok">OK</string>
     <string name="effacer">Clear</string>
     <string name="retour">Back</string>
+    <string name="index_passes">Add past readings</string>
+    <string name="index_passes_astuce">Tip: your past annual bills show the reading taken each year. Enter them here: forecasts will be accurate right away.</string>
+    <string name="index_passes_explication">Copy the reading and its date from your annual bills (yearly statement). Rows left empty are ignored.</string>
+    <string name="index_passes_annuels">Annual readings (bills)</string>
+    <string name="index_passes_ajoutes">%1$d readings added</string>
+    <string name="ajouter_une_ligne">Add a row</string>
 </resources>

@@ -304,3 +304,40 @@ class CoutTest {
         assertEquals(9.0, coutsParAnnee(ligne, tarifs).single().prixMoyen!!, 1e-6)
     }
 }
+
+/** Un nouvel utilisateur, sans historique : ses premières prévisions doivent déjà avoir un sens. */
+class PrevisionNouvelUtilisateurTest {
+    private val djs = Fabrique.climat(date("2023-01-01"), date("2025-12-31"))
+    private val conso = djs.mapValues { BASE_VRAIE + K_VRAI * it.value }
+
+    private fun compteur(pas: Long) = Fabrique.compteur(
+        Energie.GAZ,
+        Fabrique.releves(conso, Fabrique.datesTousLes(date("2024-10-01"), date("2025-12-31"), pas)),
+    )
+
+    private fun prevoirAu(c: Compteur, jour: LocalDate): Prevision? {
+        val masque = c.copy(releves = c.releves.filter { it.date <= jour })
+        return prevoir(lignes(listOf(masque), djs, jusqua = jour).single(), jour, DegresJours.normales(djs, jour))
+    }
+
+    @Test
+    fun `la premiere annee commencee en cours de route est prevue en entier`() {
+        // Suivi commencé le 1er octobre : janvier à septembre sont estimés, pas oubliés.
+        val p = prevoirAu(compteur(7), date("2024-11-01"))!!
+        val reel = conso.filterKeys { it.year == 2024 }.values.sum()
+        assertTrue(p.joursEstimesAvant > 250)
+        assertTrue(p.estimeAvant > 0)
+        assertEquals(reel, p.totalPrevu, reel * 0.05)
+    }
+
+    @Test
+    fun `sans releve encore dans l'annee le modele prevoit quand meme`() {
+        // Relevés mensuels : le 15 janvier, aucun relevé de l'année encore.
+        val c = compteur(30)
+        assertTrue(c.releves.none { it.date.year == 2025 && it.date <= date("2025-01-15") })
+        val p = prevoirAu(c, date("2025-01-15"))!!
+        val reel = conso.filterKeys { it.year == 2025 }.values.sum()
+        assertEquals(2025, p.annee)
+        assertEquals(reel, p.totalPrevu, reel * 0.05)
+    }
+}

@@ -146,10 +146,11 @@ fun ChampDate(
     libelle: String,
     valeur: String?,
     surChangement: (String?) -> Unit,
+    modifier: Modifier = Modifier,
     facultatif: Boolean = false,
 ) {
     var ouvert by remember { mutableStateOf(false) }
-    Box(Modifier.fillMaxWidth()) {
+    Box(modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = jour(valeur),
             onValueChange = {},

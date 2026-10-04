@@ -157,7 +157,12 @@ class TableauDeBordActivity : AppCompatActivity() {
                 R.string.detail_realise,
                 textes.nombre(p.realise), unite, p.joursRealises,
                 textes.nombre(p.estimeRestant), p.joursRestants,
-            )
+            ) + if (p.joursEstimesAvant > 0) {
+                // Suivi commencé en cours de période : le début est estimé.
+                "\n" + getString(R.string.estime_avant_premier_releve, textes.nombre(p.estimeAvant), unite, p.joursEstimesAvant)
+            } else {
+                ""
+            }
             val basse = p.borneBasse
             val haute = p.borneHaute
             if (basse != null && haute != null) {

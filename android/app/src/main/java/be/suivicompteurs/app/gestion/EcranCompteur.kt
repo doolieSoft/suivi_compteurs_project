@@ -1,5 +1,6 @@
 package be.suivicompteurs.app.gestion
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,6 +58,7 @@ fun EcranCompteur(
     var releves by remember { mutableStateOf<List<ReleveHistorique>>(emptyList()) }
     var releveEdite by remember { mutableStateOf<Pair<ReleveHistorique, String?>?>(null) }
     var remplacer by remember { mutableStateOf(false) }
+    var indexPasses by remember { mutableStateOf(false) }
     var confirmer by remember { mutableStateOf(false) }
     var version by remember { mutableIntStateOf(0) }
     // La maison du compteur, pour le titre.
@@ -124,6 +126,17 @@ fun EcranCompteur(
                     releveEdite = ReleveHistorique(compteurId, LocalDate.now().toString(), releves.firstOrNull()?.index ?: 0.0, false) to null
                 }) { IconeTexte(R.drawable.ic_ajouter, stringResource(R.string.ajouter)) }
             })
+            // Les anciennes factures donnent tout de suite un historique.
+            if (releves.size <= 1) {
+                Text(
+                    stringResource(R.string.index_passes_astuce),
+                    style = MaterialTheme.typography.bodySmall, color = Couleurs.encre2,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+            OutlinedButton(onClick = { indexPasses = true }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                IconeTexte(R.drawable.ic_releve, stringResource(R.string.index_passes))
+            }
             releves.forEach { r ->
                 LigneListe(
                     titre = "${jour(r.date)} · ${afficherNombre(r.index)} $unite",
@@ -155,6 +168,37 @@ fun EcranCompteur(
             surSuppression = if (dateAvant != null) ({
                 portee.launch { gestion.supprimerReleve(r.compteurId, dateAvant); releveEdite = null; version++ }
             }) else null,
+        )
+    }
+    if (indexPasses) {
+        val nbAjoutes = stringResource(R.string.index_passes_ajoutes)
+        DialogueIndexPasses(
+            unite = unite,
+            // Une ligne par année, en remontant depuis le plus ancien relevé connu.
+            depart = releves.minOfOrNull { LocalDate.parse(it.date) } ?: LocalDate.now(),
+            surFermeture = { indexPasses = false },
+            surEnregistrement = { lignes ->
+                val refus = mutableMapOf<Int, Refus>()
+                var ajoutes = 0
+                // Du plus ancien au plus récent : chaque index est contrôlé par rapport à ses voisins.
+                for ((rang, ligne) in lignes.withIndex().sortedBy { it.value.first }) {
+                    try {
+                        gestion.enregistrerReleve(
+                            ReleveHistorique(compteurId, ligne.first.toString(), ligne.second, annuel = ligne.third, source = "FOURNISSEUR"),
+                            dateAvant = null,
+                        )
+                        ajoutes++
+                    } catch (e: Refus) {
+                        refus[rang] = e
+                    }
+                }
+                version++
+                if (refus.isEmpty()) {
+                    indexPasses = false
+                    portee.launch { messages.showSnackbar(nbAjoutes.format(ajoutes)) }
+                }
+                refus
+            },
         )
     }
     if (remplacer) {
@@ -277,6 +321,77 @@ fun DialogueRemplacement(
                 enabled = date != null && lireNombre(index) != null,
                 onClick = { surConfirmation(LocalDate.parse(date), lireNombre(index)!!, numero) },
             ) { Text(stringResource(R.string.remplacer)) }
+        },
+        dismissButton = { TextButton(onClick = surFermeture) { Text(stringResource(R.string.annuler)) } },
+    )
+}
+
+/**
+ * Plusieurs index d'un coup, typiquement repris des factures annuelles : une
+ * ligne par année, datée d'un an avant la précédente.
+ */
+@Composable
+fun DialogueIndexPasses(
+    unite: String,
+    depart: LocalDate,
+    surFermeture: () -> Unit,
+    surEnregistrement: suspend (List<Triple<LocalDate, Double, Boolean>>) -> Map<Int, Refus>,
+) {
+    val portee = rememberCoroutineScope()
+    val dates = remember { mutableStateListOf<String?>(*Array(3) { depart.minusYears(it + 1L).toString() }) }
+    val index = remember { mutableStateListOf("", "", "") }
+    var annuels by remember { mutableStateOf(true) }
+    var erreurs by remember { mutableStateOf<Map<Int, Refus>>(emptyMap()) }
+
+    AlertDialog(
+        onDismissRequest = surFermeture,
+        title = { Text(stringResource(R.string.index_passes)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text(stringResource(R.string.index_passes_explication), style = MaterialTheme.typography.bodySmall, color = Couleurs.encre2)
+                for (i in dates.indices) {
+                    Row(verticalAlignment = Alignment.Top) {
+                        ChampDate(stringResource(R.string.date), dates[i], { dates[i] = it }, Modifier.weight(1f).padding(end = 8.dp))
+                        ChampTexte(
+                            stringResource(R.string.index_unite, unite), index[i], { index[i] = it; erreurs = erreurs - i },
+                            Modifier.weight(1f), numerique = true,
+                            erreur = erreurs[i]?.let { messageRefus(it) },
+                        )
+                    }
+                }
+                TextButton(onClick = {
+                    val plusAncienne = dates.filterNotNull().minOfOrNull { LocalDate.parse(it) } ?: depart
+                    dates.add(plusAncienne.minusYears(1).toString())
+                    index.add("")
+                }) { IconeTexte(R.drawable.ic_ajouter, stringResource(R.string.ajouter_une_ligne)) }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = annuels, onCheckedChange = { annuels = it })
+                    Text(stringResource(R.string.index_passes_annuels))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                // Lignes remplies seulement ; les autres sont ignorées.
+                val remplies = dates.indices.mapNotNull { i ->
+                    val d = dates[i] ?: return@mapNotNull null
+                    val v = lireNombre(index[i]) ?: return@mapNotNull null
+                    i to Triple(LocalDate.parse(d), v, annuels)
+                }
+                if (remplies.isEmpty()) { surFermeture(); return@TextButton }
+                portee.launch {
+                    val refus = surEnregistrement(remplies.map { it.second })
+                    // Les lignes enregistrées quittent le formulaire ; seules restent,
+                    // avec leur motif, celles qui ont été refusées.
+                    val refusees = refus.keys.map { remplies[it].first }.toSet()
+                    val gardees = dates.indices.filter { it in refusees || remplies.none { r -> r.first == it } }
+                    val nouvellesDates = gardees.map { dates[it] }
+                    val nouveauxIndex = gardees.map { index[it] }
+                    erreurs = refus.mapKeys { (rang, _) -> gardees.indexOf(remplies[rang].first) }
+                    dates.clear(); dates.addAll(nouvellesDates)
+                    index.clear(); index.addAll(nouveauxIndex)
+                }
+            }) { Text(stringResource(R.string.enregistrer)) }
         },
         dismissButton = { TextButton(onClick = surFermeture) { Text(stringResource(R.string.annuler)) } },
     )

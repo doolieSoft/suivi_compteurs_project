@@ -66,6 +66,12 @@ data class Prevision(
     val debut: LocalDate,
     val fin: LocalDate,
     val surReleveAnnuel: Boolean = false,
+    /**
+     * Part estimée avant le premier relevé, quand le suivi a commencé en cours
+     * de période (nouvel utilisateur) ; comprise dans [totalPrevu].
+     */
+    val estimeAvant: Double = 0.0,
+    val joursEstimesAvant: Int = 0,
 ) {
     val evolutionPct: Double?
         get() = reference?.takeIf { it != 0.0 }?.let { 100.0 * (totalPrevu - it) / it }
@@ -171,7 +177,9 @@ fun prevoir(
     anneeRetenue!!
 
     val joursPeriode = serie.jours.keys.filter { it >= debut && it <= fin }
-    if (joursPeriode.isEmpty() && !surReleveAnnuel) return null
+    // Année civile sans relevé encore : on ne prévoit que si le passé le permet
+    // (modèle thermique, années précédentes) ; sinon il n'y a rien à dire.
+    if (joursPeriode.isEmpty() && !surReleveAnnuel && serie.premierJour?.let { it > fin } == true) return null
 
     val realise = joursPeriode.somme { serie.jours.getValue(it) }
     // Au lendemain d'un relevé annuel, la période est ouverte mais encore vide.
@@ -193,6 +201,21 @@ fun prevoir(
         surconsommations.none { it.debut <= f && it.fin >= d }
     }
 
+    // Sans modèle fiable, on prolonge le rythme des derniers relevés : par
+    // degré-jour pour le chauffage (sinon un automne ferait croire à un hiver
+    // sobre, et un hiver à un été gourmand), par jour pour le reste.
+    val chauffage = ligne.energie == Energie.GAZ || ligne.energie == Energie.MAZOUT
+    fun prolongerParDegreJour(du: LocalDate, au: LocalDate): Double? {
+        if (!chauffage || normales.isEmpty()) return null
+        val recents = serie.jours.entries.sortedBy { it.key }.takeLast(365)
+        if (recents.isEmpty() || recents.any { it.key !in serie.djs }) return null
+        val djRecents = recents.somme { serie.djs.getValue(it.key) }
+        // Sans normale climatique pour ces jours (météo trop récente), on ne sait pas.
+        val djVises = DegresJours.normalSurPeriode(normales, du, au)
+        if (djRecents <= 0 || djVises <= 0) return null
+        return recents.somme { it.value } / djRecents * djVises
+    }
+
     var estime = 0.0
     var borneBasse: Double? = null
     var borneHaute: Double? = null
@@ -212,11 +235,20 @@ fun prevoir(
             // Rien de relevé encore : seules les années passées renseignent, et
             // faute de rythme à prolonger, même les années anormales servent.
             val totaux = profils.ifEmpty { passees }.map { it.total }
-            if (totaux.isEmpty()) return null
-            estime = totaux.somme { it } / totaux.size
-            methode = Methode.MoyennePassee(totaux.size)
-            borneBasse = totaux.min()
-            borneHaute = totaux.max()
+            if (totaux.isNotEmpty()) {
+                estime = totaux.somme { it } / totaux.size
+                methode = Methode.MoyennePassee(totaux.size)
+                borneBasse = totaux.min()
+                borneHaute = totaux.max()
+            } else {
+                // Ni année complète ni relevé dans la période (nouvel utilisateur) :
+                // le rythme des derniers relevés, prolongé.
+                val recents = serie.jours.entries.sortedBy { it.key }.takeLast(365)
+                if (recents.isEmpty()) return null
+                estime = prolongerParDegreJour(debutRestant, fin)
+                    ?: (recents.somme { it.value } / recents.size * joursRestants)
+                methode = Methode.Prorata
+            }
         } else {
             val rang = ecartJours(debut, dernierCouvert) + 1
             val fractions = profils
@@ -229,14 +261,33 @@ fun prevoir(
                 borneBasse = realise / fractions.max()
                 borneHaute = realise / fractions.min()
             } else {
-                // Aucun historique complet : simple prorata temporis.
-                estime = realise / joursRealises * joursRestants
+                // Aucun historique complet : simple prorata (par degré-jour pour le chauffage).
+                estime = prolongerParDegreJour(debutRestant, fin) ?: (realise / joursRealises * joursRestants)
                 methode = Methode.Prorata
             }
         }
     }
 
-    val totalPrevu = realise + estime
+    // Suivi commencé en cours de période : les jours d'avant le premier relevé
+    // ne sont pas « réalisés » mais estimés, pour prévoir toute la période et
+    // non sa seule fin.
+    var estimeAvant = 0.0
+    var joursEstimesAvant = 0
+    val premier = serie.premierJour
+    if (premier != null && premier > debut && joursRealises > 0) {
+        val finAvant = minOf(premier.minusDays(1), fin)
+        joursEstimesAvant = ecartJours(debut, finAvant) + 1
+        val modele = serie.modele
+        estimeAvant = if (modele.fiable && normales.isNotEmpty()) {
+            modele.base * joursEstimesAvant + modele.k * DegresJours.normalSurPeriode(normales, debut, finAvant)
+        } else {
+            prolongerParDegreJour(debut, finAvant) ?: (realise / joursRealises * joursEstimesAvant)
+        }
+        borneBasse = borneBasse?.plus(estimeAvant)
+        borneHaute = borneHaute?.plus(estimeAvant)
+    }
+
+    val totalPrevu = realise + estime + estimeAvant
 
     // Référence : dernière période complète disponible.
     var reference: Double? = null
@@ -275,6 +326,8 @@ fun prevoir(
         debut = debut,
         fin = fin,
         surReleveAnnuel = surReleveAnnuel,
+        estimeAvant = estimeAvant,
+        joursEstimesAvant = joursEstimesAvant,
     )
 }
 
