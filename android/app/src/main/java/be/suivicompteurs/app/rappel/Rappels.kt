@@ -130,10 +130,10 @@ class RappelReceiver : BroadcastReceiver() {
     }
 }
 
-/** Les alarmes ne survivent pas au redémarrage : il faut les reposer. */
+/** Les alarmes ne survivent ni au redémarrage ni à une mise à jour : il faut les reposer. */
 class DemarrageReceiver : BroadcastReceiver() {
     override fun onReceive(contexte: Context, intent: Intent) {
-        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == Intent.ACTION_MY_PACKAGE_REPLACED) {
             Rappels.appliquer(contexte)
         }
     }
