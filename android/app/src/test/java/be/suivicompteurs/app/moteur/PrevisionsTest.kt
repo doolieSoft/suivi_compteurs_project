@@ -101,6 +101,23 @@ class PrevisionSansModeleTest {
         // Elle reste la référence affichée : c'est bien l'année précédente.
         assertEquals(2023, p.referenceAnnee)
     }
+
+    @Test
+    fun `sans annee fiable le rythme de l'annee en cours est prolonge`() {
+        val djs = Fabrique.climat(date("2022-01-01"), date("2024-12-31"))
+        // Une seule année complète en référence, 2023, et c'est l'année d'une fuite.
+        val conso = jours(date("2023-01-01"), date("2024-06-30")).associateWith { jour ->
+            if (jour >= date("2023-01-01") && jour <= date("2023-03-31")) 0.6 else 0.2
+        }
+        val compteur = Fabrique.compteur(
+            Energie.EAU,
+            Fabrique.releves(conso, Fabrique.datesTousLes(date("2023-01-01"), date("2024-06-30"), 30)),
+        )
+        val ligne = lignes(listOf(compteur), djs).single()
+        val p = prevoir(ligne, date("2024-06-30"), DegresJours.normales(djs, date("2024-06-30")), annee = 2024)!!
+        assertTrue(p.methode is Methode.Prorata)
+        assertEquals(0.2 * 366, p.totalPrevu, 0.2 * 366 * 0.02)
+    }
 }
 
 class ComparaisonGlissanteTest {

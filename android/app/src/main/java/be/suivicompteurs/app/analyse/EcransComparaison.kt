@@ -75,7 +75,9 @@ fun EcranComparaison(surRetour: () -> Unit, surLigne: (Long, Energie, Plage) -> 
             Chargement()
             return@Cadre
         }
-        for (c in liste) {
+        // Ordre alphabétique « maison – compteur », comme les autres écrans.
+        val ordre = java.text.Collator.getInstance()
+        for (c in liste.sortedWith(compareBy(ordre) { "${it.maison} – ${textes.libelle(it.ligne)}" })) {
             val retenues = c.annees.filter { it.joursCouverts >= 30 }
             if (retenues.isEmpty()) continue
             val couleur = Couleurs.energie(c.ligne.energie.code)
@@ -161,7 +163,8 @@ fun EcranJustesse(surRetour: () -> Unit) {
             else Text(stringResource(R.string.rien_a_rejouer))
             return@Cadre
         }
-        for (j in liste) {
+        val ordre = java.text.Collator.getInstance()
+        for (j in liste.sortedWith(compareBy(ordre) { "${it.maison} – ${textes.libelle(it.ligne)}" })) {
             val r = j.rejeu
             Carte("${j.maison} – ${textes.libelle(j.ligne)}", icone = iconeEnergie(j.ligne.energie.code), couleurIcone = Couleurs.energie(j.ligne.energie.code)) {
                 Text(
