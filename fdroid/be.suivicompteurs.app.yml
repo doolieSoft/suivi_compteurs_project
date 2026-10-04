@@ -15,9 +15,9 @@ RepoType: git
 Repo: https://github.com/doolieSoft/suivi_compteurs_project.git
 
 Builds:
-  - versionName: 1.3.9
-    versionCode: 123
-    commit: 56f5095d77aeca19fe49f156d52cf2c31e299313
+  - versionName: 1.3.10
+    versionCode: 124
+    commit: 97df20b31f51bf21edf58144336e6356b93f3155
     subdir: android/app
     gradle:
       - libre
@@ -27,5 +27,5 @@ Builds:
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$
-CurrentVersion: 1.3.9
-CurrentVersionCode: 123
+CurrentVersion: 1.3.10
+CurrentVersionCode: 124
