@@ -79,6 +79,28 @@ class PrevisionSansModeleTest {
         assertEquals(0.2 * 366, p.totalPrevu, 0.2 * 366 * 0.05)
         assertTrue(p.methode is Methode.ProfilSaisonnier)
     }
+
+    @Test
+    fun `une annee de fuite ne sert pas de reference`() {
+        val djs = Fabrique.climat(date("2020-01-01"), date("2024-12-31"))
+        // 0,2 m³/jour, sauf une fuite au premier trimestre 2023 (0,6 m³/jour) :
+        // prise en compte, elle ferait croire que l'année se consomme surtout en
+        // début d'année, et la prévision de mi-2024 tomberait 7 % trop bas.
+        val conso = jours(date("2020-01-01"), date("2024-06-30")).associateWith { jour ->
+            if (jour >= date("2023-01-01") && jour <= date("2023-03-31")) 0.6 else 0.2
+        }
+        val compteur = Fabrique.compteur(
+            Energie.EAU,
+            Fabrique.releves(conso, Fabrique.datesTousLes(date("2020-01-01"), date("2024-06-30"), 30)),
+        )
+        val ligne = lignes(listOf(compteur), djs).single()
+        assertTrue(detecterAnomalies(ligne).any { it is Anomalie.Surconsommation && it.debut.year == 2023 })
+
+        val p = prevoir(ligne, date("2024-06-30"), DegresJours.normales(djs, date("2024-06-30")), annee = 2024)!!
+        assertEquals(0.2 * 366, p.totalPrevu, 0.2 * 366 * 0.01)
+        // Elle reste la référence affichée : c'est bien l'année précédente.
+        assertEquals(2023, p.referenceAnnee)
+    }
 }
 
 class ComparaisonGlissanteTest {

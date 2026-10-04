@@ -182,6 +182,15 @@ fun prevoir(
     val joursRestants = max(0, ecartJours(debutRestant, fin) + 1)
 
     val passees = periodesPassees(ligne, debut, fin)
+    // Une année marquée par une consommation anormale (fuite…) ne dit rien de
+    // l'année en cours : elle ne sert pas à l'estimer, sauf s'il n'y en a pas
+    // d'autre. Elle reste la référence affichée (« par rapport à »).
+    val surconsommations = detecterAnomalies(ligne).filterIsInstance<Anomalie.Surconsommation>()
+    val profils = passees.filter { p ->
+        val d = decaler(debut, -p.recul)
+        val f = decaler(fin, -p.recul)
+        surconsommations.none { it.debut <= f && it.fin >= d }
+    }.ifEmpty { passees }
 
     var estime = 0.0
     var borneBasse: Double? = null
@@ -200,7 +209,7 @@ fun prevoir(
             borneHaute = realise + estime + 0.15 * partChauffage
         } else if (joursPeriode.isEmpty()) {
             // Rien de relevé encore : seules les années passées renseignent.
-            val totaux = passees.map { it.total }
+            val totaux = profils.map { it.total }
             if (totaux.isEmpty()) return null
             estime = totaux.somme { it } / totaux.size
             methode = Methode.MoyennePassee(totaux.size)
@@ -208,7 +217,7 @@ fun prevoir(
             borneHaute = totaux.max()
         } else {
             val rang = ecartJours(debut, dernierCouvert) + 1
-            val fractions = passees
+            val fractions = profils
                 .map { it.courbe[minOf(rang, it.courbe.size) - 1] }
                 .filter { it > 0.05 }
             if (fractions.isNotEmpty()) {
