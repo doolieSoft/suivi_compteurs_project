@@ -93,7 +93,8 @@ class MainActivity : AppCompatActivity() {
             val marges = fenetre.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
             )
-            vue.setPadding(marges.left, marges.top, marges.right, marges.bottom)
+            vue.setPadding(marges.left, 0, marges.right, marges.bottom)
+            vues.barre.setPadding(0, marges.top, 0, 0)
             WindowInsetsCompat.CONSUMED
         }
     }

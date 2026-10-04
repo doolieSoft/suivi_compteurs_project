@@ -12,6 +12,33 @@ téléphone. Seule la météo vient d'Internet, d'[Open-Meteo](https://open-mete
 · **[⬇ Dernière version](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest)**
 · **[♥ Faire un don](https://dooliesoft.github.io/suivi_compteurs_project/#soutenir)**
 
+<table>
+  <tr>
+    <td width="25%"><img src="fastlane/metadata/android/fr-FR/images/phoneScreenshots/1-accueil.png" alt="Accueil : un appui sur un compteur pour le relever"></td>
+    <td width="25%"><img src="fastlane/metadata/android/fr-FR/images/phoneScreenshots/2-previsions.png" alt="Prévisions de l'année, avec la tendance depuis un mois"></td>
+    <td width="25%"><img src="fastlane/metadata/android/fr-FR/images/phoneScreenshots/3-detail.png" alt="Détail d'une énergie : prévision, évolution, cumul"></td>
+    <td width="25%"><img src="fastlane/metadata/android/fr-FR/images/phoneScreenshots/4-detail-graphiques.png" alt="Consommation mensuelle, année par année"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Accueil : un appui sur un compteur pour le relever</sub></td>
+    <td align="center"><sub>Prévisions de l'année, avec la tendance depuis un mois</sub></td>
+    <td align="center"><sub>Détail d'une énergie : prévision, évolution, cumul</sub></td>
+    <td align="center"><sub>Consommation mensuelle, année par année</sub></td>
+  </tr>
+  <tr>
+    <td width="25%"><img src="fastlane/metadata/android/fr-FR/images/phoneScreenshots/5-detail-signature.png" alt="Signature énergétique : consommation selon le froid"></td>
+    <td width="25%"><img src="fastlane/metadata/android/fr-FR/images/phoneScreenshots/6-comparaison.png" alt="Comparaison des années, mesurée et à climat normal"></td>
+    <td width="25%"><img src="fastlane/metadata/android/fr-FR/images/phoneScreenshots/7-justesse.png" alt="Justesse des prévisions passées"></td>
+    <td width="25%"><img src="fastlane/metadata/android/fr-FR/images/phoneScreenshots/8-saisie.png" alt="Saisie d'un relevé"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Signature énergétique : consommation selon le froid</sub></td>
+    <td align="center"><sub>Comparaison des années, mesurée et à climat normal</sub></td>
+    <td align="center"><sub>Justesse des prévisions passées</sub></td>
+    <td align="center"><sub>Saisie d'un relevé</sub></td>
+  </tr>
+</table>
+
 ## Télécharger
 
 | Où | Quoi |

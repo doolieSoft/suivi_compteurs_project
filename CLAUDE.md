@@ -77,6 +77,8 @@ l'ancien site Django ; le lancer depuis une copie temporaire
 (`git worktree add <tmp> v1.2.2`, avec `db.sqlite3` copié pour la météo),
 importer les classeurs « Ma maison » / « My house » / « Mijn huis » sur
 l'émulateur, recadrer les captures en 1080 × 2150 (sans barres système).
+Le README affiche les huit captures françaises de `fastlane/`, légendées : il suit
+de lui-même.
 
 ## Dons et réglages GitHub
 

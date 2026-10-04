@@ -1,0 +1,2 @@
+• Couleurs : barre de titre et boutons verts, champs de saisie sur fond blanc, menus sur fond vert clair.
+• Tendance des prévisions (stable, en hausse, en baisse) mesurée sur au moins 30 jours : un relevé fait deux jours plus tôt ne masque plus une dérive.

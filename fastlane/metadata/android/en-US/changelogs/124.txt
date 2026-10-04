@@ -1,0 +1,2 @@
+• Colours: green title bar and buttons, input fields on white, menus on light green.
+• Forecast trend (unchanged, up, down) measured over at least 30 days: a reading taken two days earlier no longer hides a drift.

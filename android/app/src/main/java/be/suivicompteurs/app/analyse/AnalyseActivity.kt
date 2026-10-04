@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,7 +24,7 @@ import be.suivicompteurs.app.moteur.Plage
 class AnalyseActivity : AppCompatActivity() {
 
     override fun onCreate(etat: Bundle?) {
-        enableEdgeToEdge()
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT))
         super.onCreate(etat)
         // La navigation démarre sur un modèle de route, jamais sur une route
         // concrète : les valeurs du détail arrivent donc par l'intention.

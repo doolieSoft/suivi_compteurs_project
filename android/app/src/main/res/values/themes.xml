@@ -5,10 +5,31 @@
         <item name="colorPrimaryDark">@color/primaire_sombre</item>
         <item name="colorSecondary">@color/primaire</item>
         <item name="android:colorBackground">@color/plan</item>
+        <!-- Menus déroulants sur le vert clair du fond. -->
+        <item name="colorSurfaceContainer">@color/plan</item>
         <!-- Android 15 impose l'affichage bord à bord ; les barres sont donc
              transparentes et les marges gérées par chaque écran. -->
         <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
         <item name="android:navigationBarColor" tools:targetApi="l">@android:color/transparent</item>
+        <!-- Icônes blanches sur la barre de titre vert foncé. -->
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+    </style>
+
+    <!-- Barre de titre : vert foncé, texte et icônes en blanc. Elle s'étend
+         sous la barre d'état (marge haute posée par chaque écran). -->
+    <style name="BarreTitre">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">?attr/actionBarSize</item>
+        <item name="android:background">@color/barre</item>
+        <item name="android:theme">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
+        <item name="popupTheme">@style/MenuClair</item>
+        <item name="titleTextColor">@android:color/white</item>
+    </style>
+
+    <!-- Menu « ⋮ » des barres de titre : clair, sur le vert du fond. -->
+    <style name="MenuClair" parent="ThemeOverlay.Material3.Light">
+        <item name="colorSurfaceContainer">@color/plan</item>
     </style>
 
     <!-- Lignes de détail des tuiles du tableau de bord. -->

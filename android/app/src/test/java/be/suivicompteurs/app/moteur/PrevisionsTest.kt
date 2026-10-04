@@ -71,6 +71,19 @@ class PrevisionGazTest {
     }
 
     @Test
+    fun `la tendance prend du recul meme apres un releve tout proche`() {
+        // Un relevé deux jours après le précédent : la comparaison remonte d'au moins 30 jours.
+        val avant = masquerApres(compteur, date("2024-06-30"))
+        val dernier = avant.releves.last()
+        val jour = dernier.date.plusDays(2)
+        val ligneDuJour = ligne(avant.copy(releves = avant.releves + Releve(jour, dernier.index + 5.0)))
+        val p = prevoir(ligneDuJour, jour, normales, annee = 2024)!!
+        val reference = prevoirAuRelevePrecedent(ligneDuJour, djs, p)!!
+        assertTrue(reference.releve <= jour.minusDays(RECUL_TENDANCE))
+        assertTrue(reference.releve >= p.debut.minusDays(1))
+    }
+
+    @Test
     fun `pas de tendance sans releve precedent dans la periode`() {
         // Premier relevé de l'année : le précédent appartient à l'année d'avant.
         val premier = compteur.releves.map { it.date }.filter { it.year == 2024 }.min()

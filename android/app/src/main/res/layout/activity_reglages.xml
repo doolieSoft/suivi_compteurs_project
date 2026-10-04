@@ -9,9 +9,7 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/barre"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/surface"
+        style="@style/BarreTitre"
         app:navigationIcon="@drawable/ic_retour"
         app:title="@string/titre_reglages" />
 
@@ -45,6 +43,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    app:boxBackgroundColor="@android:color/white"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/rappel_intervalle">

@@ -49,17 +49,17 @@
                 android:textSize="26sp"
                 android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/periode"
+                style="@style/TexteTuile"
+                android:textColor="@color/encre_2" />
+
             <!-- Tendance depuis le relevé précédent : ↑ plus pessimiste, ↓ plus optimiste. -->
             <TextView
                 android:id="@+id/tendance"
                 style="@style/TexteTuile"
                 android:textStyle="bold"
                 android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/periode"
-                style="@style/TexteTuile"
-                android:textColor="@color/encre_2" />
 
             <TextView
                 android:id="@+id/detail"

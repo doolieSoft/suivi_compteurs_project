@@ -9,9 +9,7 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/barre"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/surface"
+        style="@style/BarreTitre"
         app:title="@string/app_name" />
 
     <TextView

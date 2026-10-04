@@ -27,6 +27,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.lightColorScheme
@@ -58,11 +59,12 @@ object Couleurs {
     val gaz = Color(0xFFEB6834)
     val elec = Color(0xFFEDA100)
     val mazout = Color(0xFF8A5A2B)
-    val primaire = Color(0xFF2A78D6)
+    val primaire = Color(0xFF3D7A4A)
     val encre = Color(0xFF0B0B0B)
     val encre2 = Color(0xFF52514E)
     val encre3 = Color(0xFF898781)
     val plan = Color(0xFFE8F3E4)
+    val barre = Color(0xFF3D7A4A)
     val trait = Color(0xFFF0F0EC)
     val surface = Color(0xFFFCFCFB)
     val critique = Color(0xFFD03B3B)
@@ -81,10 +83,12 @@ fun Theme(contenu: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = lightColorScheme(
             primary = Couleurs.primaire,
-            primaryContainer = Color(0xFFDCE8F8),
+            primaryContainer = Color(0xFFD3E8D5),
             onPrimaryContainer = Couleurs.primaire,
-            secondaryContainer = Color(0xFFDCE8F8),
+            secondaryContainer = Color(0xFFD3E8D5),
             background = Couleurs.plan,
+            // Menus déroulants sur le vert clair du fond.
+            surfaceContainer = Couleurs.plan,
             surface = Couleurs.surface,
             onBackground = Couleurs.encre,
             onSurface = Couleurs.encre,
@@ -136,9 +140,19 @@ fun ChampTexte(
             else -> KeyboardOptions.Default
         },
         keyboardActions = KeyboardActions(onSearch = { surRecherche?.invoke() }),
+        colors = champBlanc(),
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp),
     )
 }
+
+/** Les champs ressortent en blanc sur le vert du fond. */
+@Composable
+private fun champBlanc() = OutlinedTextFieldDefaults.colors(
+    focusedContainerColor = Color.White,
+    unfocusedContainerColor = Color.White,
+    disabledContainerColor = Color.White,
+    errorContainerColor = Color.White,
+)
 
 /** Champ de date : un appui ouvre le calendrier. [facultatif] permet de l'effacer. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -157,6 +171,7 @@ fun ChampDate(
             onValueChange = {},
             readOnly = true,
             label = { Text(libelle) },
+            colors = champBlanc(),
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         )
         // Couvre le champ : un appui n'importe où ouvre le calendrier.
@@ -208,6 +223,7 @@ fun ChampChoix(
             readOnly = true,
             label = { Text(libelle) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = ouvert) },
+            colors = champBlanc(),
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth().padding(vertical = 4.dp),
         )
         ExposedDropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {

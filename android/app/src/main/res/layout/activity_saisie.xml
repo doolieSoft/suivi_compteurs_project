@@ -9,9 +9,7 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/barre"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/surface"
+        style="@style/BarreTitre"
         app:navigationIcon="@drawable/ic_retour"
         app:title="@string/titre_saisie" />
 
@@ -173,6 +171,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/champIndexConteneur"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    app:boxBackgroundColor="@android:color/white"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -198,6 +197,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    app:boxBackgroundColor="@android:color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -217,6 +217,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    app:boxBackgroundColor="@android:color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"

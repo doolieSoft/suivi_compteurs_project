@@ -469,23 +469,32 @@ private fun periodesRejouables(ligne: Ligne): Map<Int, PeriodeRejouable> {
 }
 
 /**
- * La même prévision, telle qu'on la faisait au relevé précédent : dit si le
- * dernier relevé l'a rendue plus pessimiste ou plus optimiste. Absente s'il n'y
- * a pas de relevé précédent dans la même période.
+ * La même prévision, telle qu'on la faisait il y a au moins [RECUL_TENDANCE]
+ * jours : dit si les relevés depuis l'ont rendue plus pessimiste ou plus
+ * optimiste. Comparer au seul relevé d'avant, parfois vieux de deux jours,
+ * ne laisserait voir aucune dérive, même une fuite. Faute de relevé aussi
+ * ancien dans la période, le plus ancien de la période sert. Absente s'il n'y
+ * a aucun autre relevé dans la même période.
  */
 fun prevoirAuRelevePrecedent(ligne: Ligne, djsStation: Map<LocalDate, Double>, actuelle: Prevision): PrevisionPrecedente? {
     val dates = ligne.compteurs.flatMap { c -> c.releves.map { it.date } }
         .filter { ligne.jusqua == null || it <= ligne.jusqua }
         .distinct().sorted()
     if (dates.size < 2) return null
-    val precedent = dates[dates.size - 2]
-    if (precedent < actuelle.debut.minusDays(1)) return null
+    val dernier = dates.last()
+    // Le relevé qui ouvre la période compte : c'est la première prévision de l'année.
+    val candidats = dates.filter { it >= actuelle.debut.minusDays(1) && it < dernier }
+    val precedent = candidats.lastOrNull { it <= dernier.minusDays(RECUL_TENDANCE) }
+        ?: candidats.firstOrNull() ?: return null
     val ligneAvant = lignes(ligne.compteurs, djsStation, jusqua = precedent)
         .firstOrNull { it.energie == ligne.energie && it.plage == ligne.plage } ?: return null
     val prevision = prevoir(ligneAvant, precedent, DegresJours.normales(djsStation, precedent), periode = actuelle.debut to actuelle.fin)
         ?: return null
     return PrevisionPrecedente(precedent, prevision)
 }
+
+/** Recul minimal de la tendance, en jours. */
+const val RECUL_TENDANCE = 30L
 
 /** Une prévision et le relevé auquel elle a été faite. */
 data class PrevisionPrecedente(val releve: LocalDate, val prevision: Prevision)

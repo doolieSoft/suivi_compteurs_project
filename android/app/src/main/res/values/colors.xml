@@ -8,8 +8,8 @@
     <color name="elec">#EDA100</color>
     <color name="mazout">#8A5A2B</color>
 
-    <color name="primaire">#2A78D6</color>
-    <color name="primaire_sombre">#1C5CAB</color>
+    <color name="primaire">#3D7A4A</color>
+    <color name="primaire_sombre">#2C5E37</color>
 
     <color name="bien">#006300</color>
     <color name="attention_texte">#8A5A00</color>
@@ -21,5 +21,6 @@
     <color name="encre_2">#52514E</color>
     <color name="encre_3">#898781</color>
     <color name="surface">#FCFCFB</color>
+    <color name="barre">#3D7A4A</color>
     <color name="plan">#E8F3E4</color>
 </resources>
