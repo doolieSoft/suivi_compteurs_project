@@ -1,0 +1,3 @@
+• The house name is shown in the forecasts and in meter titles.
+• Meters sorted alphabetically.
+• New screenshots.
