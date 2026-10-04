@@ -2,11 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_consulter"
-        android:icon="@drawable/ic_consulter"
-        android:title="@string/consulter"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_gerer"
         android:icon="@drawable/ic_gerer"
         android:title="@string/gerer_donnees"

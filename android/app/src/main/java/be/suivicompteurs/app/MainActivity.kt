@@ -270,7 +270,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_consulter -> { consulter(); true }
         R.id.action_exporter -> { exporter(); true }
         R.id.action_gerer -> { ouvrirGestion(); true }
         R.id.action_importer -> { importer(); true }
