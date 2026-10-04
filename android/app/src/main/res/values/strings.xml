@@ -10,11 +10,11 @@
     <string name="releve_du">relevé du %1$s</string>
     <string name="reglages">Réglages</string>
     <string name="consulter">Consulter l\'historique et les prévisions</string>
-    <string name="exporter">Exporter en Excel</string>
+    <string name="exporter">Exporter</string>
     <string name="export_en_cours">Préparation du classeur…</string>
     <string name="export_reussi">Classeur enregistré.</string>
     <string name="export_ecriture_impossible">Le classeur n\'a pas pu être écrit à cet emplacement.</string>
-    <string name="importer">Importer un classeur Excel</string>
+    <string name="importer">Importer</string>
     <string name="import_titre">Importer le classeur ?</string>
     <string name="import_confirmation">Les données de l\'appareil seront remplacées par celles du classeur ; les relevés notés sur le téléphone et absents du classeur sont conservés.</string>
     <string name="importer_confirmer">Importer</string>
@@ -146,4 +146,10 @@
     <string name="version_application">Version %1$s (%2$d)</string>
     <string name="enregistre">Enregistré</string>
     <string name="reglages_enregistres">Réglages enregistrés</string>
+    <string name="accueil_sans_compteur_a_relever">Aucun compteur à relever : vos maisons sont marquées comme plus relevées. Leur historique reste consultable ci-dessous.</string>
+    <string name="import_export">Import / export Excel</string>
+    <string name="import_export_explication">Exporter : enregistre toutes vos données dans un fichier Excel, à garder comme sauvegarde (Google Drive, e-mail…).\n\nImporter : reprend les données d\'un fichier exporté par l\'application, par exemple sur un nouveau téléphone. Une confirmation vous sera demandée.</string>
+    <string name="titre_historique">Historique</string>
+    <string name="consulter_historique">Consulter l\'historique</string>
+    <string name="releves_jusqua">relevés jusqu\'au %1$s</string>
 </resources>

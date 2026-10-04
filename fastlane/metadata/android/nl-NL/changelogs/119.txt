@@ -1,0 +1,3 @@
+• Eenvoudiger menu: één item "Excel importeren / exporteren".
+• Woningen die niet meer worden afgelezen blijven zichtbaar, in een deel "Geschiedenis".
+• Zonder woning om af te lezen opent de knop op het startscherm de geschiedenis.

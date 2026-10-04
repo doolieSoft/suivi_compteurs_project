@@ -1,0 +1,3 @@
+• Menu simplifié : une seule entrée « Import / export Excel ».
+• Les maisons qu'on ne relève plus restent consultables, dans une partie « Historique ».
+• Sans maison à relever, le bouton de l'accueil ouvre l'historique.

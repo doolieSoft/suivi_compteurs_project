@@ -8,11 +8,11 @@
     <string name="releve_du">opgenomen op %1$s</string>
     <string name="reglages">Instellingen</string>
     <string name="consulter">Geschiedenis en voorspellingen bekijken</string>
-    <string name="exporter">Exporteren naar Excel</string>
+    <string name="exporter">Exporteren</string>
     <string name="export_en_cours">Werkmap wordt voorbereid…</string>
     <string name="export_reussi">Werkmap opgeslagen.</string>
     <string name="export_ecriture_impossible">De werkmap kon niet op deze locatie worden opgeslagen.</string>
-    <string name="importer">Excel-werkmap importeren</string>
+    <string name="importer">Importeren</string>
     <string name="import_titre">Werkmap importeren?</string>
     <string name="import_confirmation">De gegevens op dit toestel worden vervangen door die van de werkmap; meterstanden die op de telefoon zijn genoteerd en niet in de werkmap staan, blijven behouden.</string>
     <string name="importer_confirmer">Importeren</string>
@@ -144,4 +144,10 @@
     <string name="version_application">Versie %1$s (%2$d)</string>
     <string name="enregistre">Opgeslagen</string>
     <string name="reglages_enregistres">Instellingen opgeslagen</string>
+    <string name="accueil_sans_compteur_a_relever">Geen meters af te lezen: je woningen staan als niet meer afgelezen. Hun geschiedenis blijft hieronder te bekijken.</string>
+    <string name="import_export">Excel importeren / exporteren</string>
+    <string name="import_export_explication">Exporteren: bewaart al je gegevens in een Excel-bestand, als back-up (Google Drive, e-mail…).\n\nImporteren: haalt de gegevens terug uit een bestand dat de app heeft geëxporteerd, bijvoorbeeld op een nieuwe telefoon. Je wordt om bevestiging gevraagd.</string>
+    <string name="titre_historique">Geschiedenis</string>
+    <string name="consulter_historique">Geschiedenis bekijken</string>
+    <string name="releves_jusqua">meterstanden tot %1$s</string>
 </resources>

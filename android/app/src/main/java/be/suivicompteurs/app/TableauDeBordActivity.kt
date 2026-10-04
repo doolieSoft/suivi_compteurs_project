@@ -63,7 +63,15 @@ class TableauDeBordActivity : AppCompatActivity() {
                 return@launch
             }
             vues.vide.visibility = View.GONE
-            for (maison in maisons) afficherMaison(maison, plusieurs = maisons.size > 1)
+            // Les maisons relevées d'abord, avec leurs prévisions ; celles qu'on ne
+            // relève plus (quittées) dans une partie « Historique », sans prévision.
+            val (aPrevoir, historiques) = maisons.partition { m -> m.actuelle && m.lignes.any { it.prevision != null } }
+            vues.barre.setTitle(if (aPrevoir.isEmpty()) R.string.titre_historique else R.string.titre_tableau_de_bord)
+            for (maison in aPrevoir) afficherMaison(maison, plusieurs = aPrevoir.size > 1)
+            if (historiques.isNotEmpty()) {
+                if (aPrevoir.isNotEmpty()) ajouterTitre(getString(R.string.titre_historique))
+                for (maison in historiques) afficherMaison(maison, plusieurs = true, historique = true)
+            }
         }
     }
 
@@ -75,16 +83,18 @@ class TableauDeBordActivity : AppCompatActivity() {
         }
     }
 
-    private fun afficherMaison(maison: ResumeMaison, plusieurs: Boolean) {
-        if (plusieurs) {
-            val titre = layoutInflater.inflate(R.layout.item_titre_maison, vues.contenu, false) as TextView
-            titre.text = maison.nom
-            vues.contenu.addView(titre)
-        }
-        for (resume in maison.lignes) afficherLigne(resume, maison.id)
+    private fun ajouterTitre(texte: String) {
+        val titre = layoutInflater.inflate(R.layout.item_titre_maison, vues.contenu, false) as TextView
+        titre.text = texte
+        vues.contenu.addView(titre)
     }
 
-    private fun afficherLigne(resume: ResumeLigne, maisonId: Long) {
+    private fun afficherMaison(maison: ResumeMaison, plusieurs: Boolean, historique: Boolean = false) {
+        if (plusieurs) ajouterTitre(maison.nom)
+        for (resume in maison.lignes) afficherLigne(resume, maison.id, historique)
+    }
+
+    private fun afficherLigne(resume: ResumeLigne, maisonId: Long, historique: Boolean = false) {
         val tuile = ItemTuileBinding.inflate(layoutInflater, vues.contenu, false)
         val ligne = resume.ligne
         val unite = ligne.unite
@@ -98,10 +108,16 @@ class TableauDeBordActivity : AppCompatActivity() {
         tuile.pastille.imageTintList = ContextCompat.getColorStateList(this, couleur)
         tuile.titre.text = textes.libelle(ligne)
 
-        val p = resume.prevision
+        val p = if (historique) null else resume.prevision
         if (p == null) {
             tuile.valeur.text = getString(R.string.tiret)
-            tuile.periode.setText(R.string.pas_de_releve_sur_la_periode)
+            val dernier = ligne.compteurs.flatMap { c -> c.releves.map { it.date } }.maxOrNull()
+            if (historique && dernier != null) {
+                masquer(tuile.valeur)
+                tuile.periode.text = getString(R.string.releves_jusqua, textes.date(dernier))
+            } else {
+                tuile.periode.setText(R.string.pas_de_releve_sur_la_periode)
+            }
             masquer(tuile.detail, tuile.fourchette, tuile.evolution, tuile.cout, tuile.methode)
         } else {
             tuile.valeur.text = getString(R.string.valeur_unite, textes.nombre(p.totalPrevu), unite)

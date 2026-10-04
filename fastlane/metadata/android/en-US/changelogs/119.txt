@@ -1,0 +1,3 @@
+• Simpler menu: a single "Excel import / export" entry.
+• Houses no longer read stay viewable, in a "History" section.
+• With no house left to read, the home button opens the history.

@@ -7,14 +7,9 @@
         android:title="@string/gerer_donnees"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_exporter"
-        android:icon="@drawable/ic_exporter"
-        android:title="@string/exporter"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_importer"
-        android:icon="@drawable/ic_importer"
-        android:title="@string/importer"
+        android:id="@+id/action_excel"
+        android:icon="@drawable/ic_excel"
+        android:title="@string/import_export"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_reglages"

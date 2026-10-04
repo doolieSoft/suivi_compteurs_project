@@ -125,8 +125,9 @@ class Analyse(contexte: Context) {
                         cout = prevision?.let { valoriser(ligne, chargee.tarifs, it.totalPrevu, aujourdhui) },
                     )
                 }
-                // Une ancienne maison sans prévision possible n'apporte rien ici.
-                if (resumes.none { it.prevision != null }) null
+                // Une maison sans prévision possible (quittée) reste consultable :
+                // l'écran la range dans son historique.
+                if (resumes.isEmpty()) null
                 else ResumeMaison(chargee.maison.id, chargee.maison.nom, chargee.maison.actuelle, resumes)
             }
         }

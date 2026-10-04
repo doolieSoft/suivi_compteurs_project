@@ -113,7 +113,20 @@ class MainActivity : AppCompatActivity() {
         vues.listeVide.visibility = if (compteurs.isEmpty()) View.VISIBLE else View.GONE
         vues.liste.visibility = if (compteurs.isEmpty()) View.GONE else View.VISIBLE
         vues.boutonConsulter.visibility = vues.liste.visibility
+        vues.boutonConsulter.setText(R.string.consulter)
         vues.messageVide.setText(R.string.accueil_vide)
+        // Plus aucun compteur à relever, mais un historique (maisons quittées) :
+        // il doit rester consultable.
+        if (compteurs.isEmpty()) {
+            lifecycleScope.launch {
+                if (BaseLocale.obtenir(this@MainActivity).historique().nombreReleves() > 0) {
+                    vues.boutonConsulter.visibility = View.VISIBLE
+                    // Plus rien à relever, donc plus de prévision : seulement l'historique.
+                    vues.boutonConsulter.setText(R.string.consulter_historique)
+                    vues.messageVide.setText(R.string.accueil_sans_compteur_a_relever)
+                }
+            }
+        }
         vues.etat.text = if (reglages.derniereSynchro > 0) {
             getString(R.string.meteo_a_jour, momentSynchro())
         } else {
@@ -146,6 +159,17 @@ class MainActivity : AppCompatActivity() {
             }
             afficher(adaptateur.elements)
         }
+    }
+
+    /** Import ou export : on explique les deux, puis on laisse choisir. */
+    private fun choisirImportExport() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.import_export)
+            .setMessage(R.string.import_export_explication)
+            .setPositiveButton(R.string.exporter) { _, _ -> exporter() }
+            .setNegativeButton(R.string.importer) { _, _ -> importer() }
+            .setNeutralButton(R.string.annuler, null)
+            .show()
     }
 
     private fun exporter() {
@@ -270,9 +294,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_exporter -> { exporter(); true }
+        R.id.action_excel -> { choisirImportExport(); true }
         R.id.action_gerer -> { ouvrirGestion(); true }
-        R.id.action_importer -> { importer(); true }
         R.id.action_reglages -> { ouvrirReglages(); true }
         else -> super.onOptionsItemSelected(item)
     }
