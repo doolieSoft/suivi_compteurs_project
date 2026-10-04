@@ -1,0 +1,3 @@
+• New users: "Add past readings" brings in your old bills, and forecasts make sense from the first month.
+• Reading date can be changed (forgotten reading).
+• Reminders: the next reminder date is shown and no longer pushed back.

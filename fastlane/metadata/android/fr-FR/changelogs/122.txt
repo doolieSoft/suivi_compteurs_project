@@ -1,0 +1,3 @@
+• Nouveaux utilisateurs : « Ajouter des index passés » reprend vos anciennes factures, et les prévisions ont du sens dès le premier mois.
+• Date du relevé modifiable (relevé oublié).
+• Rappels : la date du prochain rappel est affichée et n'est plus repoussée.

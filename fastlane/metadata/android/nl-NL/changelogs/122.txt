@@ -1,0 +1,3 @@
+• Nieuwe gebruikers: "Vroegere meterstanden toevoegen" neemt je oude afrekeningen over, en de voorspellingen kloppen vanaf de eerste maand.
+• Datum van de meterstand aanpasbaar (vergeten meterstand).
+• Herinneringen: de datum van de volgende herinnering wordt getoond en niet meer uitgesteld.
