@@ -155,4 +155,7 @@
     <string name="tendance_stable">→ stable depuis le relevé du %1$s</string>
     <string name="tendance_hausse">↑ +%1$s %2$s depuis le relevé du %3$s</string>
     <string name="tendance_baisse">↓ −%1$s %2$s depuis le relevé du %3$s</string>
+    <string name="prochain_rappel">Prochain rappel : le %1$s</string>
+    <string name="prochain_rappel_apres_enregistrement">La date du prochain rappel sera fixée à l\'enregistrement.</string>
+    <string name="reglages_enregistres_rappel">Réglages enregistrés. Prochain rappel le %1$s.</string>
 </resources>

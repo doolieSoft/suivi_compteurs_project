@@ -118,6 +118,7 @@ class ReglagesActivity : AppCompatActivity() {
         vues.interrupteurRappel.isChecked = reglages.rappelActif
         vues.champJours.setText(reglages.rappelJours.toString())
         majVisibiliteRappel()
+        afficherProchainRappel()
 
         vues.interrupteurRappel.setOnCheckedChangeListener { _, actif ->
             majVisibiliteRappel()
@@ -128,6 +129,20 @@ class ReglagesActivity : AppCompatActivity() {
         vues.boutonEnregistrer.setOnClickListener { enregistrer() }
     }
 
+    /** « Prochain rappel : le 8 octobre 2026 », d'après l'échéance mémorisée. */
+    private fun afficherProchainRappel() {
+        val prochain = reglages.rappelProchain
+        vues.texteProchainRappel.text = if (reglages.rappelActif && prochain > 0) {
+            getString(R.string.prochain_rappel, dateRappel(prochain))
+        } else {
+            getString(R.string.prochain_rappel_apres_enregistrement)
+        }
+    }
+
+    private fun dateRappel(millis: Long): String =
+        java.time.Instant.ofEpochMilli(millis).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+            .format(java.time.format.DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.LONG))
+
     private fun majVisibiliteRappel() {
         vues.blocJours.visibility =
             if (vues.interrupteurRappel.isChecked) View.VISIBLE else View.GONE
@@ -137,7 +152,13 @@ class ReglagesActivity : AppCompatActivity() {
         reglages.rappelActif = vues.interrupteurRappel.isChecked
         vues.champJours.text?.toString()?.toIntOrNull()?.let { reglages.rappelJours = it }
         Rappels.appliquer(this)
-        android.widget.Toast.makeText(this, R.string.reglages_enregistres, android.widget.Toast.LENGTH_SHORT).show()
+        // Le prochain rappel dans la confirmation : l'écran se ferme aussitôt.
+        val message = if (reglages.rappelActif && reglages.rappelProchain > 0) {
+            getString(R.string.reglages_enregistres_rappel, dateRappel(reglages.rappelProchain))
+        } else {
+            getString(R.string.reglages_enregistres)
+        }
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_LONG).show()
         finish()
     }
 }

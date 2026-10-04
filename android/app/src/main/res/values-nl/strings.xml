@@ -153,4 +153,7 @@
     <string name="tendance_stable">→ ongewijzigd sinds de meterstand van %1$s</string>
     <string name="tendance_hausse">↑ +%1$s %2$s sinds de meterstand van %3$s</string>
     <string name="tendance_baisse">↓ −%1$s %2$s sinds de meterstand van %3$s</string>
+    <string name="prochain_rappel">Volgende herinnering: %1$s</string>
+    <string name="prochain_rappel_apres_enregistrement">De datum van de volgende herinnering wordt vastgelegd bij het opslaan.</string>
+    <string name="reglages_enregistres_rappel">Instellingen opgeslagen. Volgende herinnering op %1$s.</string>
 </resources>

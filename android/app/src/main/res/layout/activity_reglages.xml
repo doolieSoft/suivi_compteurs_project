@@ -55,6 +55,14 @@
                         android:layout_height="wrap_content"
                         android:inputType="number" />
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/texteProchainRappel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textColor="@color/encre_2"
+                    android:textSize="13sp" />
             </LinearLayout>
 
             <View

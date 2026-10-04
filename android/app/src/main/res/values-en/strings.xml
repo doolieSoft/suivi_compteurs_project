@@ -153,4 +153,7 @@
     <string name="tendance_stable">→ unchanged since the reading of %1$s</string>
     <string name="tendance_hausse">↑ +%1$s %2$s since the reading of %3$s</string>
     <string name="tendance_baisse">↓ −%1$s %2$s since the reading of %3$s</string>
+    <string name="prochain_rappel">Next reminder: %1$s</string>
+    <string name="prochain_rappel_apres_enregistrement">The next reminder date will be set when you save.</string>
+    <string name="reglages_enregistres_rappel">Settings saved. Next reminder on %1$s.</string>
 </resources>
