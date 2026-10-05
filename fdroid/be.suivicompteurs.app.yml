@@ -1,6 +1,7 @@
 AntiFeatures:
   TetheredNet:
-    en-US: Weather data and place search use the public Open-Meteo API; the server address cannot be changed yet.
+    en-US: Weather data and place search use the public Open-Meteo API; the server
+      address cannot be changed yet.
 Categories:
   - Finance Manager
   - Science & Education
