@@ -28,7 +28,9 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
    - `versionName`, `versionCode`, `CurrentVersion`, `CurrentVersionCode` ;
    - `commit` = **hash complet** de l'étiquette, jamais le nom de l'étiquette ;
    - fins de ligne **LF**, aucun commentaire `#`, champs dans l'ordre de
-     `rewritemeta` (`Donate` avant `Liberapay`) ;
+     `rewritemeta` (`Donate` avant `Liberapay`, `AntiFeatures` en tête) ;
+   - textes longs (description d'`AntiFeatures`…) coupés vers 80 colonnes,
+     suite indentée de deux espaces de plus, comme le fait `rewritemeta` ;
    - `AutoName` = nom de l'application dans le manifeste (`nom_lanceur`).
 7. Si le développeur le demande : installer l'APK **libre** publié sur son
    téléphone (`adb install -r`, même clé : données conservées). Ne jamais
