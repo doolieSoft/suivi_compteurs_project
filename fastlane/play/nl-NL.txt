@@ -1,7 +1,7 @@
 Noteer je meters voor water, gas, elektriciteit en stookolie, en zie waar je jaar naartoe gaat.
 
 AFLEZEN IN ENKELE SECONDEN
-• Fotografeer de meter: de stand wordt automatisch gelezen, op de telefoon, zonder netwerk (niet in de F-Droid-versie).
+• Fotografeer de meter: de stand wordt automatisch gelezen, op de telefoon, zonder netwerk.
 • De app controleert de lezing: een meter loopt nooit terug, en een serienummer wordt niet voor een meterstand aangezien.
 • Herinneringen om af te lezen, zo vaak als je wilt.
 
@@ -24,6 +24,5 @@ EN OOK
 • Meerdere woningen, vervanging van meters, dubbeltariefmeters, tarieven en gebeurtenissen (isolatie, werken…).
 • Grafieken: cumulatief sinds 1 januari, maandverbruik, jaarvergelijking, klimaat.
 • Beschikbaar in het Nederlands, Frans en Engels.
-• Volledig vrije F-Droid-versie: zonder automatisch lezen, de stand wordt met de hand ingevoerd.
 
 Weergegevens: Open-Meteo.com (CC BY 4.0).

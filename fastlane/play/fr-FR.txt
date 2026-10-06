@@ -1,7 +1,7 @@
 Notez vos compteurs d'eau, de gaz, d'électricité et de mazout, et voyez où va votre année.
 
 RELEVER EN QUELQUES SECONDES
-• Photographiez le compteur : l'index est lu automatiquement, sur le téléphone, sans réseau (pas dans la version F-Droid).
+• Photographiez le compteur : l'index est lu automatiquement, sur le téléphone, sans réseau.
 • L'application vérifie la lecture : un compteur ne recule pas, et un numéro de série n'est pas pris pour un index.
 • Rappels de relevé, au rythme que vous choisissez.
 
@@ -24,6 +24,5 @@ ET AUSSI
 • Plusieurs maisons, remplacement de compteur, compteurs bi-horaires, tarifs et événements (isolation, travaux…).
 • Graphiques : cumul de l'année, consommation mensuelle, comparaison des années, climat.
 • Disponible en français, anglais et néerlandais.
-• Version F-Droid entièrement libre : sans lecture automatique, l'index se saisit à la main.
 
 Données météo : Open-Meteo.com (CC BY 4.0).

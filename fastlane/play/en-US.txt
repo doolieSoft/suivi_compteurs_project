@@ -1,7 +1,7 @@
 Record your water, gas, electricity and heating oil meters, and see where your year is heading.
 
 READINGS IN SECONDS
-• Photograph the meter: the reading is recognised automatically, on the phone, offline (not in the F-Droid version).
+• Photograph the meter: the reading is recognised automatically, on the phone, offline.
 • The app checks the reading: a meter never goes backwards, and a serial number is not mistaken for a reading.
 • Reading reminders, as often as you like.
 
@@ -24,6 +24,5 @@ AND ALSO
 • Several houses, meter replacement, dual-rate meters, tariffs and events (insulation, works…).
 • Charts: year to date, monthly consumption, year comparison, climate.
 • Available in English, French and Dutch, in any currency.
-• Fully free F-Droid version: no automatic reading, the index is typed by hand.
 
 Weather data: Open-Meteo.com (CC BY 4.0).

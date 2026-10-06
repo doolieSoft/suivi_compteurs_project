@@ -27,8 +27,7 @@ personnel.
 
 `docs/confidentialite.html`, en trois langues.
 
-1. Remplacer `[adresse de contact]`, `[contact address]` et `[contactadres]`
-   par l'adresse que vous voulez rendre publique, puis commiter.
+1. Contact : la page des tickets GitHub du projet (déjà en place).
 2. GitHub → dépôt → **Settings › Pages** → *Source* : **Deploy from a branch**,
    branche `main`, dossier **`/docs`**.
 3. Quelques minutes plus tard, la page est en ligne à
@@ -73,12 +72,14 @@ d'elles-mêmes (étape 8).
 
 ## 5. Fiche du Play Store
 
-**Présence sur le Play Store › Fiche principale** : copier les textes de
-`metadata/android/fr-FR/`, puis **Ajouter des traductions** pour `en-US` et `nl-NL`
-avec les textes de leurs dossiers. Chaque langue a son icône, sa bannière et
-ses captures.
+**Présence sur le Play Store › Fiche principale** : copier le titre et la
+description courte de `metadata/android/fr-FR/`, et la description complète de
+**`play/fr-FR.txt`** : c'est la même, sans les mentions de F-Droid (Google
+n'aime pas qu'une fiche renvoie vers un autre magasin). Puis **Ajouter des
+traductions** pour `en-US` et `nl-NL`. Chaque langue a son icône, sa bannière
+et ses captures, dans `metadata/android/<langue>/images/`.
 
-- **Catégorie** : Outils (ou Maison et décoration).
+- **Catégorie** : Maison et intérieur.
 - **Adresse de contact** : celle de la politique de confidentialité.
 - **Site web** (Paramètres de la fiche › Coordonnées) : la page du projet,
   <https://dooliesoft.github.io/suivi_compteurs_project/>. Les textes de la

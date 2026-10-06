@@ -1,0 +1,1 @@
+• Description : la lecture automatique de l'index est signalée comme absente de la version F-Droid.

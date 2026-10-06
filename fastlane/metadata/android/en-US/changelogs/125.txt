@@ -1,0 +1,1 @@
+• Description: automatic meter reading is now marked as unavailable in the F-Droid version.

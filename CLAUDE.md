@@ -60,7 +60,10 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
 - Icônes : Material Symbols (Apache 2.0) converties en vector drawables
   `res/drawable/ic_*.xml`, servant aux écrans XML comme à Compose.
 - `fastlane/metadata/android/` : fiche des stores (titre, descriptions,
-  captures, notes de version). `fdroid/` : recette F-Droid.
+  captures, notes de version), lue telle quelle par F-Droid.
+  `fastlane/play/<langue>.txt` : la description complète à coller dans la Play
+  Console, sans aucune mention de F-Droid ; la tenir à jour avec
+  `full_description.txt`. `fdroid/` : recette F-Droid.
 - `docs/` : page du projet (GitHub Pages) et politique de confidentialité.
 
 ## Tests
