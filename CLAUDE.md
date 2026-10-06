@@ -42,6 +42,12 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
   demande, installer d'abord une construction d'essai sur son téléphone
   (libre, `Release`, signée avec la clé, `-PsuiviLienDons=…` pour garder le
   bouton de dons) avant de committer.
+- Tant que la MR F-Droid n'est pas fusionnée : développer et pousser sur
+  `main` librement, mais ne publier une version (étiquette) qu'en cas de
+  besoin (bug, correction demandée par un relecteur) ; le rappeler au
+  développeur s'il demande une publication. Éviter d'ici là toute nouvelle
+  permission, connexion réseau ou bibliothèque. Après la fusion, les
+  étiquettes sont reprises seules par F-Droid.
 - Il rédige ses demandes en plusieurs messages courts : attendre la fin de
   l'idée avant d'agir, et revenir en arrière proprement s'il change d'avis.
 
