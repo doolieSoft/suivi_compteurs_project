@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Suivi compteurs</string>
+
+    <!-- Accueil -->
+    <string name="index_avec_unite">%1$s %2$s</string>
+    <string name="aucun_index">Aucun relevé</string>
+    <string name="releve_du">relevé du %1$s</string>
+    <string name="reglages">Réglages</string>
+    <string name="consulter">Consulter l\'historique et les prévisions</string>
+    <string name="exporter">Exporter</string>
+    <string name="export_en_cours">Préparation du classeur…</string>
+    <string name="export_reussi">Classeur enregistré.</string>
+    <string name="export_ecriture_impossible">Le classeur n\'a pas pu être écrit à cet emplacement.</string>
+    <string name="importer">Importer</string>
+    <string name="import_titre">Importer le classeur ?</string>
+    <string name="import_confirmation">Les données de l\'appareil seront remplacées par celles du classeur ; les relevés notés sur le téléphone et absents du classeur sont conservés.</string>
+    <string name="importer_confirmer">Importer</string>
+    <string name="annuler">Annuler</string>
+    <string name="import_en_cours">Lecture du classeur…</string>
+    <string name="import_illisible">Ce fichier n\'a pas pu être lu comme un classeur Excel.</string>
+    <plurals name="import_reussi">
+        <item quantity="one">Classeur importé : %1$d relevé.</item>
+        <item quantity="many">Classeur importé : %1$d relevés.</item>
+        <item quantity="other">Classeur importé : %1$d relevés.</item>
+    </plurals>
+    <string name="tirer_pour_synchroniser">Tirez vers le bas pour mettre à jour la météo</string>
+
+    <!-- Saisie -->
+    <string name="titre_saisie">Nouveau relevé</string>
+    <string name="compteur_introuvable">Compteur introuvable</string>
+    <string name="dernier_index">Dernier index connu : %1$s %2$s</string>
+    <string name="cadrer_le_compteur">Approchez-vous : les chiffres doivent remplir la largeur</string>
+    <string name="declencher">Photographier</string>
+    <string name="reprendre">Reprendre la photo</string>
+    <string name="sans_photo">Sans photo</string>
+    <string name="depuis_galerie">Depuis la galerie</string>
+    <string name="lampe_allumer">Lampe</string>
+    <string name="lampe_eteindre">Lampe allumée</string>
+    <string name="lampe_indisponible">Pas de lampe sur cet appareil</string>
+    <string name="entourer_le_cadran">Entourez les chiffres du cadran avec le doigt, puis relancez la lecture.</string>
+    <string name="lire_la_zone">Lire la zone entourée</string>
+    <string name="photo_echouee">La photo n\'a pas pu être prise</string>
+    <string name="camera_refusee">Appareil photo indisponible : saisissez l\'index à la main.</string>
+    <string name="ocr_en_cours">Lecture de l\'index…</string>
+    <string name="ocr_echec">Aucun chiffre reconnu. Saisissez l\'index à la main.</string>
+    <string name="ocr_lu_sur_la_photo">Lu sur la photo : %1$s</string>
+    <string name="ocr_autres_suites">Autres suites lues : %1$s</string>
+    <string name="ocr_aucun_chiffre">Aucun chiffre reconnu sur la photo.</string>
+    <string name="ocr_sans_historique">Aucun relevé antérieur : vérifiez attentivement.</string>
+    <string name="ocr_rien_ne_ressemble">Aucune suite de chiffres ne ressemble à l\'index : saisissez-le à la main.</string>
+    <string name="ocr_inhabituelle">Progression inhabituelle de %1$s : à confirmer.</string>
+    <string name="ocr_progression">Soit %1$s depuis le dernier relevé.</string>
+    <string name="ocr_recul">Lecture inférieure au dernier index : corrigez à la main.</string>
+    <string name="ocr_resultat">Lu sur la photo : %1$s. %2$s</string>
+    <string name="index_releve">Index relevé</string>
+    <string name="index_obligatoire">Saisissez un index</string>
+    <string name="date_du_releve">Date du relevé</string>
+    <string name="commentaire">Commentaire (facultatif)</string>
+    <string name="releve_annuel">Relevé annuel</string>
+    <string name="releve_annuel_aide">À cocher pour le relevé qui clôt l\'année : les prévisions partiront de cette date.</string>
+    <string name="enregistrer">Enregistrer</string>
+    <string name="releve_enregistre">Relevé enregistré</string>
+    <string name="releve_enregistre_avec_ecart">Relevé enregistré : %1$s %2$s depuis le précédent</string>
+
+    <!-- Tableau de bord, calculé sur l'appareil -->
+    <string name="titre_tableau_de_bord">Prévisions</string>
+    <string name="tableau_vide">Aucune donnée sur l\'appareil. Importez un classeur Excel depuis le menu de l\'écran d\'accueil, ou créez votre maison et ses compteurs.</string>
+    <string name="tiret">—</string>
+    <string name="valeur_unite">%1$s %2$s</string>
+    <string name="pourcent">%1$s %%</string>
+    <string name="pas_de_releve_sur_la_periode">Pas de relevé sur l\'année en cours</string>
+    <string name="periode_releve_annuel">prévu d\'ici le %2$s, depuis le relevé annuel du %1$s</string>
+    <string name="periode_annee_civile">prévu pour l\'année %1$d</string>
+    <string name="detail_realise">%1$s %2$s relevés sur %3$d jours, %4$s %2$s estimés sur %5$d jours</string>
+    <string name="fourchette">fourchette %1$s – %2$s</string>
+    <string name="evolution_vs">%1$s par rapport à %2$d (%3$s %4$s)</string>
+    <string name="evolution_climat_egal">%1$s à climat égal</string>
+    <string name="cout_estime">≈ %1$s</string>
+    <string name="methode_employee">Méthode : %1$s</string>
+    <string name="methode_thermique">modèle thermique (degrés-jours normaux)</string>
+    <plurals name="methode_profil">
+        <item quantity="one">profil saisonnier (%1$d année de référence)</item>
+        <item quantity="many">profil saisonnier (%1$d années de référence)</item>
+        <item quantity="other">profil saisonnier (%1$d années de référence)</item>
+    </plurals>
+    <plurals name="methode_moyenne">
+        <item quantity="one">moyenne de %1$d année passée</item>
+        <item quantity="many">moyenne de %1$d années passées</item>
+        <item quantity="other">moyenne de %1$d années passées</item>
+    </plurals>
+    <string name="methode_prorata">prorata du temps écoulé (pas d\'historique complet)</string>
+    <string name="methode_aucune">rien à estimer</string>
+    <plurals name="points_a_verifier">
+        <item quantity="one">⚠ %1$d point à vérifier</item>
+        <item quantity="many">⚠ %1$d points à vérifier</item>
+        <item quantity="other">⚠ %1$d points à vérifier</item>
+    </plurals>
+    <string name="periode_du_au">du %1$s au %2$s</string>
+    <string name="anomalie_avec_periode">%1$s : %2$s</string>
+    <plurals name="anomalie_lacune">
+        <item quantity="one">aucun relevé exploitable pendant %1$d jour</item>
+        <item quantity="many">aucun relevé exploitable pendant %1$d jours</item>
+        <item quantity="other">aucun relevé exploitable pendant %1$d jours</item>
+    </plurals>
+    <plurals name="anomalie_index_fige">
+        <item quantity="one">index inchangé pendant %1$d jour, relevé probablement manquant</item>
+        <item quantity="many">index inchangé pendant %1$d jours, relevé probablement manquant</item>
+        <item quantity="other">index inchangé pendant %1$d jours, relevé probablement manquant</item>
+    </plurals>
+    <string name="anomalie_surconso_climat">%1$s %2$s en %3$d jours, soit %4$s× ce que le climat laissait attendre</string>
+    <string name="anomalie_surconso">%1$s %2$s en %3$d jours, soit %4$s× la consommation habituelle</string>
+    <string name="energie_eau">Eau</string>
+    <string name="energie_gaz">Gaz</string>
+    <string name="energie_electricite">Électricité</string>
+    <string name="energie_mazout">Mazout</string>
+    <string name="plage_haute">heures pleines</string>
+    <string name="plage_basse">heures creuses</string>
+    <string name="libelle_plage">%1$s – %2$s</string>
+
+    <!-- Réglages -->
+    <string name="titre_reglages">Réglages</string>
+    <string name="rappel_titre_reglage">Me rappeler de relever</string>
+    <string name="rappel_intervalle">Tous les combien de jours ?</string>
+    <string name="notifications_refusees">Sans autorisation de notifier, le rappel ne peut pas fonctionner.</string>
+
+    <string name="langue">Langue</string>
+    <string name="langue_actuelle">Langue : %1$s</string>
+    <string name="langue_appareil">Langue de l\'appareil</string>
+
+    <!-- Rappels -->
+    <string name="canal_rappels">Rappels de relevé</string>
+    <string name="canal_rappels_description">Notification périodique invitant à relever les compteurs.</string>
+    <string name="rappel_titre">Relevé des compteurs</string>
+    <string name="rappel_texte">Il est temps de noter vos index.</string>
+    <string name="accueil_vide">Bienvenue ! Pour commencer, créez votre maison et ses compteurs.\n\nAstuce : reprenez les index de vos anciennes factures annuelles (« Ajouter des index passés » sur chaque compteur) : les prévisions seront justes tout de suite. Ensuite, relevez une fois par semaine le premier mois.</string>
+    <string name="reprendre_sauvegarde">Importer un fichier Excel</string>
+    <string name="reprendre_sauvegarde_aide">Vous avez exporté vos données depuis une version précédente ou un autre téléphone ? Importez ce fichier pour les retrouver.</string>
+    <string name="creer_maison">Créer ma maison</string>
+    <string name="donnees_sur_appareil">Vos données restent sur cet appareil</string>
+    <string name="meteo_a_jour">Météo mise à jour le %1$s</string>
+    <string name="meteo_mise_a_jour">Météo à jour</string>
+    <string name="meteo_hors_ligne">Pas de réseau : la météo sera mise à jour plus tard. Tout le reste fonctionne sans réseau.</string>
+    <string name="meteo_echec">Météo indisponible : %1$s</string>
+    <string name="devise">Devise des tarifs</string>
+    <string name="devise_actuelle">Devise : %1$s</string>
+    <string name="devise_region">Selon la région (%1$s)</string>
+    <string name="source_meteo">Données météo : Open-Meteo.com (CC BY 4.0)</string>
+    <string name="soutenir">Soutenir le développement (don libre)</string>
+    <string name="version_application">Version %1$s (%2$d)</string>
+    <string name="enregistre">Enregistré</string>
+    <string name="reglages_enregistres">Réglages enregistrés</string>
+    <string name="accueil_sans_compteur_a_relever">Aucun compteur à relever : vos maisons sont marquées comme plus relevées. Leur historique reste consultable ci-dessous.</string>
+    <string name="import_export">Import / export Excel</string>
+    <string name="import_export_explication">Exporter : enregistre toutes vos données dans un fichier Excel, à garder comme sauvegarde (Google Drive, e-mail…).\n\nImporter : reprend les données d\'un fichier exporté par l\'application, par exemple sur un nouveau téléphone. Une confirmation vous sera demandée.</string>
+    <string name="titre_historique">Historique</string>
+    <string name="consulter_historique">Consulter l\'historique</string>
+    <string name="releves_jusqua">relevés jusqu\'au %1$s</string>
+    <string name="tendance_stable">→ stable depuis le relevé du %1$s</string>
+    <string name="tendance_hausse">↑ +%1$s %2$s depuis le relevé du %3$s</string>
+    <string name="tendance_baisse">↓ −%1$s %2$s depuis le relevé du %3$s</string>
+    <string name="prochain_rappel">Prochain rappel : le %1$s</string>
+    <string name="prochain_rappel_apres_enregistrement">La date du prochain rappel sera fixée à l\'enregistrement.</string>
+    <string name="reglages_enregistres_rappel">Réglages enregistrés. Prochain rappel le %1$s.</string>
+    <string name="estime_avant_premier_releve">dont %1$s %2$s estimés sur les %3$d jours d\'avant votre premier relevé</string>
+    <string name="menu">Menu</string>
+</resources>

@@ -61,8 +61,9 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
     `donnees/` : base Room ; `reseau/OpenMeteo.kt` : météo et recherche de ville.
   - Écrans classiques (XML) : `MainActivity` (accueil), `SaisieActivity`,
     `TableauDeBordActivity` (prévisions), `ReglagesActivity`.
-- Textes en trois langues : `res/values`, `values-en`, `values-nl` (toujours
-  les trois ; échapper les apostrophes `\'`).
+- Textes en trois langues : `res/values` (anglais, langue de secours des
+  langues non prises en charge), `values-fr`, `values-nl` (toujours les trois ;
+  échapper les apostrophes `\'`).
 - Icônes : Material Symbols (Apache 2.0) converties en vector drawables
   `res/drawable/ic_*.xml`, servant aux écrans XML comme à Compose.
 - `fastlane/metadata/android/` : fiche des stores (titre, descriptions,
