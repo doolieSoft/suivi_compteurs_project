@@ -79,6 +79,17 @@ android {
             // plusieurs lignes laisserait des morceaux orphelins.
             signingConfig = signingConfigs.getByName(signatureRelease)
         }
+        // Version d'essai pour le téléphone du développeur : construite comme
+        // une version publiée (R8 compris), mais installée à côté de celle du
+        // Play Store, avec ses propres données. Identifiant distinct par
+        // variante (voir androidComponents plus bas), clé de débogage.
+        //   ./gradlew assembleCompletEssai   (« Essai caméra »)
+        //   ./gradlew assembleLibreEssai     (« Essai libre », comme F-Droid)
+        create("essai") {
+            initWith(getByName("release"))
+            matchingFallbacks += "release"
+            signingConfig = signingConfigs.getByName("debug")
+        }
     }
 
     compileOptions {
@@ -108,6 +119,14 @@ android {
 
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
+    }
+}
+
+// Les deux versions d'essai doivent pouvoir cohabiter sur le téléphone, avec
+// celle du Play Store : un identifiant par variante.
+androidComponents {
+    onVariants(selector().withBuildType("essai")) { variante ->
+        variante.applicationId.set("be.suivicompteurs.app.essai.${variante.flavorName}")
     }
 }
 

@@ -32,16 +32,16 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
    - textes longs (description d'`AntiFeatures`…) coupés vers 80 colonnes,
      suite indentée de deux espaces de plus, comme le fait `rewritemeta` ;
    - `AutoName` = nom de l'application dans le manifeste (`nom_lanceur`).
-7. Si le développeur le demande : installer l'APK **libre** publié sur son
-   téléphone (`adb install -r`, même clé : données conservées). Ne jamais
-   toucher autrement au téléphone ; tester sur l'émulateur.
+7. Le téléphone du développeur a la version **Play Store** (signée par la clé
+   de Google) : aucun APK construit ici ne s'installe par-dessus. Ne jamais
+   la désinstaller (ses relevés seraient perdus) ; elle se met à jour par le
+   Play Store.
 
 ## Façon de travailler
 
 - Ne pas pousser ni publier sans l'accord du développeur. Quand il le
-  demande, installer d'abord une construction d'essai sur son téléphone
-  (libre, `Release`, signée avec la clé, `-PsuiviLienDons=…` pour garder le
-  bouton de dons) avant de committer.
+  demande, installer d'abord les versions d'essai sur son téléphone avant de
+  committer (voir « Tests »).
 - Tant que la MR F-Droid n'est pas fusionnée : développer et pousser sur
   `main` librement, mais ne publier une version (étiquette) qu'en cas de
   besoin (bug, correction demandée par un relecteur) ; le rappeler au
@@ -78,8 +78,23 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
 - `PariteReferenceTest` et `ImportClasseurTest` comparent le moteur à la
   référence figée du moteur Python d'origine (`src/test/resources/`) : un
   écart signifie que les chiffres changent, ce qui doit être délibéré.
-- Émulateur : AVD `Medium_Phone` ; le clavier de l'émulateur intercepte parfois
-  la saisie (`adb shell input text`), vérifier le champ après coup.
+- Versions d'essai (type de construction `essai`) : comme une version publiée
+  (R8 compris), clé de débogage, identifiant `be.suivicompteurs.app.essai.<variante>`,
+  données à part. `assembleCompletEssai` (« Essai caméra », lecture ML Kit) et
+  `assembleLibreEssai` (« Essai libre », comme F-Droid) ; elles s'installent à
+  côté de la version Play Store (`adb install -r`, données d'essai conservées).
+  Ajouter `-PsuiviLienDons=…` pour voir le bouton de dons.
+- Téléphone (moto g86) : par Wi-Fi, débogage sans fil. Associé une fois
+  (`adb pair`) ; à chaque séance, le développeur donne l'adresse IP:port à
+  `adb connect`. N'y faire qu'installer les versions d'essai, puis
+  `adb disconnect`.
+- Utiliser l'adb du SDK (`~/Android/Sdk/platform-tools/adb`) : un autre adb
+  sur la machine se dispute le serveur (« device offline »).
+- Émulateur : AVD `Essai_API34` (Android 34, léger ; l'AVD Android 37 sature
+  ce PC de 8 Go). KVM requis. Changer la langue du système :
+  `adb shell cmd locale set-device-locale de-DE` (l'interface redémarre :
+  attendre). Le clavier de l'émulateur intercepte parfois la saisie
+  (`adb shell input text`), vérifier le champ après coup.
 
 ## Captures d'écran des stores
 
