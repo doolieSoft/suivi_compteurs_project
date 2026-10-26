@@ -1,0 +1,1 @@
+• Si votre téléphone est réglé dans une langue que l'application ne propose pas (allemand, espagnol…), elle s'affiche désormais en anglais plutôt qu'en français. Le français et le néerlandais ne changent pas.
