@@ -20,18 +20,10 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
    change de façon visible — textes de `docs/index.html` (trois langues),
    captures `docs/captures/{fr,en,nl}/`, liens. Le numéro de version s'y
    affiche seul (API GitHub).
-6. **Merge request F-Droid** (tant qu'elle n'est pas fusionnée) :
-   https://gitlab.com/fdroid/fdroiddata/-/merge_requests/51053, fork
-   `gitlab.com/doolieSoft/fdroiddata`, branche `compteurs`, fichier
-   `metadata/be.suivicompteurs.app.yml`. Y reporter la recette de
-   `fdroid/be.suivicompteurs.app.yml` (mise à jour elle aussi) :
-   - `versionName`, `versionCode`, `CurrentVersion`, `CurrentVersionCode` ;
-   - `commit` = **hash complet** de l'étiquette, jamais le nom de l'étiquette ;
-   - fins de ligne **LF**, aucun commentaire `#`, champs dans l'ordre de
-     `rewritemeta` (`Donate` avant `Liberapay`, `AntiFeatures` en tête) ;
-   - textes longs (description d'`AntiFeatures`…) coupés vers 80 colonnes,
-     suite indentée de deux espaces de plus, comme le fait `rewritemeta` ;
-   - `AutoName` = nom de l'application dans le manifeste (`nom_lanceur`).
+6. **F-Droid** : rien à faire. L'application y est publiée depuis le 27 octobre
+   2026 ; F-Droid reprend seul les étiquettes `vX.Y.Z`, sous quelques jours.
+   Seul un changement de recette (`metadata/be.suivicompteurs.app.yml` dans
+   `gitlab.com/fdroid/fdroiddata`) demande une merge request.
 7. Le téléphone du développeur a la version **Play Store** (signée par la clé
    de Google) : aucun APK construit ici ne s'installe par-dessus. Ne jamais
    la désinstaller (ses relevés seraient perdus) ; elle se met à jour par le
@@ -42,12 +34,6 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
 - Ne pas pousser ni publier sans l'accord du développeur. Quand il le
   demande, installer d'abord les versions d'essai sur son téléphone avant de
   committer (voir « Tests »).
-- Tant que la MR F-Droid n'est pas fusionnée : développer et pousser sur
-  `main` librement, mais ne publier une version (étiquette) qu'en cas de
-  besoin (bug, correction demandée par un relecteur) ; le rappeler au
-  développeur s'il demande une publication. Éviter d'ici là toute nouvelle
-  permission, connexion réseau ou bibliothèque. Après la fusion, les
-  étiquettes sont reprises seules par F-Droid.
 - Il rédige ses demandes en plusieurs messages courts : attendre la fin de
   l'idée avant d'agir, et revenir en arrière proprement s'il change d'avis.
 
@@ -70,7 +56,8 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
   captures, notes de version), lue telle quelle par F-Droid.
   `fastlane/play/<langue>.txt` : la description complète à coller dans la Play
   Console, sans aucune mention de F-Droid ; la tenir à jour avec
-  `full_description.txt`. `fdroid/` : recette F-Droid.
+  `full_description.txt`. `fdroid/` : recette F-Droid telle que fusionnée (la
+  référence est dans `fdroiddata`).
 - `docs/` : page du projet (GitHub Pages) et politique de confidentialité.
 
 ## Tests
