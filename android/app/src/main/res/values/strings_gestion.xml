@@ -85,4 +85,23 @@
     <string name="index_passes_annuels">Annual readings (bills)</string>
     <string name="index_passes_ajoutes">%1$d readings added</string>
     <string name="ajouter_une_ligne">Add a row</string>
+    <string name="radiateur">Radiator</string>
+    <string name="radiateurs_titre">Radiators (%1$d)</string>
+    <string name="radiateurs_astuce">Add one line per radiator, with its factor. You can then enter your readings.</string>
+    <string name="radiateurs_gerer">Add radiators</string>
+    <string name="radiateur_nom">Name (living room, bedroom…)</string>
+    <string name="radiateur_coefficient">Factor</string>
+    <string name="radiateur_coefficient_astuce">You will find it on your annual statement. If the device already shows weighted values, enter 1.</string>
+    <string name="radiateur_coefficient_detail">Factor %1$s</string>
+    <string name="radiateur_chiffre">%1$s (× %2$s)</string>
+    <string name="radiateur_chiffre_precedent">Previous reading: %1$s</string>
+    <string name="radiateur_chiffre_obligatoire">Enter the number shown on this radiator</string>
+    <string name="radiateurs_premier_releve">First reading: it serves as the starting point.</string>
+    <string name="radiateurs_periode">Since the previous reading: %1$s u</string>
+    <string name="remise_a_zero_titre">Reset to zero?</string>
+    <string name="remise_a_zero_question">Lower than the previous reading: %1$s. Was the device reset, for example at its annual date?</string>
+    <string name="remise_a_zero_oui">Yes, it was reset</string>
+    <string name="corriger">Correct</string>
+    <string name="retirer">Remove</string>
+    <string name="supprimer_releve_confirmation">Delete this reading?</string>
 </resources>

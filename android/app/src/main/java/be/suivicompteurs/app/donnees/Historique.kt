@@ -84,6 +84,30 @@ data class ReleveHistorique(
 )
 
 /**
+ * Radiateur d'un compteur de type répartiteur. Le coefficient donne leur poids
+ * aux unités de son boîtier : le corriger vaut pour tout l'historique.
+ */
+@Entity(tableName = "radiateurs")
+data class RadiateurLocal(
+    @PrimaryKey val id: Long,
+    val compteurId: Long,
+    val nom: String,
+    val coefficient: Double,
+    /** AAAA-MM-JJ. Un radiateur retiré n'est plus relevé, son passé compte encore. */
+    val dateRetrait: String? = null,
+)
+
+/** Chiffre affiché par le boîtier d'un radiateur le jour d'un relevé. */
+@Entity(tableName = "releves_radiateurs", primaryKeys = ["radiateurId", "date"])
+data class ReleveRadiateur(
+    val radiateurId: Long,
+    val compteurId: Long,
+    /** AAAA-MM-JJ. */
+    val date: String,
+    val unites: Double,
+)
+
+/**
  * Fait marquant expliquant une rupture de consommation : isolation du toit,
  * changement de douche, remplacement de compteur…
  */
@@ -153,6 +177,8 @@ data class Historique(
     val tarifs: List<TarifLocal>,
     val evenements: List<EvenementLocal> = emptyList(),
     val pointsVerifies: List<PointVerifie> = emptyList(),
+    val radiateurs: List<RadiateurLocal> = emptyList(),
+    val relevesRadiateurs: List<ReleveRadiateur> = emptyList(),
 )
 
 @Dao
@@ -180,6 +206,18 @@ abstract class HistoriqueDao {
 
     @Query("SELECT * FROM points_verifies ORDER BY resoluLe")
     abstract suspend fun pointsVerifies(): List<PointVerifie>
+
+    @Query("SELECT * FROM radiateurs ORDER BY compteurId, id")
+    abstract suspend fun radiateurs(): List<RadiateurLocal>
+
+    @Query("SELECT * FROM releves_radiateurs ORDER BY compteurId, date, radiateurId")
+    abstract suspend fun relevesRadiateurs(): List<ReleveRadiateur>
+
+    @Query("SELECT * FROM radiateurs WHERE compteurId = :compteurId ORDER BY id")
+    abstract suspend fun radiateursDe(compteurId: Long): List<RadiateurLocal>
+
+    @Query("SELECT * FROM releves_radiateurs WHERE compteurId = :compteurId ORDER BY date, radiateurId")
+    abstract suspend fun relevesRadiateursDe(compteurId: Long): List<ReleveRadiateur>
 
     @Query("SELECT COUNT(*) FROM historique_releves")
     abstract suspend fun nombreReleves(): Int
@@ -228,6 +266,7 @@ abstract class HistoriqueDao {
     @Query("SELECT COALESCE(MAX(id), 0) + 1 FROM maisons") abstract suspend fun prochaineMaison(): Long
     @Query("SELECT COALESCE(MAX(id), 0) + 1 FROM stations") abstract suspend fun prochaineStation(): Long
     @Query("SELECT COALESCE(MAX(id), 0) + 1 FROM historique_compteurs") abstract suspend fun prochainCompteur(): Long
+    @Query("SELECT COALESCE(MAX(id), 0) + 1 FROM radiateurs") abstract suspend fun prochainRadiateur(): Long
 
     @Upsert abstract suspend fun enregistrerMaison(maison: MaisonLocale)
     @Upsert abstract suspend fun enregistrerStation(station: StationLocale)
@@ -236,17 +275,25 @@ abstract class HistoriqueDao {
     @Upsert abstract suspend fun enregistrerTarif(tarif: TarifLocal)
     @Upsert abstract suspend fun enregistrerEvenement(evenement: EvenementLocal)
     @Upsert abstract suspend fun enregistrerPointVerifie(point: PointVerifie)
+    @Upsert abstract suspend fun enregistrerRadiateur(radiateur: RadiateurLocal)
+    @Upsert abstract suspend fun enregistrerRelevesRadiateurs(liste: List<ReleveRadiateur>)
 
     @Query("DELETE FROM historique_releves WHERE compteurId = :compteurId AND date = :date")
     abstract suspend fun supprimerReleve(compteurId: Long, date: String)
 
+    @Query("DELETE FROM releves_radiateurs WHERE compteurId = :compteurId AND date = :date")
+    abstract suspend fun supprimerRelevesRadiateurs(compteurId: Long, date: String)
+
+    @Query("DELETE FROM radiateurs WHERE id = :id") abstract suspend fun supprimerRadiateur(id: Long)
     @Query("DELETE FROM tarifs WHERE id = :id") abstract suspend fun supprimerTarif(id: Long)
     @Query("DELETE FROM evenements WHERE id = :id") abstract suspend fun supprimerEvenement(id: Long)
     @Query("DELETE FROM points_verifies WHERE id = :id") abstract suspend fun supprimerPointVerifie(id: Long)
 
-    /** Un compteur part avec ses relevés. */
+    /** Un compteur part avec ses relevés et ses radiateurs. */
     @Transaction
     open suspend fun supprimerCompteur(id: Long) {
+        supprimerRelevesRadiateursDe(id)
+        supprimerRadiateursDe(id)
         supprimerRelevesDe(id)
         supprimerCompteurSeul(id)
     }
@@ -262,6 +309,8 @@ abstract class HistoriqueDao {
     }
 
     @Query("DELETE FROM historique_releves WHERE compteurId = :id") protected abstract suspend fun supprimerRelevesDe(id: Long)
+    @Query("DELETE FROM releves_radiateurs WHERE compteurId = :id") protected abstract suspend fun supprimerRelevesRadiateursDe(id: Long)
+    @Query("DELETE FROM radiateurs WHERE compteurId = :id") protected abstract suspend fun supprimerRadiateursDe(id: Long)
     @Query("DELETE FROM historique_compteurs WHERE id = :id") protected abstract suspend fun supprimerCompteurSeul(id: Long)
     @Query("DELETE FROM tarifs WHERE maisonId = :id") protected abstract suspend fun supprimerTarifsDe(id: Long)
     @Query("DELETE FROM evenements WHERE maisonId = :id") protected abstract suspend fun supprimerEvenementsDe(id: Long)
@@ -280,6 +329,8 @@ abstract class HistoriqueDao {
         tarifs = tarifs(),
         evenements = evenements(),
         pointsVerifies = pointsVerifies(),
+        radiateurs = radiateurs(),
+        relevesRadiateurs = relevesRadiateurs(),
     )
 
     @Query("SELECT * FROM degres_jours ORDER BY stationId, date")
@@ -299,6 +350,8 @@ abstract class HistoriqueDao {
         viderTarifs()
         viderEvenements()
         viderPointsVerifies()
+        viderRadiateurs()
+        viderRelevesRadiateurs()
         insererMaisons(historique.maisons)
         insererStations(historique.stations)
         insererCompteurs(historique.compteurs)
@@ -307,6 +360,8 @@ abstract class HistoriqueDao {
         insererTarifs(historique.tarifs)
         insererEvenements(historique.evenements)
         insererPointsVerifies(historique.pointsVerifies)
+        insererRadiateurs(historique.radiateurs)
+        insererRelevesRadiateurs(historique.relevesRadiateurs)
     }
 
     @Query("DELETE FROM maisons") protected abstract suspend fun viderMaisons()
@@ -317,6 +372,8 @@ abstract class HistoriqueDao {
     @Query("DELETE FROM tarifs") protected abstract suspend fun viderTarifs()
     @Query("DELETE FROM evenements") protected abstract suspend fun viderEvenements()
     @Query("DELETE FROM points_verifies") protected abstract suspend fun viderPointsVerifies()
+    @Query("DELETE FROM radiateurs") protected abstract suspend fun viderRadiateurs()
+    @Query("DELETE FROM releves_radiateurs") protected abstract suspend fun viderRelevesRadiateurs()
 
     @Insert protected abstract suspend fun insererMaisons(liste: List<MaisonLocale>)
     @Insert protected abstract suspend fun insererStations(liste: List<StationLocale>)
@@ -326,4 +383,6 @@ abstract class HistoriqueDao {
     @Insert protected abstract suspend fun insererTarifs(liste: List<TarifLocal>)
     @Insert protected abstract suspend fun insererEvenements(liste: List<EvenementLocal>)
     @Insert protected abstract suspend fun insererPointsVerifies(liste: List<PointVerifie>)
+    @Insert protected abstract suspend fun insererRadiateurs(liste: List<RadiateurLocal>)
+    @Insert protected abstract suspend fun insererRelevesRadiateurs(liste: List<ReleveRadiateur>)
 }

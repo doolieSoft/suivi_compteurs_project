@@ -60,6 +60,8 @@ object ExportClasseur {
 
         // --- une feuille par énergie ------------------------------------------
         for (energie in Energie.entries) {
+            // Les répartiteurs sont rares : pas de feuille vide pour tout le monde.
+            if (energie == Energie.REPARTITEUR && compteurs.none { it.energie == energie.code }) continue
             val f = x.feuille(energie.libelle)
             f.largeurs(12, 13, 11, 7, 10, 11, 13, 18, 40)
             for (c in compteurs.filter { it.energie == energie.code }) {
@@ -176,6 +178,24 @@ object ExportClasseur {
             },
             largeurs = listOf(34, 14, 12, 15, 16, 14, 7, 16, 12, 12, 34),
         )
+        if (h.radiateurs.isNotEmpty()) {
+            tableau(
+                x, "Radiateurs",
+                listOf("N°", "Compteur", "Nom", "Coefficient", "Retiré le"),
+                h.radiateurs.map { r ->
+                    listOf(
+                        Cellule(r.id), Cellule(codesCompteurs[r.compteurId]), Cellule(r.nom),
+                        Cellule(r.coefficient), date(r.dateRetrait),
+                    )
+                },
+                largeurs = listOf(6, 34, 24, 12, 12),
+            )
+            tableau(
+                x, "Relevés radiateurs",
+                listOf("N°", "Date", "Unités"),
+                h.relevesRadiateurs.map { r -> listOf(Cellule(r.radiateurId), date(r.date), Cellule(r.unites)) },
+            )
+        }
         tableau(
             x, "Événements",
             listOf("Maison", "Date", "Énergie", "Libellé", "Description"),

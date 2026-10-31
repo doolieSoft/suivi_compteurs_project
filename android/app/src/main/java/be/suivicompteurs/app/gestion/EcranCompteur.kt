@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import be.suivicompteurs.app.R
 import be.suivicompteurs.app.donnees.CompteurHistorique
+import be.suivicompteurs.app.donnees.RadiateurLocal
 import be.suivicompteurs.app.donnees.ReleveHistorique
 import java.time.LocalDate
 import kotlinx.coroutines.launch
@@ -40,6 +41,7 @@ fun EcranCompteur(
     maisonId: Long,
     surRetour: () -> Unit,
     surCompteur: (Long) -> Unit,
+    surReleveRadiateurs: (Long, String?) -> Unit,
 ) {
     val portee = rememberCoroutineScope()
     // Confirmation brève après un enregistrement : l'écran ne change pas.
@@ -56,6 +58,8 @@ fun EcranCompteur(
     var pose by remember { mutableStateOf<String?>(null) }
     var depose by remember { mutableStateOf<String?>(null) }
     var releves by remember { mutableStateOf<List<ReleveHistorique>>(emptyList()) }
+    var radiateurs by remember { mutableStateOf<List<RadiateurLocal>>(emptyList()) }
+    var radiateurEdite by remember { mutableStateOf<RadiateurLocal?>(null) }
     var releveEdite by remember { mutableStateOf<Pair<ReleveHistorique, String?>?>(null) }
     var remplacer by remember { mutableStateOf(false) }
     var indexPasses by remember { mutableStateOf(false) }
@@ -74,7 +78,9 @@ fun EcranCompteur(
         origine = c
         nomMaison = gestion.maison(c.maisonId)?.nom.orEmpty()
         releves = gestion.releves(compteurId).sortedByDescending { it.date }
+        radiateurs = gestion.radiateurs(compteurId).filter { it.dateRetrait == null }
     }
+    val repartiteur = energie == "REP"
 
     fun enregistrer() = portee.launch {
         val c = (origine ?: CompteurHistorique(0, maisonId, energie, plage, unite, "", null)).copy(
@@ -93,11 +99,16 @@ fun EcranCompteur(
         messages = messages,
         surSuppression = if (compteurId != 0L) ({ confirmer = true }) else null,
     ) {
-        ChampChoix(stringResource(R.string.energie), energies(), energie) {
+        // Un répartiteur n'a pas les mêmes relevés : on ne devient pas l'un ou l'autre en route.
+        ChampChoix(
+            stringResource(R.string.energie),
+            energies().filter { compteurId == 0L || (it.first == "REP") == repartiteur },
+            energie,
+        ) {
             energie = it
             // Valeurs usuelles : le gaz se relève en m³ et se convertit à ~11 kWh/m³.
             if (compteurId == 0L) {
-                unite = when (it) { "ELEC" -> "kWh"; "MAZ" -> "L"; else -> "m³" }
+                unite = when (it) { "ELEC" -> "kWh"; "MAZ" -> "L"; "REP" -> "u"; else -> "m³" }
                 // Un litre de mazout libère environ 10 kWh.
                 coef = when (it) { "GAZ" -> "11"; "MAZ" -> "10"; else -> "1" }
             }
@@ -105,7 +116,7 @@ fun EcranCompteur(
         if (energie == "ELEC") ChampChoix(stringResource(R.string.plage), plages(), plage) { plage = it }
         ChampTexte(stringResource(R.string.libelle_facultatif), libelle, { libelle = it })
         ChampTexte(stringResource(R.string.numero_compteur), numero, { numero = it })
-        Row {
+        if (!repartiteur) Row {
             ChampTexte(stringResource(R.string.unite), unite, { unite = it }, Modifier.weight(1f).padding(end = 8.dp))
             ChampTexte(stringResource(R.string.coef_kwh), coef, { coef = it }, Modifier.weight(1f), numerique = true)
         }
@@ -114,27 +125,51 @@ fun EcranCompteur(
         Button(onClick = { enregistrer() }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             IconeTexte(R.drawable.ic_valider, stringResource(R.string.enregistrer))
         }
-        if (compteurId != 0L && depose == null) {
+        // Pour un répartiteur, un boîtier neuf est une simple remise à zéro.
+        if (compteurId != 0L && depose == null && !repartiteur) {
             OutlinedButton(onClick = { remplacer = true }, Modifier.fillMaxWidth()) {
                 IconeTexte(R.drawable.ic_compteur, stringResource(R.string.remplacer_compteur))
+            }
+        }
+
+        if (compteurId != 0L && repartiteur) {
+            TitreSection(stringResource(R.string.radiateurs_titre, radiateurs.size), icone = R.drawable.ic_repartiteur, action = {
+                TextButton(onClick = { radiateurEdite = RadiateurLocal(0, compteurId, "", 1.0) }) {
+                    IconeTexte(R.drawable.ic_ajouter, stringResource(R.string.ajouter))
+                }
+            })
+            if (radiateurs.isEmpty()) {
+                Text(
+                    stringResource(R.string.radiateurs_astuce),
+                    style = MaterialTheme.typography.bodySmall, color = Couleurs.encre2,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+            radiateurs.forEach { r ->
+                LigneListe(
+                    titre = r.nom,
+                    detail = stringResource(R.string.radiateur_coefficient_detail, afficherNombre(r.coefficient)),
+                    surAppui = { radiateurEdite = r },
+                )
             }
         }
 
         if (compteurId != 0L) {
             TitreSection(stringResource(R.string.releves_titre, releves.size), icone = R.drawable.ic_releve, action = {
                 TextButton(onClick = {
-                    releveEdite = ReleveHistorique(compteurId, LocalDate.now().toString(), releves.firstOrNull()?.index ?: 0.0, false) to null
+                    if (repartiteur) surReleveRadiateurs(compteurId, null)
+                    else releveEdite = ReleveHistorique(compteurId, LocalDate.now().toString(), releves.firstOrNull()?.index ?: 0.0, false) to null
                 }) { IconeTexte(R.drawable.ic_ajouter, stringResource(R.string.ajouter)) }
             })
             // Les anciennes factures donnent tout de suite un historique.
-            if (releves.size <= 1) {
+            if (releves.size <= 1 && !repartiteur) {
                 Text(
                     stringResource(R.string.index_passes_astuce),
                     style = MaterialTheme.typography.bodySmall, color = Couleurs.encre2,
                     modifier = Modifier.padding(top = 8.dp),
                 )
             }
-            OutlinedButton(onClick = { indexPasses = true }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+            if (!repartiteur) OutlinedButton(onClick = { indexPasses = true }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                 IconeTexte(R.drawable.ic_releve, stringResource(R.string.index_passes))
             }
             releves.forEach { r ->
@@ -144,7 +179,7 @@ fun EcranCompteur(
                         if (r.annuel) stringResource(R.string.releve_annuel) else null,
                         r.commentaire.ifEmpty { null },
                     ).joinToString(" · "),
-                    surAppui = { releveEdite = r to r.date },
+                    surAppui = { if (repartiteur) surReleveRadiateurs(compteurId, r.date) else releveEdite = r to r.date },
                 )
             }
         }
@@ -167,6 +202,18 @@ fun EcranCompteur(
             },
             surSuppression = if (dateAvant != null) ({
                 portee.launch { gestion.supprimerReleve(r.compteurId, dateAvant); releveEdite = null; version++ }
+            }) else null,
+        )
+    }
+    radiateurEdite?.let { r ->
+        DialogueRadiateur(
+            r,
+            surFermeture = { radiateurEdite = null },
+            surEnregistrement = { nouveau ->
+                portee.launch { gestion.enregistrerRadiateur(nouveau); radiateurEdite = null; version++ }
+            },
+            surRetrait = if (r.id != 0L) ({
+                portee.launch { gestion.retirerRadiateur(r, LocalDate.now()); radiateurEdite = null; version++ }
             }) else null,
         )
     }

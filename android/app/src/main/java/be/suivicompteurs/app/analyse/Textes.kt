@@ -48,6 +48,7 @@ class Textes(private val contexte: Context) {
             Energie.GAZ -> R.string.energie_gaz
             Energie.ELECTRICITE -> R.string.energie_electricite
             Energie.MAZOUT -> R.string.energie_mazout
+            Energie.REPARTITEUR -> R.string.energie_repartiteur
         }
     )
 

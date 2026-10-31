@@ -468,8 +468,10 @@ fun detecterAnomalies(ligne: Ligne): List<Anomalie> {
     val anomalies = mutableListOf<Anomalie>()
     for ((debut, fin) in ligne.serie.lacunes) anomalies += Anomalie.Lacune(debut, fin)
 
+    // Un radiateur coupé tout l'été ne compte rien : c'est normal.
+    val figeSuspect = ligne.energie != Energie.REPARTITEUR
     for (p in liste) {
-        if (p.volume == 0.0 && p.nbJours >= JOURS_SANS_CONSO_SUSPECT) {
+        if (figeSuspect && p.volume == 0.0 && p.nbJours >= JOURS_SANS_CONSO_SUSPECT) {
             anomalies += Anomalie.IndexFige(p.debut, p.fin, p.nbJours, p.compteur.unite)
         }
     }

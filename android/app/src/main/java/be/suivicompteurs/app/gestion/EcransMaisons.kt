@@ -69,6 +69,7 @@ fun energies() = listOf(
     "GAZ" to stringResource(R.string.energie_gaz),
     "ELEC" to stringResource(R.string.energie_electricite),
     "MAZ" to stringResource(R.string.energie_mazout),
+    "REP" to stringResource(R.string.energie_repartiteur),
 )
 
 @Composable
@@ -315,7 +316,8 @@ fun DialogueTarif(
         title = { Text(stringResource(R.string.tarif)) },
         text = {
             androidx.compose.foundation.layout.Column(Modifier.verticalScroll(rememberScrollState())) {
-                ChampChoix(stringResource(R.string.energie), energies(), energie) { energie = it }
+                // Pas de tarif pour les répartiteurs : leur coût dépend de tout l'immeuble.
+                ChampChoix(stringResource(R.string.energie), energies().filter { it.first != "REP" }, energie) { energie = it }
                 ChampDate(stringResource(R.string.debut), debut, { debut = it })
                 ChampDate(stringResource(R.string.fin), fin, { fin = it }, facultatif = true)
                 val symbole = Monnaie.symbole(LocalContext.current)

@@ -22,6 +22,7 @@ JE GEGEVENS BLIJVEN BIJ JOU
 
 EN OOK
 • Meerdere woningen, vervanging van meters, dubbeltariefmeters, tarieven en gebeurtenissen (isolatie, werken…).
+• Warmtekostenverdelers: een regel per radiator met de coëfficiënt, jaarlijkse nulstelling inbegrepen.
 • Grafieken: cumulatief sinds 1 januari, maandverbruik, jaarvergelijking, klimaat.
 • Beschikbaar in het Nederlands, Frans en Engels.
 

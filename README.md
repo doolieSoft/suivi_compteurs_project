@@ -68,6 +68,8 @@ first.
   meter readings, years compared at normal weather, costs;
 - comparison of years, weather, accuracy of past forecasts;
 - several houses, meter replacement, tariffs, events (building work…);
+- heat cost allocators: one line per radiator with its factor, annual resets
+  included;
 - Excel import and export, which doubles as a backup (Google Drive included);
 - reading reminders;
 - French, English and Dutch; your choice of currency.
@@ -139,6 +141,16 @@ estimated, so years stay comparable even if the reading slips by a few days.
 
 The range shown reflects the spread between reference years, not the
 uncertainty of the weather to come.
+
+### Heat cost allocators
+
+These small devices, one per radiator, count relative units. A unit only means
+something once multiplied by the radiator's factor, and many devices reset every
+year. For each reading, the app adds up the weighted difference for each radiator
+(after a reset, the difference is simply the new number) and keeps a running total
+(`Repartiteurs.kt`). That total never goes down, so charts, forecasts and the
+weather adjustment treat it like any other meter. It stays a relative figure: no
+kWh and no cost, since the bill depends on the whole building.
 
 ### Degree days
 

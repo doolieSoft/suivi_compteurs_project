@@ -85,4 +85,23 @@
     <string name="index_passes_annuels">Jaarlijkse meterstanden (afrekeningen)</string>
     <string name="index_passes_ajoutes">%1$d meterstanden toegevoegd</string>
     <string name="ajouter_une_ligne">Regel toevoegen</string>
+    <string name="radiateur">Radiator</string>
+    <string name="radiateurs_titre">Radiatoren (%1$d)</string>
+    <string name="radiateurs_astuce">Voeg per radiator een regel toe, met de coëfficiënt. Daarna kun je je standen invoeren.</string>
+    <string name="radiateurs_gerer">Radiatoren toevoegen</string>
+    <string name="radiateur_nom">Naam (woonkamer, slaapkamer…)</string>
+    <string name="radiateur_coefficient">Coëfficiënt</string>
+    <string name="radiateur_coefficient_astuce">Je vindt die op je jaarafrekening. Toont het toestel al gewogen waarden, vul dan 1 in.</string>
+    <string name="radiateur_coefficient_detail">Coëfficiënt %1$s</string>
+    <string name="radiateur_chiffre">%1$s (× %2$s)</string>
+    <string name="radiateur_chiffre_precedent">Vorige stand: %1$s</string>
+    <string name="radiateur_chiffre_obligatoire">Vul het getal van deze radiator in</string>
+    <string name="radiateurs_premier_releve">Eerste stand: dit is het vertrekpunt.</string>
+    <string name="radiateurs_periode">Sinds de vorige stand: %1$s u</string>
+    <string name="remise_a_zero_titre">Op nul gezet?</string>
+    <string name="remise_a_zero_question">Lager dan de vorige stand: %1$s. Is het toestel op nul gezet, bijvoorbeeld op zijn jaardatum?</string>
+    <string name="remise_a_zero_oui">Ja, op nul gezet</string>
+    <string name="corriger">Corrigeren</string>
+    <string name="retirer">Verwijderen</string>
+    <string name="supprimer_releve_confirmation">Deze stand verwijderen?</string>
 </resources>

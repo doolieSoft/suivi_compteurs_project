@@ -65,6 +65,8 @@ désinstaller, donc d'exporter ses données en Excel avant.
   énergétique, index, années comparées à climat normal, coûts ;
 - comparaison des années, climat, justesse des prévisions passées ;
 - plusieurs maisons, remplacement de compteurs, tarifs, événements (travaux…) ;
+- répartiteurs de frais de chauffage : une ligne par radiateur avec son
+  coefficient, remises à zéro annuelles comprises ;
 - import et export Excel, qui tient lieu de sauvegarde (Google Drive compris) ;
 - rappels de relevé ;
 - français, anglais, néerlandais ; devise au choix.
@@ -139,6 +141,17 @@ que les années restent comparables même si le relevé glisse de quelques jours
 
 La fourchette affichée reflète l'écart entre années de référence, non
 l'incertitude météorologique à venir.
+
+### Les répartiteurs de chauffage
+
+Ces petits boîtiers, un par radiateur, comptent des unités relatives : une unité
+ne vaut quelque chose qu'une fois multipliée par le coefficient du radiateur, et
+beaucoup de boîtiers repartent de zéro chaque année. À chaque relevé, l'application
+additionne l'écart pondéré de chaque radiateur (après une remise à zéro, l'écart
+est le nouveau chiffre) et tient un cumul (`Repartiteurs.kt`). Ce cumul ne recule
+jamais : courbes, prévisions et correction climatique le traitent comme n'importe
+quel compteur. Il reste une valeur relative, sans kWh ni coût, puisque la facture
+dépend de tout l'immeuble.
 
 ### Les degrés-jours
 

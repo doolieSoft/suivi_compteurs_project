@@ -1,6 +1,10 @@
 package be.suivicompteurs.app.classeur
 
+import be.suivicompteurs.app.donnees.CompteurHistorique
 import be.suivicompteurs.app.donnees.Historique
+import be.suivicompteurs.app.donnees.RadiateurLocal
+import be.suivicompteurs.app.donnees.ReleveHistorique
+import be.suivicompteurs.app.donnees.ReleveRadiateur
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
 import org.junit.Assert.assertEquals
@@ -79,6 +83,50 @@ class ExportClasseurTest {
         val apres = importer(exporter(avant).inputStream()).historique
         assertEquals(avant.pointsVerifies.map { it.copy(id = 0, maisonId = 0) }, apres.pointsVerifies.map { it.copy(id = 0, maisonId = 0) })
         assertEquals(avant.maisons.first().nom, apres.maisons.single { it.id == apres.pointsVerifies.single().maisonId }.nom)
+    }
+
+    @Test
+    fun `les radiateurs et leurs chiffres survivent a l'export`() {
+        val base = synthetique()
+        val maison = base.maisons.first().id
+        val compteur = CompteurHistorique(9000, maison, "REP", "UNIQUE", "u", "", null)
+        val salon = RadiateurLocal(70, compteur.id, "Salon", 2.0)
+        val chambre = RadiateurLocal(71, compteur.id, "Chambre", 0.5, dateRetrait = "2025-06-01")
+        val h = base.copy(
+            compteurs = base.compteurs + compteur,
+            releves = base.releves + listOf(
+                ReleveHistorique(compteur.id, "2024-09-01", 0.0, false),
+                ReleveHistorique(compteur.id, "2025-01-01", 180.0, false),
+            ),
+            radiateurs = listOf(salon, chambre),
+            relevesRadiateurs = listOf(
+                ReleveRadiateur(salon.id, compteur.id, "2024-09-01", 100.0),
+                ReleveRadiateur(chambre.id, compteur.id, "2024-09-01", 100.0),
+                ReleveRadiateur(salon.id, compteur.id, "2025-01-01", 180.0),
+                ReleveRadiateur(chambre.id, compteur.id, "2025-01-01", 140.0),
+            ),
+        )
+
+        val apres = importer(exporter(h).inputStream()).historique
+
+        val repris = apres.compteurs.single { it.energie == "REP" }
+        assertEquals("u", repris.unite)
+        assertEquals(listOf(0.0, 180.0), apres.releves.filter { it.compteurId == repris.id }.map { it.index })
+        val radiateurs = apres.radiateurs.associateBy { it.nom }
+        assertEquals(setOf("Salon", "Chambre"), radiateurs.keys)
+        assertEquals(repris.id, radiateurs.getValue("Salon").compteurId)
+        assertEquals(0.5, radiateurs.getValue("Chambre").coefficient, 0.0)
+        assertEquals("2025-06-01", radiateurs.getValue("Chambre").dateRetrait)
+        val chiffres = apres.relevesRadiateurs.associateBy { it.radiateurId to it.date }
+        assertEquals(4, chiffres.size)
+        assertEquals(180.0, chiffres.getValue(radiateurs.getValue("Salon").id to "2025-01-01").unites, 0.0)
+    }
+
+    @Test
+    fun `sans repartiteur le classeur ne change pas`() {
+        val noms = Classeur.lire(exporter(synthetique()).inputStream()).noms
+        assertTrue("Répartiteurs" !in noms)
+        assertTrue("Radiateurs" !in noms)
     }
 
     @Test

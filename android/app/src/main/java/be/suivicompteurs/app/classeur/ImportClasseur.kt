@@ -7,7 +7,9 @@ import be.suivicompteurs.app.donnees.EvenementLocal
 import be.suivicompteurs.app.donnees.Historique
 import be.suivicompteurs.app.donnees.MaisonLocale
 import be.suivicompteurs.app.donnees.PointVerifie
+import be.suivicompteurs.app.donnees.RadiateurLocal
 import be.suivicompteurs.app.donnees.ReleveHistorique
+import be.suivicompteurs.app.donnees.ReleveRadiateur
 import be.suivicompteurs.app.donnees.StationLocale
 import be.suivicompteurs.app.donnees.TarifLocal
 import be.suivicompteurs.app.moteur.Compteur
@@ -42,10 +44,12 @@ object ImportClasseur {
     private const val FEUILLE_TARIFS = "Tarifs"
     private const val FEUILLE_DJ = "Degrés-jours"
     private const val FEUILLE_EVENEMENTS = "Événements"
+    private const val FEUILLE_RADIATEURS = "Radiateurs"
+    private const val FEUILLE_RELEVES_RADIATEURS = "Relevés radiateurs"
     private const val FEUILLE_POINTS_VERIFIES = "Points vérifiés"
     private val FEUILLES_TABLEAUX = setOf(
         FEUILLE_MAISONS, FEUILLE_COMPTEURS, FEUILLE_TARIFS, FEUILLE_DJ, FEUILLE_EVENEMENTS,
-        FEUILLE_POINTS_VERIFIES, "Par année",
+        FEUILLE_POINTS_VERIFIES, FEUILLE_RADIATEURS, FEUILLE_RELEVES_RADIATEURS, "Par année",
     )
 
     /** Libellés des sources de relevé, tels que le serveur les écrit. */
@@ -222,6 +226,30 @@ object ImportClasseur {
         }.orEmpty()
 
         // --- degrés-jours ----------------------------------------------------
+        // --- radiateurs : sans ces feuilles, les index du classeur font foi ------
+        val radiateurs = LinkedHashMap<Long, RadiateurLocal>()
+        classeur[FEUILLE_RADIATEURS]?.let { feuille ->
+            for (l in tableau(feuille)) {
+                val numero = enNombre(l["N°"])?.toLong() ?: continue
+                val fiche = fiches[enTexte(l["Compteur"])] ?: continue
+                radiateurs[numero] = RadiateurLocal(
+                    id = radiateurs.size + 1L,
+                    compteurId = fiche.historique.id,
+                    nom = enTexte(l["Nom"]).ifEmpty { numero.toString() },
+                    coefficient = enNombre(l["Coefficient"]) ?: 1.0,
+                    dateRetrait = enDate(l["Retiré le"])?.toString(),
+                )
+            }
+        }
+        val relevesRadiateurs = classeur[FEUILLE_RELEVES_RADIATEURS]?.let { feuille ->
+            tableau(feuille).mapNotNull { l ->
+                val radiateur = enNombre(l["N°"])?.toLong()?.let { radiateurs[it] } ?: return@mapNotNull null
+                val jour = enDate(l["Date"]) ?: return@mapNotNull null
+                val unites = enNombre(l["Unités"]) ?: return@mapNotNull null
+                ReleveRadiateur(radiateur.id, radiateur.compteurId, jour.toString(), unites)
+            }
+        }.orEmpty()
+
         val djs = LinkedHashMap<Pair<Long, String>, DegreJourLocal>()
         classeur[FEUILLE_DJ]?.let { feuille ->
             for (l in tableau(feuille)) {
@@ -242,6 +270,8 @@ object ImportClasseur {
             tarifs = tarifs,
             evenements = evenements,
             pointsVerifies = pointsVerifies,
+            radiateurs = radiateurs.values.toList(),
+            relevesRadiateurs = relevesRadiateurs,
         )
         return ResultatImport(historique, compteursASaisir(historique), historique.releves.size)
     }

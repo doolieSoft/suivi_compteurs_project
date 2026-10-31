@@ -110,6 +110,7 @@
     <string name="energie_gaz">Gas</string>
     <string name="energie_electricite">Electricity</string>
     <string name="energie_mazout">Heating oil</string>
+    <string name="energie_repartiteur">Heat cost allocators</string>
     <string name="plage_haute">peak hours</string>
     <string name="plage_basse">off-peak hours</string>
     <string name="libelle_plage">%1$s – %2$s</string>

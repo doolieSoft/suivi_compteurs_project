@@ -108,6 +108,7 @@
     <string name="energie_gaz">Gas</string>
     <string name="energie_electricite">Elektriciteit</string>
     <string name="energie_mazout">Stookolie</string>
+    <string name="energie_repartiteur">Warmtekostenverdelers</string>
     <string name="plage_haute">piekuren</string>
     <string name="plage_basse">daluren</string>
     <string name="libelle_plage">%1$s – %2$s</string>

@@ -85,4 +85,23 @@
     <string name="index_passes_annuels">Relevés annuels (factures)</string>
     <string name="index_passes_ajoutes">%1$d index ajoutés</string>
     <string name="ajouter_une_ligne">Ajouter une ligne</string>
+    <string name="radiateur">Radiateur</string>
+    <string name="radiateurs_titre">Radiateurs (%1$d)</string>
+    <string name="radiateurs_astuce">Ajoutez une ligne par radiateur, avec son coefficient. Vous pourrez ensuite saisir vos relevés.</string>
+    <string name="radiateurs_gerer">Ajouter les radiateurs</string>
+    <string name="radiateur_nom">Nom (salon, chambre…)</string>
+    <string name="radiateur_coefficient">Coefficient</string>
+    <string name="radiateur_coefficient_astuce">Vous le trouverez sur votre décompte annuel. Si le boîtier affiche déjà des valeurs pondérées, mettez 1.</string>
+    <string name="radiateur_coefficient_detail">Coefficient %1$s</string>
+    <string name="radiateur_chiffre">%1$s (× %2$s)</string>
+    <string name="radiateur_chiffre_precedent">Relevé précédent : %1$s</string>
+    <string name="radiateur_chiffre_obligatoire">Saisissez le chiffre affiché sur ce radiateur</string>
+    <string name="radiateurs_premier_releve">Premier relevé : il sert de point de départ.</string>
+    <string name="radiateurs_periode">Depuis le relevé précédent : %1$s u</string>
+    <string name="remise_a_zero_titre">Remise à zéro ?</string>
+    <string name="remise_a_zero_question">Plus bas que le relevé précédent : %1$s. Le boîtier a-t-il été remis à zéro, par exemple à sa date annuelle ?</string>
+    <string name="remise_a_zero_oui">Oui, remis à zéro</string>
+    <string name="corriger">Corriger</string>
+    <string name="retirer">Retirer</string>
+    <string name="supprimer_releve_confirmation">Supprimer ce relevé ?</string>
 </resources>

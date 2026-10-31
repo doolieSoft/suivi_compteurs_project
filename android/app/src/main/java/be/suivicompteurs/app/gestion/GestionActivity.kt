@@ -2,6 +2,7 @@ package be.suivicompteurs.app.gestion
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
@@ -48,6 +49,7 @@ class GestionActivity : AppCompatActivity() {
         enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT))
         super.onCreate(etat)
         val gestion = Gestion(this)
+        val relever = intent.getLongExtra(RELEVE_RADIATEURS, 0L)
         setContent {
             Theme {
                 val nav = rememberNavController()
@@ -83,6 +85,28 @@ class GestionActivity : AppCompatActivity() {
                             maisonId = entree.arguments!!.getLong("maison"),
                             surRetour = { nav.popBackStack() },
                             surCompteur = { nav.navigate("compteur/$it") { popUpTo("compteur/{id}?maison={maison}") { inclusive = true } } },
+                            surReleveRadiateurs = { compteur, date ->
+                                nav.navigate("releve_radiateurs/$compteur" + date?.let { "?date=$it" }.orEmpty())
+                            },
+                        )
+                    }
+                    composable(
+                        "releve_radiateurs/{id}?date={date}",
+                        arguments = listOf(
+                            navArgument("id") { type = NavType.LongType },
+                            navArgument("date") { type = NavType.StringType; nullable = true; defaultValue = null },
+                        ),
+                    ) { entree ->
+                        val compteur = entree.arguments!!.getLong("id")
+                        // Venu de l'accueil, on y retourne.
+                        val retour = { if (relever != 0L) finish() else nav.popBackStack() ; Unit }
+                        BackHandler(onBack = retour)
+                        EcranReleveRadiateurs(
+                            gestion,
+                            compteurId = compteur,
+                            dateInitiale = entree.arguments!!.getString("date"),
+                            surRetour = retour,
+                            surCompteur = { nav.navigate("compteur/$compteur") },
                         )
                     }
                 }
@@ -91,12 +115,18 @@ class GestionActivity : AppCompatActivity() {
                 if (etat == null && intent.getBooleanExtra(NOUVELLE_MAISON, false)) {
                     androidx.compose.runtime.LaunchedEffect(Unit) { nav.navigate("maison/0") }
                 }
+                if (etat == null && relever != 0L) {
+                    androidx.compose.runtime.LaunchedEffect(Unit) { nav.navigate("releve_radiateurs/$relever") }
+                }
             }
         }
     }
 
     companion object {
         const val NOUVELLE_MAISON = "nouvelleMaison"
+
+        /** Compteur de type répartiteur dont ouvrir le relevé, depuis l'accueil. */
+        const val RELEVE_RADIATEURS = "releveRadiateurs"
     }
 }
 

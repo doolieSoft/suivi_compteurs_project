@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var vues: ActivityMainBinding
     private lateinit var reglages: Reglages
-    private val adaptateur = CompteurAdapter { compteur -> ouvrirSaisie(compteur.id) }
+    private val adaptateur = CompteurAdapter { compteur -> ouvrirSaisie(compteur) }
 
     private val demanderNotifications =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -209,10 +209,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun ouvrirSaisie(compteurId: Int) {
+    private fun ouvrirSaisie(compteur: CompteurLocal) {
         startActivity(
-            Intent(this, SaisieActivity::class.java)
-                .putExtra(SaisieActivity.EXTRA_COMPTEUR, compteurId)
+            if (compteur.energie == "REP") {
+                Intent(this, be.suivicompteurs.app.gestion.GestionActivity::class.java)
+                    .putExtra(be.suivicompteurs.app.gestion.GestionActivity.RELEVE_RADIATEURS, compteur.id.toLong())
+            } else {
+                Intent(this, SaisieActivity::class.java)
+                    .putExtra(SaisieActivity.EXTRA_COMPTEUR, compteur.id)
+            }
         )
     }
 
@@ -350,6 +355,7 @@ class CompteurAdapter(
             "EAU" -> R.drawable.ic_eau to R.color.eau
             "GAZ" -> R.drawable.ic_gaz to R.color.gaz
             "MAZ" -> R.drawable.ic_mazout to R.color.mazout
+            "REP" -> R.drawable.ic_repartiteur to R.color.repartiteur
             else -> R.drawable.ic_electricite to R.color.elec
         }
         cellule.vues.pastille.setImageResource(icone)

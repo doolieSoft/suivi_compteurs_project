@@ -52,6 +52,7 @@ fun CompteurLocal.nomAffiche(contexte: Context): String = buildList {
                 "EAU" -> R.string.energie_eau
                 "GAZ" -> R.string.energie_gaz
                 "MAZ" -> R.string.energie_mazout
+                "REP" -> R.string.energie_repartiteur
                 else -> R.string.energie_electricite
             }
         )

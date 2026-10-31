@@ -22,6 +22,7 @@ YOUR DATA STAYS WITH YOU
 
 AND ALSO
 • Several houses, meter replacement, dual-rate meters, tariffs and events (insulation, works…).
+• Heat cost allocators: one line per radiator with its factor, annual resets included.
 • Charts: year to date, monthly consumption, year comparison, climate.
 • Available in English, French and Dutch, in any currency.
 • Fully free F-Droid version: no automatic reading, the index is typed by hand.

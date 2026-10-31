@@ -114,6 +114,7 @@
     <string name="energie_gaz">Gaz</string>
     <string name="energie_electricite">Électricité</string>
     <string name="energie_mazout">Mazout</string>
+    <string name="energie_repartiteur">Répartiteurs de chauffage</string>
     <string name="plage_haute">heures pleines</string>
     <string name="plage_basse">heures creuses</string>
     <string name="libelle_plage">%1$s – %2$s</string>

@@ -179,6 +179,16 @@ class AnomaliesTest {
     }
 
     @Test
+    fun `un repartiteur fige l ete n est pas signale`() {
+        val compteur = Fabrique.compteur(
+            Energie.REPARTITEUR,
+            listOf(Releve(date("2023-01-01"), 100.0), Releve(date("2023-04-01"), 180.0), Releve(date("2023-10-01"), 180.0)),
+        )
+        val anomalies = detecterAnomalies(lignes(listOf(compteur), djs).single())
+        assertTrue(anomalies.none { it is Anomalie.IndexFige })
+    }
+
+    @Test
     fun `une surconsommation franche est signalee`() {
         var index = 100.0
         var jour = date("2023-01-01")

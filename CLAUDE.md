@@ -41,7 +41,7 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
 
 - `android/app/src/main/java/be/suivicompteurs/app/`
   - `moteur/` : calculs en Kotlin pur (ventilation, modèle thermique, prévisions,
-    points à vérifier), sans Android ;
+    points à vérifier, cumul des répartiteurs), sans Android ;
   - `analyse/` : écrans d'analyse (Compose) ; `gestion/` : maisons, compteurs,
     tarifs, événements (Compose) ; `classeur/` : import et export Excel ;
     `donnees/` : base Room ; `reseau/OpenMeteo.kt` : météo et recherche de ville.

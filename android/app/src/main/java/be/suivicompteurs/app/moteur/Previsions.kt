@@ -204,7 +204,7 @@ fun prevoir(
     // Sans modèle fiable, on prolonge le rythme des derniers relevés : par
     // degré-jour pour le chauffage (sinon un automne ferait croire à un hiver
     // sobre, et un hiver à un été gourmand), par jour pour le reste.
-    val chauffage = ligne.energie == Energie.GAZ || ligne.energie == Energie.MAZOUT
+    val chauffage = ligne.energie in setOf(Energie.GAZ, Energie.MAZOUT, Energie.REPARTITEUR)
     fun prolongerParDegreJour(du: LocalDate, au: LocalDate): Double? {
         if (!chauffage || normales.isEmpty()) return null
         val recents = serie.jours.entries.sortedBy { it.key }.takeLast(365)

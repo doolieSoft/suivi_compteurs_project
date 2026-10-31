@@ -28,7 +28,13 @@ enum class Energie(
     ELECTRICITE("ELEC", "Électricité", true, 2),
 
     /** Relevé en litres le plus souvent ; l'unité reste libre sur le compteur. */
-    MAZOUT("MAZ", "Mazout", true, 3);
+    MAZOUT("MAZ", "Mazout", true, 3),
+
+    /**
+     * Répartiteurs de frais de chauffage, voir `Repartiteurs.kt`. L'index est
+     * un cumul d'unités sans valeur physique : ni kWh, ni tarif.
+     */
+    REPARTITEUR("REP", "Répartiteurs", true, 4);
 
     companion object {
         fun depuisCode(code: String): Energie = entries.first { it.code == code }

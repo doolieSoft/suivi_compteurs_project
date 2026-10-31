@@ -41,8 +41,10 @@ interface CompteurDao {
         TarifLocal::class,
         EvenementLocal::class,
         PointVerifie::class,
+        RadiateurLocal::class,
+        ReleveRadiateur::class,
     ],
-    version = 9,
+    version = 10,
     exportSchema = true,
 )
 abstract class BaseLocale : RoomDatabase() {
@@ -192,6 +194,22 @@ abstract class BaseLocale : RoomDatabase() {
             }
         }
 
+        /** Radiateurs des compteurs de type répartiteur, et leurs chiffres. */
+        private val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `radiateurs` (" +
+                        "`id` INTEGER NOT NULL, `compteurId` INTEGER NOT NULL, `nom` TEXT NOT NULL, " +
+                        "`coefficient` REAL NOT NULL, `dateRetrait` TEXT, PRIMARY KEY(`id`))"
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `releves_radiateurs` (" +
+                        "`radiateurId` INTEGER NOT NULL, `compteurId` INTEGER NOT NULL, " +
+                        "`date` TEXT NOT NULL, `unites` REAL NOT NULL, PRIMARY KEY(`radiateurId`, `date`))"
+                )
+            }
+        }
+
         @Volatile
         private var instance: BaseLocale? = null
 
@@ -201,7 +219,7 @@ abstract class BaseLocale : RoomDatabase() {
                     contexte.applicationContext,
                     BaseLocale::class.java,
                     "suivi-compteurs.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10).build().also { instance = it }
             }
     }
 }
