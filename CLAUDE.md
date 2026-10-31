@@ -59,6 +59,9 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
   `full_description.txt`. `fdroid/` : recette F-Droid telle que fusionnée (la
   référence est dans `fdroiddata`).
 - `docs/` : page du projet (GitHub Pages) et politique de confidentialité.
+- `README.md` (anglais) et `README.fr.md` : les tenir à jour ensemble. La
+  documentation technique (`android/README.md`, `fastlane/PUBLIER.md`,
+  `fdroid/LISEZMOI.md`) reste en français.
 
 ## Tests
 
@@ -91,8 +94,8 @@ l'ancien site Django ; le lancer depuis une copie temporaire
 (`git worktree add <tmp> v1.2.2`, avec `db.sqlite3` copié pour la météo),
 importer les classeurs « Ma maison » / « My house » / « Mijn huis » sur
 l'émulateur, recadrer les captures en 1080 × 2150 (sans barres système).
-Le README affiche les huit captures françaises de `fastlane/`, légendées : il suit
-de lui-même.
+`README.md` et `README.fr.md` affichent les huit captures anglaises et françaises
+de `fastlane/`, légendées : ils suivent d'eux-mêmes.
 
 ## Dons et réglages GitHub
 
