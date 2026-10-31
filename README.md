@@ -44,8 +44,9 @@ téléphone. Seule la météo vient d'Internet, d'[Open-Meteo](https://open-mete
 | Où | Quoi |
 |---|---|
 | Google Play | mises à jour automatiques |
+| [F-Droid](https://f-droid.org/packages/be.suivicompteurs.app/) | mises à jour automatiques, sans composant propriétaire : l'index se saisit à la main |
 | [`suivi-compteurs.apk`](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs.apk) | avec lecture automatique de l'index sur photo (ML Kit) |
-| [`suivi-compteurs-libre.apk`](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk) | sans composant propriétaire : l'index se saisit à la main (aussi destinée à F-Droid) |
+| [`suivi-compteurs-libre.apk`](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk) | sans composant propriétaire : l'index se saisit à la main |
 
 Pour installer un APK : l'ouvrir depuis le gestionnaire de fichiers du
 téléphone, et autoriser l'installation quand Android le demande. Les trois
