@@ -89,6 +89,12 @@ android {
             initWith(getByName("release"))
             matchingFallbacks += "release"
             signingConfig = signingConfigs.getByName("debug")
+            // -PsuiviEssaiRapide : sans R8, quelques minutes de moins à chaque
+            // essai. À repasser avec R8 avant de publier.
+            if (hasProperty("suiviEssaiRapide")) {
+                isMinifyEnabled = false
+                isShrinkResources = false
+            }
         }
     }
 

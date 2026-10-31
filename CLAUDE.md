@@ -73,7 +73,9 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
   données à part. `assembleCompletEssai` (« Essai caméra », lecture ML Kit) et
   `assembleLibreEssai` (« Essai libre », comme F-Droid) ; elles s'installent à
   côté de la version Play Store (`adb install -r`, données d'essai conservées).
-  Ajouter `-PsuiviLienDons=…` pour voir le bouton de dons.
+  Ajouter `-PsuiviLienDons=…` pour voir le bouton de dons et
+  `-PsuiviEssaiRapide` pour se passer de R8 (bien plus rapide) ; repasser
+  avec R8 avant de publier.
 - Téléphone (moto g86) : par Wi-Fi, débogage sans fil. Associé une fois
   (`adb pair`) ; à chaque séance, le développeur donne l'adresse IP:port à
   `adb connect`. N'y faire qu'installer les versions d'essai, puis
