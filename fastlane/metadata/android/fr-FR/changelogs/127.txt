@@ -1,0 +1,1 @@
+• Nouveau type de compteur : les répartiteurs de frais de chauffage. Déclarez vos radiateurs et leur coefficient, tapez le chiffre de chaque boîtier, et l'application calcule le total. Les remises à zéro annuelles sont prises en charge.

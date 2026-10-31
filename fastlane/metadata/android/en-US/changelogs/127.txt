@@ -1,0 +1,1 @@
+• New meter type: heat cost allocators. Add your radiators and their factors, enter the number on each device, and the app works out the total. Annual resets are handled.

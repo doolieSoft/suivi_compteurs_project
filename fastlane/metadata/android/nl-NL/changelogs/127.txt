@@ -1,0 +1,1 @@
+• Nieuw metertype: warmtekostenverdelers. Voeg je radiatoren en hun coëfficiënt toe, vul het getal van elk toestel in en de app berekent het totaal. De jaarlijkse nulstelling wordt verwerkt.
