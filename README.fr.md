@@ -3,7 +3,7 @@
 [English](README.md) · **Français**
 
 Application Android de suivi des compteurs d'eau, de gaz, d'électricité et de
-mazout. Elle produit des graphiques, une prévision de l'année et une
+mazout (fioul). Elle produit des graphiques, une prévision de l'année et une
 comparaison inter-années **corrigée des degrés-jours**, afin qu'un hiver
 rigoureux ne soit pas confondu avec une dérive de consommation.
 
@@ -68,7 +68,7 @@ désinstaller, donc d'exporter ses données en Excel avant.
 - répartiteurs de frais de chauffage : une ligne par radiateur avec son
   coefficient, remises à zéro annuelles comprises ;
 - compteurs prépayés : relevé du solde et suivi des achats ;
-- cuves de mazout à jauge : relevé du niveau et suivi des livraisons ;
+- cuves de mazout (fioul) à jauge : relevé du niveau et suivi des livraisons ;
 - points à vérifier, dont les relevés sans doute mal saisis ;
 - import et export Excel, qui tient lieu de sauvegarde (Google Drive compris) ;
 - rappels de relevé ;
