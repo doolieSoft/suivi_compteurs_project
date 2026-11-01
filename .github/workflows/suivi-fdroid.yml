@@ -1,0 +1,21 @@
+name: Suivre la publication F-Droid
+
+# Une fois par jour : une issue, donc un e-mail, quand une version paraît sur
+# F-Droid, quand sa construction échoue ou quand elle tarde trop.
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  suivre:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Comparer la dernière version à F-Droid
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 .github/scripts/suivi_fdroid.py

@@ -24,6 +24,8 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
    2026 ; F-Droid reprend seul les étiquettes `vX.Y.Z`, sous quelques jours.
    Seul un changement de recette (`metadata/be.suivicompteurs.app.yml` dans
    `gitlab.com/fdroid/fdroiddata`) demande une merge request.
+   Le workflow `suivi-fdroid.yml` ouvre chaque jour au besoin une issue : version
+   parue, construction échouée, ou retard de 14 jours.
 7. Le téléphone du développeur a la version **Play Store** (signée par la clé
    de Google) : aucun APK construit ici ne s'installe par-dessus. Ne jamais
    la désinstaller (ses relevés seraient perdus) ; elle se met à jour par le
