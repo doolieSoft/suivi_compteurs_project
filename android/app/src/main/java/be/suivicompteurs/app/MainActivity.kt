@@ -211,9 +211,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun ouvrirSaisie(compteur: CompteurLocal) {
         startActivity(
-            if (compteur.energie == "REP") {
-                Intent(this, be.suivicompteurs.app.gestion.GestionActivity::class.java)
-                    .putExtra(be.suivicompteurs.app.gestion.GestionActivity.RELEVE_RADIATEURS, compteur.id.toLong())
+            if (compteur.energie == "REP" || compteur.prepaye) {
+                val cle = if (compteur.prepaye) be.suivicompteurs.app.gestion.GestionActivity.RELEVE_SOLDE
+                    else be.suivicompteurs.app.gestion.GestionActivity.RELEVE_RADIATEURS
+                Intent(this, be.suivicompteurs.app.gestion.GestionActivity::class.java).putExtra(cle, compteur.id.toLong())
             } else {
                 Intent(this, SaisieActivity::class.java)
                     .putExtra(SaisieActivity.EXTRA_COMPTEUR, compteur.id)
@@ -345,9 +346,13 @@ class CompteurAdapter(
         val contexte = cellule.vues.root.context
 
         cellule.vues.libelle.text = compteur.nomAffiche(contexte)
-        cellule.vues.index.text = compteur.dernierIndex?.let {
-            contexte.getString(R.string.index_avec_unite, formaterIndex(it), compteur.unite)
-        } ?: contexte.getString(R.string.aucun_index)
+        cellule.vues.index.text = when {
+            compteur.solde != null ->
+                contexte.getString(R.string.solde_restant, formaterIndex(compteur.solde), compteur.unite)
+            else -> compteur.dernierIndex?.let {
+                contexte.getString(R.string.index_avec_unite, formaterIndex(it), compteur.unite)
+            } ?: contexte.getString(R.string.aucun_index)
+        }
         cellule.vues.date.text = compteur.dernierReleve?.let {
             contexte.getString(R.string.releve_du, formaterDate(it))
         } ?: ""

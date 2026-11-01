@@ -104,4 +104,20 @@
     <string name="corriger">Correct</string>
     <string name="retirer">Remove</string>
     <string name="supprimer_releve_confirmation">Delete this reading?</string>
+    <string name="compteur_prepaye">Prepaid meter: you buy kWh in advance and it counts down</string>
+    <string name="achats_titre">Purchases (%1$d)</string>
+    <string name="achat">Purchase</string>
+    <string name="achat_quantite">kWh purchased</string>
+    <string name="achat_montant">Amount paid, taxes included (%1$s, optional)</string>
+    <string name="achat_tarif">Price per kWh (%1$s, optional)</string>
+    <string name="achat_apres_releve">Bought after that day\'s reading</string>
+    <string name="achat_ajouter">Add a purchase</string>
+    <string name="solde_lu">Balance on the meter (kWh)</string>
+    <string name="solde_precedent">Previous balance: %1$s kWh</string>
+    <string name="achats_periode">Purchased since then: %1$s kWh</string>
+    <string name="solde_conso_periode">Used since the previous reading: %1$s kWh</string>
+    <string name="solde_premier_releve">First reading: it serves as the starting point.</string>
+    <string name="achat_oublie_titre">A purchase missing?</string>
+    <string name="achat_oublie_question">The balance is %1$s kWh higher than expected. Did you buy electricity?</string>
+    <string name="achat_oublie_oui">Add the purchase</string>
 </resources>

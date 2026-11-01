@@ -104,4 +104,20 @@
     <string name="corriger">Corriger</string>
     <string name="retirer">Retirer</string>
     <string name="supprimer_releve_confirmation">Supprimer ce relevé ?</string>
+    <string name="compteur_prepaye">Compteur prépayé : on achète des kWh d\'avance et il décompte</string>
+    <string name="achats_titre">Achats (%1$d)</string>
+    <string name="achat">Achat</string>
+    <string name="achat_quantite">kWh achetés</string>
+    <string name="achat_montant">Prix payé, taxes comprises (%1$s, facultatif)</string>
+    <string name="achat_tarif">Prix du kWh (%1$s, facultatif)</string>
+    <string name="achat_apres_releve">Acheté après le relevé de ce jour</string>
+    <string name="achat_ajouter">Ajouter un achat</string>
+    <string name="solde_lu">Solde affiché sur le compteur (kWh)</string>
+    <string name="solde_precedent">Solde précédent : %1$s kWh</string>
+    <string name="achats_periode">Achats depuis : %1$s kWh</string>
+    <string name="solde_conso_periode">Consommé depuis le relevé précédent : %1$s kWh</string>
+    <string name="solde_premier_releve">Premier relevé : il sert de point de départ.</string>
+    <string name="achat_oublie_titre">Un achat oublié ?</string>
+    <string name="achat_oublie_question">Le solde dépasse de %1$s kWh ce qui était attendu. Avez-vous acheté de l\'électricité ?</string>
+    <string name="achat_oublie_oui">Ajouter l\'achat</string>
 </resources>

@@ -23,6 +23,8 @@ YOUR DATA STAYS WITH YOU
 AND ALSO
 • Several houses, meter replacement, dual-rate meters, tariffs and events (insulation, works…).
 • Heat cost allocators: one line per radiator with its factor, annual resets included.
+• Prepaid meters: read the balance, note your purchases, and the app works out your usage.
+• Points to check: the app spots readings that were probably mistyped.
 • Charts: year to date, monthly consumption, year comparison, climate.
 • Available in English, French and Dutch, in any currency.
 • Fully free F-Droid version: no automatic reading, the index is typed by hand.

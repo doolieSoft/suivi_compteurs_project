@@ -5,6 +5,7 @@
     <!-- Accueil -->
     <string name="index_avec_unite">%1$s %2$s</string>
     <string name="aucun_index">Aucun relevé</string>
+    <string name="solde_restant">%1$s %2$s restants</string>
     <string name="releve_du">relevé du %1$s</string>
     <string name="reglages">Réglages</string>
     <string name="consulter">Consulter l\'historique et les prévisions</string>
@@ -108,6 +109,7 @@
         <item quantity="many">index inchangé pendant %1$d jours, relevé probablement manquant</item>
         <item quantity="other">index inchangé pendant %1$d jours, relevé probablement manquant</item>
     </plurals>
+    <string name="anomalie_releve_douteux">relevé du %1$s à vérifier : %2$s %6$s consommés avant lui (environ %3$s attendus), puis %4$s %6$s après (environ %5$s attendus)</string>
     <string name="anomalie_surconso_climat">%1$s %2$s en %3$d jours, soit %4$s× ce que le climat laissait attendre</string>
     <string name="anomalie_surconso">%1$s %2$s en %3$d jours, soit %4$s× la consommation habituelle</string>
     <string name="energie_eau">Eau</string>

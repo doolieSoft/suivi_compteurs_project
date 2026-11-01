@@ -1,5 +1,6 @@
 package be.suivicompteurs.app.classeur
 
+import be.suivicompteurs.app.donnees.AchatLocal
 import be.suivicompteurs.app.donnees.CompteurHistorique
 import be.suivicompteurs.app.donnees.Historique
 import be.suivicompteurs.app.donnees.RadiateurLocal
@@ -123,10 +124,44 @@ class ExportClasseurTest {
     }
 
     @Test
-    fun `sans repartiteur le classeur ne change pas`() {
+    fun `les soldes et les achats d un compteur prepaye survivent a l'export`() {
+        val base = synthetique()
+        val compteur = CompteurHistorique(9000, base.maisons.first().id, "ELEC", "UNIQUE", "kWh", "prépayé", "2026-01-01", prepaye = true)
+        val h = base.copy(
+            compteurs = base.compteurs + compteur,
+            releves = base.releves + listOf(
+                ReleveHistorique(compteur.id, "2026-11-01", 0.0, false, solde = 120.0),
+                ReleveHistorique(compteur.id, "2026-11-10", 70.0, false, solde = 250.0),
+            ),
+            achats = listOf(
+                AchatLocal(1, compteur.id, "2026-11-05", 200.0, montant = 700.0),
+                AchatLocal(2, compteur.id, "2026-11-10", 50.0, tarif = 3.4, apresReleve = true),
+            ),
+        )
+
+        val apres = importer(exporter(h).inputStream())
+
+        val repris = apres.historique.compteurs.single { it.libelle == "prépayé" }
+        assertTrue(repris.prepaye)
+        val releves = apres.historique.releves.filter { it.compteurId == repris.id }
+        assertEquals(listOf(120.0, 250.0), releves.map { it.solde })
+        assertEquals(listOf(0.0, 70.0), releves.map { it.index })
+        val achats = apres.historique.achats.sortedBy { it.date }
+        assertEquals(listOf(repris.id, repris.id), achats.map { it.compteurId })
+        assertEquals(700.0, achats[0].montant!!, 0.0)
+        assertEquals(3.4, achats[1].tarif!!, 0.0)
+        assertTrue(achats[1].apresReleve)
+        // Le dernier solde lu, plus l'achat fait après lui.
+        assertEquals(300.0, apres.compteursASaisir.single { it.id.toLong() == repris.id }.solde!!, 0.0)
+    }
+
+    @Test
+    fun `sans repartiteur ni prepaye le classeur ne change pas`() {
         val noms = Classeur.lire(exporter(synthetique()).inputStream()).noms
         assertTrue("Répartiteurs" !in noms)
         assertTrue("Radiateurs" !in noms)
+        assertTrue("Achats" !in noms)
+        assertTrue("Soldes" !in noms)
     }
 
     @Test

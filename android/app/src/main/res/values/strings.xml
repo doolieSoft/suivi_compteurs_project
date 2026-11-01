@@ -7,6 +7,7 @@
     <!-- Home -->
     <string name="index_avec_unite">%1$s %2$s</string>
     <string name="aucun_index">No reading</string>
+    <string name="solde_restant">%1$s %2$s left</string>
     <string name="releve_du">read on %1$s</string>
     <string name="reglages">Settings</string>
     <string name="consulter">View history and forecasts</string>
@@ -104,6 +105,7 @@
         <item quantity="one">reading unchanged for %1$d day, probably a missing reading</item>
         <item quantity="other">reading unchanged for %1$d days, probably a missing reading</item>
     </plurals>
+    <string name="anomalie_releve_douteux">reading of %1$s may be wrong: %2$s %6$s used before it (about %3$s expected), then %4$s %6$s after it (about %5$s expected)</string>
     <string name="anomalie_surconso_climat">%1$s %2$s in %3$d days, %4$s× what the weather would suggest</string>
     <string name="anomalie_surconso">%1$s %2$s in %3$d days, %4$s× the usual consumption</string>
     <string name="energie_eau">Water</string>

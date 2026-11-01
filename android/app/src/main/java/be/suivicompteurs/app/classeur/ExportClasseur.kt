@@ -166,7 +166,7 @@ object ExportClasseur {
             x, "Compteurs",
             listOf(
                 "Code", "Maison", "Énergie", "Plage", "Libellé", "Numéro", "Unité",
-                "Coefficient kWh", "Posé le", "Déposé le", "Remplace",
+                "Coefficient kWh", "Posé le", "Déposé le", "Remplace", "Prépayé",
             ),
             compteurs.map { c ->
                 listOf(
@@ -174,9 +174,10 @@ object ExportClasseur {
                     Cellule(Energie.depuisCode(c.energie).libelle), Cellule(Plage.depuisCode(c.plage).libelle),
                     Cellule(c.libelle), Cellule(c.numero), Cellule(c.unite), Cellule(c.coefKwh),
                     date(c.datePose), date(c.dateDepose), Cellule(c.remplaceId?.let { codesCompteurs[it] }),
+                    Cellule(if (c.prepaye) "oui" else null),
                 )
             },
-            largeurs = listOf(34, 14, 12, 15, 16, 14, 7, 16, 12, 12, 34),
+            largeurs = listOf(34, 14, 12, 15, 16, 14, 7, 16, 12, 12, 34, 10),
         )
         if (h.radiateurs.isNotEmpty()) {
             tableau(
@@ -194,6 +195,29 @@ object ExportClasseur {
                 x, "Relevés radiateurs",
                 listOf("N°", "Date", "Unités"),
                 h.relevesRadiateurs.map { r -> listOf(Cellule(r.radiateurId), date(r.date), Cellule(r.unites)) },
+            )
+        }
+        if (h.compteurs.any { it.prepaye }) {
+            val prepayes = h.compteurs.filter { it.prepaye }.map { it.id }.toSet()
+            tableau(
+                x, "Soldes",
+                listOf("Compteur", "Date", "Solde"),
+                h.releves.filter { it.compteurId in prepayes && it.solde != null }.map { r ->
+                    listOf(Cellule(codesCompteurs[r.compteurId]), date(r.date), Cellule(r.solde, Format.DECIMALES_3))
+                },
+                largeurs = listOf(34, 12, 12),
+            )
+            tableau(
+                x, "Achats",
+                listOf("Compteur", "Date", "Quantité", "Prix payé", "Tarif", "Après le relevé"),
+                h.achats.map { a ->
+                    listOf(
+                        Cellule(codesCompteurs[a.compteurId]), date(a.date), Cellule(a.quantite, Format.DECIMALES_3),
+                        Cellule(a.montant, Format.DECIMALES_2), Cellule(a.tarif, Format.DECIMALES_5),
+                        Cellule(if (a.apresReleve) "oui" else null),
+                    )
+                },
+                largeurs = listOf(34, 12, 12, 12, 12, 16),
             )
         }
         tableau(

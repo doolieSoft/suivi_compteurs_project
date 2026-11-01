@@ -5,6 +5,7 @@ import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.EvenementLocal
 import be.suivicompteurs.app.donnees.MaisonLocale
 import be.suivicompteurs.app.donnees.PointVerifie
+import be.suivicompteurs.app.donnees.pourMoteur
 import be.suivicompteurs.app.moteur.Anomalie
 import be.suivicompteurs.app.moteur.ComparaisonGlissante
 import be.suivicompteurs.app.moteur.Compteur
@@ -13,6 +14,7 @@ import be.suivicompteurs.app.moteur.Energie
 import be.suivicompteurs.app.moteur.Ligne
 import be.suivicompteurs.app.moteur.Plage
 import be.suivicompteurs.app.moteur.Prevision
+import be.suivicompteurs.app.moteur.tarifsDesAchats
 import be.suivicompteurs.app.moteur.Releve
 import be.suivicompteurs.app.moteur.Tarif
 import be.suivicompteurs.app.moteur.comparerAAnneePrecedente
@@ -75,6 +77,7 @@ class Analyse(contexte: Context) {
         val compteurs = historique.compteurs()
         val releves = historique.releves().groupBy { it.compteurId }
         val tarifs = historique.tarifs()
+        val achats = historique.achats().groupBy { it.compteurId }
         val evenements = historique.evenements()
         val pointsVerifies = historique.pointsVerifies()
         val djsParStation = historique.stations().associate { station ->
@@ -110,6 +113,8 @@ class Analyse(contexte: Context) {
                         abonnementMensuel = it.abonnement,
                         propreALaMaison = it.maisonId != null,
                     )
+                } + compteurs.filter { it.maisonId == maison.id && it.prepaye }.flatMap { c ->
+                    tarifsDesAchats(achats[c.id].orEmpty().map { it.pourMoteur() }, Energie.depuisCode(c.energie))
                 },
                 evenements = evenements.filter { it.maisonId == maison.id },
                 pointsVerifies = pointsVerifies.filter { it.maisonId == maison.id },

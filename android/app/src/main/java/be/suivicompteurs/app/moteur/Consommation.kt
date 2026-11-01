@@ -3,6 +3,7 @@ package be.suivicompteurs.app.moteur
 import java.time.LocalDate
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
 
 /*
  * Calcul des consommations à partir des relevés d'index.
@@ -446,6 +447,24 @@ sealed interface Anomalie {
     ) : Anomalie {
         override val niveau get() = Niveau.ALERTE
     }
+
+    /**
+     * Index sans doute mal saisi : trop de consommation d'un côté de [date],
+     * trop peu de l'autre, et les deux écarts se compensent. L'index reste
+     * pourtant entre ses voisins : rien d'autre ne l'aurait vu.
+     */
+    data class ReleveDouteux(
+        override val debut: LocalDate,
+        override val fin: LocalDate,
+        val date: LocalDate,
+        val volumeAvant: Double,
+        val attenduAvant: Double,
+        val volumeApres: Double,
+        val attenduApres: Double,
+        val unite: String,
+    ) : Anomalie {
+        override val niveau get() = Niveau.ALERTE
+    }
 }
 
 /** Un index figé plus longtemps signale presque toujours un relevé oublié. */
@@ -460,6 +479,50 @@ const val FACTEUR_SURCONSOMMATION_MODELE = 2.5
 /** Face à une simple médiane, un doublement suffit : signature typique d'une fuite. */
 const val FACTEUR_SURCONSOMMATION_MEDIANE = 2.0
 
+/** De part et d'autre d'un relevé douteux, l'une au moins vaut tant de fois l'attendu… */
+const val FACTEUR_RELEVE_DOUTEUX = 1.5
+
+/** … et les deux écarts dépassent ce nombre de jours de consommation moyenne. */
+const val JOURS_ECART_RELEVE_DOUTEUX = 3
+
+/** Écarts qui ne se compensent pas : un vrai changement, pas un index faux. */
+const val PART_ECART_NON_COMPENSE = 0.5
+
+/** Relevés dont l'index semble faux, d'après le modèle thermique. */
+private fun relevesDouteux(ligne: Ligne): List<Anomalie.ReleveDouteux> {
+    val modele = ligne.serie.modele
+    val djs = ligne.serie.djs
+    if (!modele.fiable) return emptyList()
+    val toutes = periodes(ligne.compteurs, ligne.jusqua)
+    val nbJours = toutes.sumOf { it.nbJours }
+    if (nbJours == 0) return emptyList()
+    val seuil = JOURS_ECART_RELEVE_DOUTEUX * toutes.sumOf { it.volume } / nbJours
+
+    fun attendu(p: Periode): Double? =
+        p.jours.toList().takeIf { jours -> jours.all { it in djs } }
+            ?.sumOf { modele.attendu(djs.getValue(it)) }?.takeIf { it > 0 }
+
+    return ligne.compteurs.flatMap { compteur ->
+        periodes(listOf(compteur), ligne.jusqua).zipWithNext().mapNotNull { (avant, apres) ->
+            val attenduAvant = attendu(avant) ?: return@mapNotNull null
+            val attenduApres = attendu(apres) ?: return@mapNotNull null
+            val ecartAvant = avant.volume - attenduAvant
+            val ecartApres = apres.volume - attenduApres
+            val rapportAvant = avant.volume / attenduAvant
+            val rapportApres = apres.volume / attenduApres
+            val opposes = (rapportAvant >= FACTEUR_RELEVE_DOUTEUX && rapportApres <= 1 / FACTEUR_RELEVE_DOUTEUX) ||
+                (rapportApres >= FACTEUR_RELEVE_DOUTEUX && rapportAvant <= 1 / FACTEUR_RELEVE_DOUTEUX)
+            val nets = min(abs(ecartAvant), abs(ecartApres)) >= seuil
+            val compenses = abs(ecartAvant + ecartApres) <= PART_ECART_NON_COMPENSE * max(abs(ecartAvant), abs(ecartApres))
+            if (!opposes || !nets || !compenses) return@mapNotNull null
+            Anomalie.ReleveDouteux(
+                avant.debut, apres.fin, avant.fin,
+                avant.volume, attenduAvant, apres.volume, attenduApres, compteur.unite,
+            )
+        }
+    }
+}
+
 /** Repère les points qui méritent un coup d'œil avant d'interpréter les courbes. */
 fun detecterAnomalies(ligne: Ligne): List<Anomalie> {
     val liste = periodes(ligne.compteurs, ligne.jusqua)
@@ -467,6 +530,7 @@ fun detecterAnomalies(ligne: Ligne): List<Anomalie> {
 
     val anomalies = mutableListOf<Anomalie>()
     for ((debut, fin) in ligne.serie.lacunes) anomalies += Anomalie.Lacune(debut, fin)
+    anomalies += relevesDouteux(ligne)
 
     // Un radiateur coupé tout l'été ne compte rien : c'est normal.
     val figeSuspect = ligne.energie != Energie.REPARTITEUR

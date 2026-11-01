@@ -43,8 +43,9 @@ interface CompteurDao {
         PointVerifie::class,
         RadiateurLocal::class,
         ReleveRadiateur::class,
+        AchatLocal::class,
     ],
-    version = 10,
+    version = 11,
     exportSchema = true,
 )
 abstract class BaseLocale : RoomDatabase() {
@@ -210,6 +211,22 @@ abstract class BaseLocale : RoomDatabase() {
             }
         }
 
+        /** Compteurs prépayés : leur solde et leurs achats. */
+        private val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `historique_compteurs` ADD COLUMN `prepaye` INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `historique_releves` ADD COLUMN `solde` REAL")
+                db.execSQL("ALTER TABLE `compteurs` ADD COLUMN `prepaye` INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `compteurs` ADD COLUMN `solde` REAL")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `achats` (" +
+                        "`id` INTEGER NOT NULL, `compteurId` INTEGER NOT NULL, `date` TEXT NOT NULL, " +
+                        "`quantite` REAL NOT NULL, `montant` REAL, `tarif` REAL, " +
+                        "`apresReleve` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`))"
+                )
+            }
+        }
+
         @Volatile
         private var instance: BaseLocale? = null
 
@@ -219,7 +236,7 @@ abstract class BaseLocale : RoomDatabase() {
                     contexte.applicationContext,
                     BaseLocale::class.java,
                     "suivi-compteurs.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11).build().also { instance = it }
             }
     }
 }

@@ -170,7 +170,8 @@ class PariteReferenceTest {
             a.getJSONArray("anomalies").objets().map {
                 listOf(it.getString("genre"), it.getString("niveau"), it.getString("debut"), it.getString("fin"))
             },
-            detecterAnomalies(ligne).map { listOf(genre(it), it.niveau.name.lowercase(), it.debut.toString(), it.fin.toString()) },
+            // Le moteur Python ne connaissait pas les relevés douteux.
+            detecterAnomalies(ligne).filter { it !is Anomalie.ReleveDouteux }.map { listOf(genre(it), it.niveau.name.lowercase(), it.debut.toString(), it.fin.toString()) },
         )
 
         val couts = coutsParAnnee(ligne, tarifs)
@@ -245,6 +246,7 @@ class PariteReferenceTest {
         is Anomalie.Lacune -> "lacune"
         is Anomalie.IndexFige -> "index_fige"
         is Anomalie.Surconsommation -> if (a.faceAuClimat) "surconsommation_climat" else "surconsommation"
+        is Anomalie.ReleveDouteux -> error("absent de la référence")
     }
 
     // -- comparaisons ---------------------------------------------------------

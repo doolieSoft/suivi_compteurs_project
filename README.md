@@ -70,6 +70,8 @@ first.
 - several houses, meter replacement, tariffs, events (building work…);
 - heat cost allocators: one line per radiator with its factor, annual resets
   included;
+- prepaid meters: read the balance, note your purchases;
+- points to check, including readings that were probably mistyped;
 - Excel import and export, which doubles as a backup (Google Drive included);
 - reading reminders;
 - French, English and Dutch; your choice of currency.
@@ -151,6 +153,13 @@ year. For each reading, the app adds up the weighted difference for each radiato
 (`Repartiteurs.kt`). That total never goes down, so charts, forecasts and the
 weather adjustment treat it like any other meter. It stays a relative figure: no
 kWh and no cost, since the bill depends on the whole building.
+
+### Prepaid meters
+
+These show a balance that goes down and rises with each purchase. The app works
+out usage as `previous balance + purchases since − current balance` and keeps a
+running total (`Prepaye.kt`) that any other meter would give. Each paid purchase
+sets the price per kWh until the next one.
 
 ### Degree days
 

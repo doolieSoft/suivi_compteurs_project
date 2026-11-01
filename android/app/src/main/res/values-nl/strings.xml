@@ -5,6 +5,7 @@
     <!-- Startscherm -->
     <string name="index_avec_unite">%1$s %2$s</string>
     <string name="aucun_index">Geen meterstand</string>
+    <string name="solde_restant">Nog %1$s %2$s</string>
     <string name="releve_du">opgenomen op %1$s</string>
     <string name="reglages">Instellingen</string>
     <string name="consulter">Geschiedenis en voorspellingen bekijken</string>
@@ -102,6 +103,7 @@
         <item quantity="one">stand onveranderd gedurende %1$d dag, waarschijnlijk een ontbrekende meterstand</item>
         <item quantity="other">stand onveranderd gedurende %1$d dagen, waarschijnlijk een ontbrekende meterstand</item>
     </plurals>
+    <string name="anomalie_releve_douteux">stand van %1$s controleren: %2$s %6$s verbruikt ervoor (ongeveer %3$s verwacht), daarna %4$s %6$s (ongeveer %5$s verwacht)</string>
     <string name="anomalie_surconso_climat">%1$s %2$s in %3$d dagen, %4$s× wat het weer liet verwachten</string>
     <string name="anomalie_surconso">%1$s %2$s in %3$d dagen, %4$s× het gebruikelijke verbruik</string>
     <string name="energie_eau">Water</string>

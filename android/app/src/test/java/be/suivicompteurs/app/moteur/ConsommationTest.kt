@@ -167,6 +167,7 @@ class ThermosensibiliteTest {
 
 class AnomaliesTest {
     private val djs = Fabrique.climat(date("2023-01-01"), date("2024-12-31"))
+    private val conso = djs.mapValues { BASE_VRAIE + K_VRAI * it.value }
 
     @Test
     fun `un index fige longtemps est signale`() {
@@ -186,6 +187,40 @@ class AnomaliesTest {
         )
         val anomalies = detecterAnomalies(lignes(listOf(compteur), djs).single())
         assertTrue(anomalies.none { it is Anomalie.IndexFige })
+    }
+
+    /** Un relevé par mois, celui de décembre faussé de [erreur]. */
+    private fun ligneAvecErreur(erreur: Double): Ligne {
+        val mensuelles = Fabrique.datesTousLes(date("2023-01-01"), date("2024-12-31"), 30)
+        val releves = Fabrique.releves(conso, mensuelles).toMutableList()
+        releves[12] = releves[12].copy(index = releves[12].index + erreur)
+        return lignes(listOf(Fabrique.compteur(Energie.GAZ, releves)), djs).single()
+    }
+
+    @Test
+    fun `un index faux reste entre ses voisins mais il est signale`() {
+        val ligne = ligneAvecErreur(150.0)
+        val point = detecterAnomalies(ligne).filterIsInstance<Anomalie.ReleveDouteux>().single()
+        assertEquals(ligne.compteurs.single().releves[12].date, point.date)
+        assertTrue(point.volumeAvant > point.attenduAvant)
+        assertTrue(point.volumeApres < point.attenduApres)
+        assertEquals(Niveau.ALERTE, point.niveau)
+    }
+
+    @Test
+    fun `des releves justes ne sont pas douteux`() {
+        assertTrue(detecterAnomalies(ligneAvecErreur(0.0)).none { it is Anomalie.ReleveDouteux })
+    }
+
+    @Test
+    fun `un ecart sans rattrapage n est pas un releve douteux`() {
+        val mensuelles = Fabrique.datesTousLes(date("2023-01-01"), date("2024-12-31"), 30)
+        val releves = Fabrique.releves(conso, mensuelles).mapIndexed { i, r ->
+            // À partir de décembre, le compteur a pris 150 m³ d'avance pour de bon.
+            if (i >= 12) r.copy(index = r.index + 150.0) else r
+        }
+        val ligne = lignes(listOf(Fabrique.compteur(Energie.GAZ, releves)), djs).single()
+        assertTrue(detecterAnomalies(ligne).none { it is Anomalie.ReleveDouteux })
     }
 
     @Test

@@ -86,6 +86,15 @@ class Textes(private val contexte: Context) {
                 anomalie.nbJours,
                 nombre(anomalie.rapport, 1),
             )
+            is Anomalie.ReleveDouteux -> contexte.getString(
+                R.string.anomalie_releve_douteux,
+                date(anomalie.date),
+                nombre(anomalie.volumeAvant, 0),
+                nombre(anomalie.attenduAvant, 0),
+                nombre(anomalie.volumeApres, 0),
+                nombre(anomalie.attenduApres, 0),
+                anomalie.unite,
+            )
         }
         return contexte.getString(R.string.anomalie_avec_periode, periode, texte)
     }

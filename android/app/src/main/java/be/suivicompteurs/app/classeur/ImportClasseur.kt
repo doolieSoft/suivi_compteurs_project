@@ -1,5 +1,6 @@
 package be.suivicompteurs.app.classeur
 
+import be.suivicompteurs.app.donnees.AchatLocal
 import be.suivicompteurs.app.donnees.CompteurHistorique
 import be.suivicompteurs.app.donnees.CompteurLocal
 import be.suivicompteurs.app.donnees.DegreJourLocal
@@ -12,12 +13,15 @@ import be.suivicompteurs.app.donnees.ReleveHistorique
 import be.suivicompteurs.app.donnees.ReleveRadiateur
 import be.suivicompteurs.app.donnees.StationLocale
 import be.suivicompteurs.app.donnees.TarifLocal
+import be.suivicompteurs.app.donnees.pourMoteur
 import be.suivicompteurs.app.moteur.Compteur
 import be.suivicompteurs.app.moteur.DegresJours
 import be.suivicompteurs.app.moteur.Energie
 import be.suivicompteurs.app.moteur.Plage
 import be.suivicompteurs.app.moteur.Releve
+import be.suivicompteurs.app.moteur.SoldeReleve
 import be.suivicompteurs.app.moteur.periodes
+import be.suivicompteurs.app.moteur.soldeEstime
 import java.time.LocalDate
 import kotlin.math.max
 import kotlin.math.round
@@ -46,10 +50,13 @@ object ImportClasseur {
     private const val FEUILLE_EVENEMENTS = "Événements"
     private const val FEUILLE_RADIATEURS = "Radiateurs"
     private const val FEUILLE_RELEVES_RADIATEURS = "Relevés radiateurs"
+    private const val FEUILLE_ACHATS = "Achats"
+    private const val FEUILLE_SOLDES = "Soldes"
     private const val FEUILLE_POINTS_VERIFIES = "Points vérifiés"
     private val FEUILLES_TABLEAUX = setOf(
         FEUILLE_MAISONS, FEUILLE_COMPTEURS, FEUILLE_TARIFS, FEUILLE_DJ, FEUILLE_EVENEMENTS,
-        FEUILLE_POINTS_VERIFIES, FEUILLE_RADIATEURS, FEUILLE_RELEVES_RADIATEURS, "Par année",
+        FEUILLE_POINTS_VERIFIES, FEUILLE_RADIATEURS, FEUILLE_RELEVES_RADIATEURS,
+        FEUILLE_ACHATS, FEUILLE_SOLDES, "Par année",
     )
 
     /** Libellés des sources de relevé, tels que le serveur les écrit. */
@@ -127,6 +134,7 @@ object ImportClasseur {
                     numero = enTexte(l["Numéro"]),
                     coefKwh = enNombre(l["Coefficient kWh"]) ?: 1.0,
                     dateDepose = enDate(l["Déposé le"])?.toString(),
+                    prepaye = enTexte(l["Prépayé"]).lowercase() == "oui",
                 ),
                 depose = enDate(l["Déposé le"]) != null,
                 maison = maison,
@@ -250,6 +258,32 @@ object ImportClasseur {
             }
         }.orEmpty()
 
+        // --- compteurs prépayés : le solde de chaque relevé, et les achats ------
+        classeur[FEUILLE_SOLDES]?.let { feuille ->
+            for (l in tableau(feuille)) {
+                val fiche = fiches[enTexte(l["Compteur"])] ?: continue
+                val jour = enDate(l["Date"]) ?: continue
+                val cle = fiche.historique.id to jour.toString()
+                releves[cle] = releves[cle]?.copy(solde = enNombre(l["Solde"])) ?: continue
+            }
+        }
+        val achats = classeur[FEUILLE_ACHATS]?.let { feuille ->
+            tableau(feuille).mapIndexedNotNull { rang, l ->
+                val fiche = fiches[enTexte(l["Compteur"])] ?: return@mapIndexedNotNull null
+                val jour = enDate(l["Date"]) ?: return@mapIndexedNotNull null
+                val quantite = enNombre(l["Quantité"]) ?: return@mapIndexedNotNull null
+                AchatLocal(
+                    id = rang + 1L,
+                    compteurId = fiche.historique.id,
+                    date = jour.toString(),
+                    quantite = quantite,
+                    montant = enNombre(l["Prix payé"]),
+                    tarif = enNombre(l["Tarif"]),
+                    apresReleve = enTexte(l["Après le relevé"]).lowercase() == "oui",
+                )
+            }
+        }.orEmpty()
+
         val djs = LinkedHashMap<Pair<Long, String>, DegreJourLocal>()
         classeur[FEUILLE_DJ]?.let { feuille ->
             for (l in tableau(feuille)) {
@@ -272,6 +306,7 @@ object ImportClasseur {
             pointsVerifies = pointsVerifies,
             radiateurs = radiateurs.values.toList(),
             relevesRadiateurs = relevesRadiateurs,
+            achats = achats,
         )
         return ResultatImport(historique, compteursASaisir(historique), historique.releves.size)
     }
@@ -377,6 +412,11 @@ object ImportClasseur {
                 decimales = if (energie == Energie.ELECTRICITE) 1 else 3,
                 dernierIndex = siens.lastOrNull()?.index,
                 dernierReleve = siens.lastOrNull()?.date,
+                prepaye = c.prepaye,
+                solde = if (!c.prepaye) null else soldeEstime(
+                    siens.mapNotNull { r -> r.solde?.let { SoldeReleve(LocalDate.parse(r.date), it) } },
+                    historique.achats.filter { it.compteurId == c.id }.map { it.pourMoteur() },
+                ),
                 consoJournaliereMax = round(max(debits.maxOrNull() ?: 1.0, 1.0) * 1000) / 1000,
                 plage = c.plage,
                 nomCompteur = c.libelle,

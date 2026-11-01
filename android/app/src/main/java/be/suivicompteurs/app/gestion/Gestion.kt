@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.withTransaction
 import be.suivicompteurs.app.R
 import be.suivicompteurs.app.classeur.ImportClasseur
+import be.suivicompteurs.app.donnees.AchatLocal
 import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.CompteurHistorique
 import be.suivicompteurs.app.donnees.EvenementLocal
@@ -14,10 +15,13 @@ import be.suivicompteurs.app.donnees.ReleveHistorique
 import be.suivicompteurs.app.donnees.ReleveRadiateur
 import be.suivicompteurs.app.donnees.StationLocale
 import be.suivicompteurs.app.donnees.TarifLocal
+import be.suivicompteurs.app.donnees.pourMoteur
 import be.suivicompteurs.app.moteur.ChiffreRadiateur
 import be.suivicompteurs.app.moteur.DegresJours
 import be.suivicompteurs.app.moteur.Radiateur
+import be.suivicompteurs.app.moteur.SoldeReleve
 import be.suivicompteurs.app.moteur.indexCumules
+import be.suivicompteurs.app.moteur.indexPrepayes
 import java.time.LocalDate
 import kotlin.math.abs
 
@@ -63,6 +67,7 @@ class Gestion(contexte: Context) {
     suspend fun evenements(maisonId: Long) = dao.evenementsDe(maisonId)
     suspend fun radiateurs(compteurId: Long) = dao.radiateursDe(compteurId)
     suspend fun chiffresRadiateurs(compteurId: Long) = dao.relevesRadiateursDe(compteurId)
+    suspend fun achats(compteurId: Long) = dao.achatsDe(compteurId)
 
     // --- maisons ------------------------------------------------------------
 
@@ -226,18 +231,55 @@ class Gestion(contexte: Context) {
         rafraichirSaisie()
     }
 
-    /** Sans chiffres de radiateurs, comme pour tout autre compteur, rien ne change. */
+    // --- compteurs prépayés -------------------------------------------------
+
+    suspend fun enregistrerAchat(achat: AchatLocal) {
+        base.withTransaction {
+            val id = if (achat.id == 0L) dao.prochainAchat() else achat.id
+            dao.enregistrerAchat(achat.copy(id = id))
+            recalculerIndex(achat.compteurId)
+        }
+        rafraichirSaisie()
+    }
+
+    suspend fun supprimerAchat(achat: AchatLocal) {
+        base.withTransaction {
+            dao.supprimerAchat(achat.id)
+            recalculerIndex(achat.compteurId)
+        }
+        rafraichirSaisie()
+    }
+
+    /** L'index de [releve] est ignoré : il se déduit des soldes et des achats. */
+    suspend fun enregistrerReleveSolde(releve: ReleveHistorique, dateAvant: String?) {
+        val compteurId = releve.compteurId
+        if (dao.relevesDe(compteurId).any { it.date == releve.date && it.date != dateAvant }) {
+            throw Refus(Motif.DATE_DEJA_RELEVEE, releve.date)
+        }
+        base.withTransaction {
+            dateAvant?.let { dao.supprimerReleve(compteurId, it) }
+            dao.enregistrerReleve(releve)
+            recalculerIndex(compteurId)
+        }
+        rafraichirSaisie()
+    }
+
+    /** Sans radiateurs ni solde, comme pour tout compteur ordinaire, rien ne change. */
     private suspend fun recalculerIndex(compteurId: Long) {
-        val cumuls = indexCumules(
+        val releves = dao.relevesDe(compteurId)
+        val cumuls = if (dao.compteur(compteurId)?.prepaye == true) {
+            indexPrepayes(
+                releves.mapNotNull { r -> r.solde?.let { SoldeReleve(LocalDate.parse(r.date), it) } },
+                dao.achatsDe(compteurId).map { it.pourMoteur() },
+            )
+        } else indexCumules(
             dao.radiateursDe(compteurId).map { Radiateur(it.id, it.coefficient) },
             dao.relevesRadiateursDe(compteurId).map {
                 ChiffreRadiateur(it.radiateurId, LocalDate.parse(it.date), it.unites)
             },
         )
         dao.enregistrerReleves(
-            dao.relevesDe(compteurId).mapNotNull { r ->
-                cumuls[LocalDate.parse(r.date)]?.let { r.copy(index = it) }
-            }
+            releves.mapNotNull { r -> cumuls[LocalDate.parse(r.date)]?.let { r.copy(index = it) } }
         )
     }
 

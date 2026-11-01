@@ -104,4 +104,20 @@
     <string name="corriger">Corrigeren</string>
     <string name="retirer">Verwijderen</string>
     <string name="supprimer_releve_confirmation">Deze stand verwijderen?</string>
+    <string name="compteur_prepaye">Prepaidmeter: je koopt vooraf kWh en hij telt af</string>
+    <string name="achats_titre">Aankopen (%1$d)</string>
+    <string name="achat">Aankoop</string>
+    <string name="achat_quantite">Gekochte kWh</string>
+    <string name="achat_montant">Betaald bedrag, inclusief belasting (%1$s, optioneel)</string>
+    <string name="achat_tarif">Prijs per kWh (%1$s, optioneel)</string>
+    <string name="achat_apres_releve">Gekocht na de stand van die dag</string>
+    <string name="achat_ajouter">Aankoop toevoegen</string>
+    <string name="solde_lu">Saldo op de meter (kWh)</string>
+    <string name="solde_precedent">Vorig saldo: %1$s kWh</string>
+    <string name="achats_periode">Sindsdien gekocht: %1$s kWh</string>
+    <string name="solde_conso_periode">Verbruikt sinds de vorige stand: %1$s kWh</string>
+    <string name="solde_premier_releve">Eerste stand: dit is het vertrekpunt.</string>
+    <string name="achat_oublie_titre">Een aankoop vergeten?</string>
+    <string name="achat_oublie_question">Het saldo ligt %1$s kWh hoger dan verwacht. Heb je elektriciteit gekocht?</string>
+    <string name="achat_oublie_oui">Aankoop toevoegen</string>
 </resources>

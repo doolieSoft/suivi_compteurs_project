@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -50,6 +51,10 @@ class GestionActivity : AppCompatActivity() {
         super.onCreate(etat)
         val gestion = Gestion(this)
         val relever = intent.getLongExtra(RELEVE_RADIATEURS, 0L)
+        val releverSolde = intent.getLongExtra(RELEVE_SOLDE, 0L)
+        val depuisAccueil = relever != 0L || releverSolde != 0L
+        // Venu de l'accueil, on y retourne.
+        fun retour(nav: NavHostController): () -> Unit = { if (depuisAccueil) finish() else nav.popBackStack() }
         setContent {
             Theme {
                 val nav = rememberNavController()
@@ -88,6 +93,9 @@ class GestionActivity : AppCompatActivity() {
                             surReleveRadiateurs = { compteur, date ->
                                 nav.navigate("releve_radiateurs/$compteur" + date?.let { "?date=$it" }.orEmpty())
                             },
+                            surReleveSolde = { compteur, date ->
+                                nav.navigate("releve_solde/$compteur" + date?.let { "?date=$it" }.orEmpty())
+                            },
                         )
                     }
                     composable(
@@ -98,15 +106,28 @@ class GestionActivity : AppCompatActivity() {
                         ),
                     ) { entree ->
                         val compteur = entree.arguments!!.getLong("id")
-                        // Venu de l'accueil, on y retourne.
-                        val retour = { if (relever != 0L) finish() else nav.popBackStack() ; Unit }
-                        BackHandler(onBack = retour)
+                        BackHandler(onBack = retour(nav))
                         EcranReleveRadiateurs(
                             gestion,
                             compteurId = compteur,
                             dateInitiale = entree.arguments!!.getString("date"),
-                            surRetour = retour,
+                            surRetour = retour(nav),
                             surCompteur = { nav.navigate("compteur/$compteur") },
+                        )
+                    }
+                    composable(
+                        "releve_solde/{id}?date={date}",
+                        arguments = listOf(
+                            navArgument("id") { type = NavType.LongType },
+                            navArgument("date") { type = NavType.StringType; nullable = true; defaultValue = null },
+                        ),
+                    ) { entree ->
+                        BackHandler(onBack = retour(nav))
+                        EcranReleveSolde(
+                            gestion,
+                            compteurId = entree.arguments!!.getLong("id"),
+                            dateInitiale = entree.arguments!!.getString("date"),
+                            surRetour = retour(nav),
                         )
                     }
                 }
@@ -115,8 +136,10 @@ class GestionActivity : AppCompatActivity() {
                 if (etat == null && intent.getBooleanExtra(NOUVELLE_MAISON, false)) {
                     androidx.compose.runtime.LaunchedEffect(Unit) { nav.navigate("maison/0") }
                 }
-                if (etat == null && relever != 0L) {
-                    androidx.compose.runtime.LaunchedEffect(Unit) { nav.navigate("releve_radiateurs/$relever") }
+                if (etat == null && depuisAccueil) {
+                    androidx.compose.runtime.LaunchedEffect(Unit) {
+                        nav.navigate(if (relever != 0L) "releve_radiateurs/$relever" else "releve_solde/$releverSolde")
+                    }
                 }
             }
         }
@@ -127,6 +150,9 @@ class GestionActivity : AppCompatActivity() {
 
         /** Compteur de type répartiteur dont ouvrir le relevé, depuis l'accueil. */
         const val RELEVE_RADIATEURS = "releveRadiateurs"
+
+        /** Compteur prépayé dont ouvrir le relevé, depuis l'accueil. */
+        const val RELEVE_SOLDE = "releveSolde"
     }
 }
 

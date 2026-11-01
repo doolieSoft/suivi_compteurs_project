@@ -12,6 +12,7 @@ val Anomalie.genre: String
         is Anomalie.Lacune -> "lacune"
         is Anomalie.IndexFige -> "index_fige"
         is Anomalie.Surconsommation -> "surconsommation"
+        is Anomalie.ReleveDouteux -> "releve_douteux"
     }
 
 /**

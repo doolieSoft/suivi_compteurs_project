@@ -41,6 +41,9 @@ data class CompteurLocal(
     @ColumnInfo(defaultValue = "UNIQUE") val plage: String = "UNIQUE",
     /** Libellé propre au compteur (« compteur 2 »), vide le plus souvent. */
     @ColumnInfo(defaultValue = "") val nomCompteur: String = "",
+    @ColumnInfo(defaultValue = "0") val prepaye: Boolean = false,
+    /** Compteur prépayé : dernier solde lu, plus ce qui a été acheté depuis. */
+    val solde: Double? = null,
 )
 
 /** « Ma maison – Gaz – (compteur 2) », l'énergie et la plage dans la langue de l'interface. */

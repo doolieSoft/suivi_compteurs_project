@@ -67,6 +67,8 @@ désinstaller, donc d'exporter ses données en Excel avant.
 - plusieurs maisons, remplacement de compteurs, tarifs, événements (travaux…) ;
 - répartiteurs de frais de chauffage : une ligne par radiateur avec son
   coefficient, remises à zéro annuelles comprises ;
+- compteurs prépayés : relevé du solde et suivi des achats ;
+- points à vérifier, dont les relevés sans doute mal saisis ;
 - import et export Excel, qui tient lieu de sauvegarde (Google Drive compris) ;
 - rappels de relevé ;
 - français, anglais, néerlandais ; devise au choix.
@@ -152,6 +154,13 @@ est le nouveau chiffre) et tient un cumul (`Repartiteurs.kt`). Ce cumul ne recul
 jamais : courbes, prévisions et correction climatique le traitent comme n'importe
 quel compteur. Il reste une valeur relative, sans kWh ni coût, puisque la facture
 dépend de tout l'immeuble.
+
+### Les compteurs prépayés
+
+Ils affichent un solde qui descend et remonte à chaque achat. L'application en
+déduit `consommation = solde précédent + achats depuis − solde actuel` et tient
+un cumul (`Prepaye.kt`) semblable à l'index de tout autre compteur. Chaque achat
+payé fixe le prix du kWh jusqu'à l'achat suivant.
 
 ### Les degrés-jours
 
