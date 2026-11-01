@@ -4,6 +4,7 @@ READINGS IN SECONDS
 • Photograph the meter: the reading is recognised automatically, on the phone, offline (not in the F-Droid version).
 • The app checks the reading: a meter never goes backwards, and a serial number is not mistaken for a reading.
 • Reading reminders, as often as you like.
+• After each reading: what it changes in the forecast, and your use compared with what the weather suggested.
 
 FORECAST YOUR YEAR
 • Forecast of your consumption up to your next annual reading, or to 31 December.

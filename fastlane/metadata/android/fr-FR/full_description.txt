@@ -4,6 +4,7 @@ RELEVER EN QUELQUES SECONDES
 • Photographiez le compteur : l'index est lu automatiquement, sur le téléphone, sans réseau (pas dans la version F-Droid).
 • L'application vérifie la lecture : un compteur ne recule pas, et un numéro de série n'est pas pris pour un index.
 • Rappels de relevé, au rythme que vous choisissez.
+• Après chaque relevé : ce qu'il change à la prévision, et votre consommation face à ce que le climat laissait attendre.
 
 PRÉVOIR VOTRE ANNÉE
 • Prévision de la consommation jusqu'au prochain relevé annuel, ou jusqu'au 31 décembre.

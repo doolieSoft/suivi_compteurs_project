@@ -28,6 +28,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import be.suivicompteurs.app.Monnaie
 import be.suivicompteurs.app.R
+import be.suivicompteurs.app.analyse.Analyse
+import be.suivicompteurs.app.analyse.Textes
 import be.suivicompteurs.app.donnees.AchatLocal
 import be.suivicompteurs.app.donnees.ReleveHistorique
 import be.suivicompteurs.app.donnees.pourMoteur
@@ -108,6 +110,8 @@ fun EcranReleveSolde(
     surRetour: () -> Unit,
 ) {
     val portee = rememberCoroutineScope()
+    val contexte = LocalContext.current
+    var impact by remember { mutableStateOf<String?>(null) }
     var charge by remember { mutableStateOf(false) }
     var releves by remember { mutableStateOf<List<ReleveHistorique>>(emptyList()) }
     var achats by remember { mutableStateOf<List<AchatLocal>>(emptyList()) }
@@ -143,6 +147,7 @@ fun EcranReleveSolde(
     val lu = lireNombre(solde)?.takeIf { it >= 0 }
 
     fun enregistrer() = portee.launch {
+        val cible = date ?: return@launch
         try {
             gestion.enregistrerReleveSolde(
                 (origine ?: ReleveHistorique(compteurId, date!!, 0.0, false)).copy(
@@ -150,11 +155,16 @@ fun EcranReleveSolde(
                 ),
                 dateInitiale,
             )
-            surRetour()
+            impact = dateInitiale.takeIf { it == null }?.let {
+                runCatching { Analyse(contexte).impactReleve(compteurId, LocalDate.parse(cible)) }.getOrNull()
+            }?.let { Textes(contexte).impact(it) }
+            if (impact == null) surRetour()
         } catch (e: Refus) {
             refus = e
         }
     }
+
+    impact?.let { DialogueImpact(it, surRetour) }
 
     Cadre(
         titre = stringResource(R.string.releve),

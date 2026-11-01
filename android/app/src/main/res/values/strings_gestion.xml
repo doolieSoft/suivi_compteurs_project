@@ -132,4 +132,7 @@
     <string name="livraison_oubliee_titre">A delivery missing?</string>
     <string name="livraison_oubliee_question">The level is %1$s %2$s higher than expected. Was there a delivery?</string>
     <string name="livraison_oubliee_oui">Add the delivery</string>
+    <string name="tour_complet_titre">Has the meter gone round?</string>
+    <string name="tour_complet_question">This reading (%1$s) is lower than the previous one (%2$s). If the meter passed its maximum and restarted from zero, you used %3$s %4$s.</string>
+    <string name="tour_complet_oui">Yes, it went round</string>
 </resources>

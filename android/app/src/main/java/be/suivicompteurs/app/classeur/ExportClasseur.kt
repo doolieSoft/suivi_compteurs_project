@@ -85,7 +85,8 @@ object ExportClasseur {
                     val n = f.prochaineLigne
                     val p = n - 1
                     val calculs = if (n > premiere) listOf(
-                        Cellule(Formule("B$n-B$p"), Format.DECIMALES_3),
+                        // Après un tour complet, l'index repart de zéro : l'écart compte le maximum.
+                        Cellule(Formule("B$n-B$p" + (if (r.tourComplet > 0) "+${r.tourComplet}" else "")), Format.DECIMALES_3),
                         Cellule(Formule("A$n-A$p"), Format.DECIMALES_0),
                         Cellule(Formule("IF(D$n>0,C$n/D$n,\"\")"), Format.DECIMALES_3),
                         Cellule(Formule("IF(D$n>0,E$n*365,\"\")"), Format.DECIMALES_0),
@@ -122,7 +123,7 @@ object ExportClasseur {
                     plage = Plage.depuisCode(c.plage),
                     unite = c.unite,
                     datePose = c.datePose?.let(LocalDate::parse),
-                    releves = relevesDe[c.id].orEmpty().map { Releve(LocalDate.parse(it.date), it.index, it.annuel) },
+                    releves = relevesDe[c.id].orEmpty().map { Releve(LocalDate.parse(it.date), it.index, it.annuel, it.tourComplet) },
                 )
             }
             for (ligne in lignes(moteur, djs)) {
@@ -218,6 +219,14 @@ object ExportClasseur {
                     )
                 },
                 largeurs = listOf(34, 12, 12, 12, 12, 16),
+            )
+        }
+        h.releves.filter { it.tourComplet > 0 }.takeIf { it.isNotEmpty() }?.let { tours ->
+            tableau(
+                x, "Tours complets",
+                listOf("Compteur", "Date", "Maximum"),
+                tours.map { r -> listOf(Cellule(codesCompteurs[r.compteurId]), date(r.date), Cellule(r.tourComplet)) },
+                largeurs = listOf(34, 12, 12),
             )
         }
         tableau(

@@ -3,6 +3,7 @@ package be.suivicompteurs.app.analyse
 import android.content.Context
 import be.suivicompteurs.app.R
 import be.suivicompteurs.app.moteur.Anomalie
+import be.suivicompteurs.app.moteur.ImpactReleve
 import be.suivicompteurs.app.moteur.Energie
 import be.suivicompteurs.app.moteur.Ligne
 import be.suivicompteurs.app.moteur.Methode
@@ -68,6 +69,36 @@ class Textes(private val contexte: Context) {
         )
         Methode.Prorata -> contexte.getString(R.string.methode_prorata)
         Methode.Aucune -> contexte.getString(R.string.methode_aucune)
+    }
+
+    /** En dessous de ces écarts, autant dire que rien n'a bougé. */
+    private val seuilPrevision = 0.01
+    private val seuilAttendu = 0.03
+
+    fun impact(i: ImpactReleve): String {
+        val ecart = i.previsionApres - i.previsionAvant
+        val prevision = when {
+            i.previsionAvant <= 0 || abs(ecart) < i.previsionAvant * seuilPrevision ->
+                contexte.getString(R.string.impact_prevision_stable, nombre(i.previsionApres), i.unite)
+            else -> contexte.getString(
+                R.string.impact_prevision,
+                nombre(i.previsionAvant), nombre(i.previsionApres), i.unite,
+                (if (ecart > 0) "+" else "−") + nombre(abs(ecart)),
+            )
+        }
+        val volume = nombre(i.volume, if (i.volume < 100) 1 else 0)
+        val rythme = when (val attendu = i.attendu) {
+            null -> contexte.getString(R.string.impact_periode, volume, i.unite, i.nbJours)
+            else -> {
+                val part = (i.volume - attendu) / attendu
+                when {
+                    abs(part) < seuilAttendu -> contexte.getString(R.string.impact_comme_attendu, volume, i.unite, i.nbJours)
+                    part < 0 -> contexte.getString(R.string.impact_moins_attendu, volume, i.unite, i.nbJours, nombre(-part * 100))
+                    else -> contexte.getString(R.string.impact_plus_attendu, volume, i.unite, i.nbJours, nombre(part * 100))
+                }
+            }
+        }
+        return prevision + "\n\n" + rythme
     }
 
     fun anomalie(anomalie: Anomalie): String {

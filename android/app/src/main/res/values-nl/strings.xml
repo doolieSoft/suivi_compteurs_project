@@ -166,4 +166,11 @@
     <string name="reglages_enregistres_rappel">Instellingen opgeslagen. Volgende herinnering op %1$s.</string>
     <string name="estime_avant_premier_releve">waarvan %1$s %2$s geschat over de %3$d dagen vóór je eerste meterstand</string>
     <string name="menu">Menu</string>
+    <string name="impact_prevision">Prognose: %1$s → %2$s %3$s (%4$s)</string>
+    <string name="impact_prevision_stable">Prognose: %1$s %2$s, ongewijzigd</string>
+    <string name="impact_periode">%1$s %2$s in %3$d dagen</string>
+    <string name="impact_comme_attendu">%1$s %2$s in %3$d dagen, zoals verwacht voor dit weer</string>
+    <string name="impact_moins_attendu">%1$s %2$s in %3$d dagen, %4$s%% minder dan verwacht voor dit weer</string>
+    <string name="impact_plus_attendu">%1$s %2$s in %3$d dagen, %4$s%% meer dan verwacht voor dit weer</string>
+    <string name="ouvrir_reglages">Instellingen openen</string>
 </resources>

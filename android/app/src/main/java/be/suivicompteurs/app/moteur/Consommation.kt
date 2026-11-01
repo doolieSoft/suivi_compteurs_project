@@ -2,8 +2,10 @@ package be.suivicompteurs.app.moteur
 
 import java.time.LocalDate
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
 
 /*
  * Calcul des consommations à partir des relevés d'index.
@@ -54,6 +56,20 @@ data class Periode(
     val jours: Sequence<LocalDate> get() = jours(debut.plusDays(1), fin)
 }
 
+/** Après un tour, la consommation ne dépasse pas cette part du maximum. */
+const val PART_TOUR_COMPLET = 0.1
+
+/**
+ * Maximum d'un compteur qui aurait fait un tour complet entre [precedent] et
+ * [actuel] : celui du nombre de chiffres de [precedent] (99 870 → 100 000).
+ * Absent si le saut ne s'explique pas ainsi : c'est alors une faute de frappe.
+ */
+fun maximumApresTour(precedent: Double, actuel: Double): Double? {
+    if (actuel >= precedent || precedent < 1) return null
+    val maximum = 10.0.pow(floor(precedent).toLong().toString().length)
+    return maximum.takeIf { it - precedent + actuel <= PART_TOUR_COMPLET * it }
+}
+
 /**
  * Périodes de consommation d'une ligne de compteurs.
  *
@@ -67,7 +83,7 @@ fun periodes(compteurs: List<Compteur>, jusqua: LocalDate? = null): List<Periode
             .filter { jusqua == null || it.date <= jusqua }
             .sortedBy { it.date }
         for ((avant, apres) in releves.zipWithNext()) {
-            val volume = apres.index - avant.index
+            val volume = apres.index + apres.tourComplet - avant.index
             // Index en recul : compteur remis à zéro ou saisie erronée.
             if (apres.date <= avant.date || volume < 0) continue
             resultat += Periode(compteur, avant.date, apres.date, volume)

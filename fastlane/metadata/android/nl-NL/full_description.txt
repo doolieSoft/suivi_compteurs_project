@@ -4,6 +4,7 @@ AFLEZEN IN ENKELE SECONDEN
 • Fotografeer de meter: de stand wordt automatisch gelezen, op de telefoon, zonder netwerk (niet in de F-Droid-versie).
 • De app controleert de lezing: een meter loopt nooit terug, en een serienummer wordt niet voor een meterstand aangezien.
 • Herinneringen om af te lezen, zo vaak als je wilt.
+• Na elke stand: wat die aan de prognose verandert, en je verbruik tegenover wat het weer deed verwachten.
 
 VOORSPEL JE JAAR
 • Voorspelling van je verbruik tot de volgende jaarlijkse meterstand, of tot 31 december.

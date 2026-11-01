@@ -23,9 +23,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import be.suivicompteurs.app.R
+import be.suivicompteurs.app.analyse.Analyse
+import be.suivicompteurs.app.analyse.Textes
 import be.suivicompteurs.app.donnees.RadiateurLocal
 import be.suivicompteurs.app.donnees.ReleveHistorique
 import be.suivicompteurs.app.donnees.ReleveRadiateur
@@ -87,6 +90,8 @@ fun EcranReleveRadiateurs(
     surCompteur: () -> Unit,
 ) {
     val portee = rememberCoroutineScope()
+    val contexte = LocalContext.current
+    var impact by remember { mutableStateOf<String?>(null) }
     var charge by remember { mutableStateOf(false) }
     var radiateurs by remember { mutableStateOf<List<RadiateurLocal>>(emptyList()) }
     var historique by remember { mutableStateOf<List<ReleveRadiateur>>(emptyList()) }
@@ -128,11 +133,16 @@ fun EcranReleveRadiateurs(
                 actuels,
                 dateInitiale,
             )
-            surRetour()
+            impact = dateInitiale.takeIf { it == null }?.let {
+                runCatching { Analyse(contexte).impactReleve(compteurId, LocalDate.parse(cible)) }.getOrNull()
+            }?.let { Textes(contexte).impact(it) }
+            if (impact == null) surRetour()
         } catch (e: Refus) {
             refus = e
         }
     }
+
+    impact?.let { DialogueImpact(it, surRetour) }
 
     Cadre(
         titre = stringResource(R.string.releve),

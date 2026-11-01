@@ -45,7 +45,7 @@ interface CompteurDao {
         ReleveRadiateur::class,
         AchatLocal::class,
     ],
-    version = 11,
+    version = 12,
     exportSchema = true,
 )
 abstract class BaseLocale : RoomDatabase() {
@@ -227,6 +227,13 @@ abstract class BaseLocale : RoomDatabase() {
             }
         }
 
+        /** Compteurs repassés par zéro après leur maximum. */
+        private val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `historique_releves` ADD COLUMN `tourComplet` REAL NOT NULL DEFAULT 0")
+            }
+        }
+
         @Volatile
         private var instance: BaseLocale? = null
 
@@ -236,7 +243,7 @@ abstract class BaseLocale : RoomDatabase() {
                     contexte.applicationContext,
                     BaseLocale::class.java,
                     "suivi-compteurs.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12).build().also { instance = it }
             }
     }
 }

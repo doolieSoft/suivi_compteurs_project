@@ -60,8 +60,9 @@ first.
 
 - record a meter reading, with automatic recognition from a photo that you
   always confirm;
-- consistency checks: a meter doesn't run backwards, and a date holds only one
-  reading;
+- consistency checks: a meter doesn't run backwards unless it rolled over past its
+  maximum, and a date holds only one reading;
+- after each reading, what it changes in the forecast;
 - forecasts for the year, from one annual reading to the next or by calendar
   year;
 - detail for each energy: running total, monthly consumption, energy signature,

@@ -59,7 +59,9 @@ désinstaller, donc d'exporter ses données en Excel avant.
 
 - relevé d'un compteur, avec lecture automatique de l'index sur la photo,
   toujours soumise à confirmation ;
-- contrôle de cohérence : un index ne recule pas, une date ne porte qu'un relevé ;
+- contrôle de cohérence : un index ne recule pas, sauf tour complet du compteur,
+  et une date ne porte qu'un relevé ;
+- après chaque relevé, ce qu'il change à la prévision ;
 - prévisions de l'année, d'un relevé annuel au suivant ou en année civile ;
 - détail de chaque énergie : cumul, consommation mensuelle, signature
   énergétique, index, années comparées à climat normal, coûts ;

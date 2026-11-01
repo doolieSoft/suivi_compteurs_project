@@ -121,7 +121,7 @@
     <string name="energie_eau">Eau</string>
     <string name="energie_gaz">Gaz</string>
     <string name="energie_electricite">Électricité</string>
-    <string name="energie_mazout">Mazout</string>
+    <string name="energie_mazout">Mazout / fioul</string>
     <string name="energie_repartiteur">Répartiteurs de chauffage</string>
     <string name="plage_haute">heures pleines</string>
     <string name="plage_basse">heures creuses</string>
@@ -173,4 +173,11 @@
     <string name="reglages_enregistres_rappel">Réglages enregistrés. Prochain rappel le %1$s.</string>
     <string name="estime_avant_premier_releve">dont %1$s %2$s estimés sur les %3$d jours d\'avant votre premier relevé</string>
     <string name="menu">Menu</string>
+    <string name="impact_prevision">Prévision : %1$s → %2$s %3$s (%4$s)</string>
+    <string name="impact_prevision_stable">Prévision : %1$s %2$s, inchangée</string>
+    <string name="impact_periode">%1$s %2$s en %3$d jours</string>
+    <string name="impact_comme_attendu">%1$s %2$s en %3$d jours, comme attendu pour ce climat</string>
+    <string name="impact_moins_attendu">%1$s %2$s en %3$d jours, %4$s %% de moins qu\'attendu pour ce climat</string>
+    <string name="impact_plus_attendu">%1$s %2$s en %3$d jours, %4$s %% de plus qu\'attendu pour ce climat</string>
+    <string name="ouvrir_reglages">Ouvrir les réglages</string>
 </resources>

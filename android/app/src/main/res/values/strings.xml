@@ -168,4 +168,11 @@
     <string name="reglages_enregistres_rappel">Settings saved. Next reminder on %1$s.</string>
     <string name="estime_avant_premier_releve">of which %1$s %2$s estimated over the %3$d days before your first reading</string>
     <string name="menu">Menu</string>
+    <string name="impact_prevision">Forecast: %1$s → %2$s %3$s (%4$s)</string>
+    <string name="impact_prevision_stable">Forecast: %1$s %2$s, unchanged</string>
+    <string name="impact_periode">%1$s %2$s in %3$d days</string>
+    <string name="impact_comme_attendu">%1$s %2$s in %3$d days, as expected for this weather</string>
+    <string name="impact_moins_attendu">%1$s %2$s in %3$d days, %4$s%% less than expected for this weather</string>
+    <string name="impact_plus_attendu">%1$s %2$s in %3$d days, %4$s%% more than expected for this weather</string>
+    <string name="ouvrir_reglages">Open settings</string>
 </resources>

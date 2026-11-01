@@ -132,4 +132,7 @@
     <string name="livraison_oubliee_titre">Een levering vergeten?</string>
     <string name="livraison_oubliee_question">Het niveau ligt %1$s %2$s hoger dan verwacht. Was er een levering?</string>
     <string name="livraison_oubliee_oui">Levering toevoegen</string>
+    <string name="tour_complet_titre">Is de meter rondgegaan?</string>
+    <string name="tour_complet_question">Deze stand (%1$s) is lager dan de vorige (%2$s). Als de meter zijn maximum voorbij is en opnieuw vanaf nul telt, heb je %3$s %4$s verbruikt.</string>
+    <string name="tour_complet_oui">Ja, rondgegaan</string>
 </resources>

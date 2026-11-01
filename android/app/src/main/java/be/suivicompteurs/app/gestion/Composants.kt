@@ -304,6 +304,17 @@ fun ConfirmerSuppression(message: String, surConfirmation: () -> Unit, surAbando
 @Composable
 fun Espace() = Spacer(Modifier.padding(4.dp))
 
+/** Ce qu'un relevé qui vient d'être saisi a changé à la prévision. */
+@Composable
+fun DialogueImpact(texte: String, surFermeture: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = surFermeture,
+        title = { Text(stringResource(R.string.releve_enregistre)) },
+        text = { Text(texte) },
+        confirmButton = { TextButton(onClick = surFermeture) { Text(stringResource(android.R.string.ok)) } },
+    )
+}
+
 /** Icône d'une énergie, d'après son code. */
 fun iconeEnergie(code: String): Int = when (code) {
     "EAU" -> R.drawable.ic_eau

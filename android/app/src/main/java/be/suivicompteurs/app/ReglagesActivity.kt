@@ -5,10 +5,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.os.LocaleListCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.core.view.ViewCompat
@@ -18,6 +20,9 @@ import be.suivicompteurs.app.rappel.Rappels
 import com.google.android.material.snackbar.Snackbar
 
 /** Rappels de relevé et langue de l'interface. */
+/** Le temps de lire le message et de trouver le bouton. */
+private const val DUREE_MESSAGE_REFUS = 8000
+
 class ReglagesActivity : AppCompatActivity() {
 
     /**
@@ -87,12 +92,24 @@ class ReglagesActivity : AppCompatActivity() {
 
     private val demanderNotifications =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { accorde ->
-            if (!accorde) {
-                vues.interrupteurRappel.isChecked = false
-                Snackbar.make(vues.root, R.string.notifications_refusees, Snackbar.LENGTH_LONG)
-                    .show()
-            }
+            if (!accorde) signalerRefusNotifications()
         }
+
+    /**
+     * Après deux refus, Android n'affiche plus sa question et répond non tout
+     * seul : seuls les réglages du système permettent encore d'autoriser.
+     */
+    private fun signalerRefusNotifications() {
+        vues.interrupteurRappel.isChecked = false
+        Snackbar.make(vues.root, R.string.notifications_refusees, DUREE_MESSAGE_REFUS)
+            .setAction(R.string.ouvrir_reglages) {
+                startActivity(
+                    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                        .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                )
+            }
+            .show()
+    }
 
     override fun onCreate(etat: Bundle?) {
         super.onCreate(etat)
@@ -123,8 +140,12 @@ class ReglagesActivity : AppCompatActivity() {
 
         vues.interrupteurRappel.setOnCheckedChangeListener { _, actif ->
             majVisibiliteRappel()
-            if (actif && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                demanderNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+            if (actif && !NotificationManagerCompat.from(this).areNotificationsEnabled()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    demanderNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    signalerRefusNotifications()
+                }
             }
         }
         vues.boutonEnregistrer.setOnClickListener { enregistrer() }

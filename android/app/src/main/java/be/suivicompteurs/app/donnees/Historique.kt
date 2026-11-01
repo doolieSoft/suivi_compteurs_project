@@ -87,6 +87,8 @@ data class ReleveHistorique(
     val photo: String? = null,
     /** Compteur prépayé : le solde lu, dont [index], cumulé, se déduit. */
     val solde: Double? = null,
+    /** Maximum du compteur s'il l'a dépassé avant ce relevé et repassé par zéro. */
+    @ColumnInfo(defaultValue = "0") val tourComplet: Double = 0.0,
 )
 
 /** Achat d'énergie pour un compteur prépayé. */

@@ -52,11 +52,12 @@ object ImportClasseur {
     private const val FEUILLE_RELEVES_RADIATEURS = "Relevés radiateurs"
     private const val FEUILLE_ACHATS = "Achats"
     private const val FEUILLE_SOLDES = "Soldes"
+    private const val FEUILLE_TOURS = "Tours complets"
     private const val FEUILLE_POINTS_VERIFIES = "Points vérifiés"
     private val FEUILLES_TABLEAUX = setOf(
         FEUILLE_MAISONS, FEUILLE_COMPTEURS, FEUILLE_TARIFS, FEUILLE_DJ, FEUILLE_EVENEMENTS,
         FEUILLE_POINTS_VERIFIES, FEUILLE_RADIATEURS, FEUILLE_RELEVES_RADIATEURS,
-        FEUILLE_ACHATS, FEUILLE_SOLDES, "Par année",
+        FEUILLE_ACHATS, FEUILLE_SOLDES, FEUILLE_TOURS, "Par année",
     )
 
     /** Libellés des sources de relevé, tels que le serveur les écrit. */
@@ -267,6 +268,14 @@ object ImportClasseur {
                 releves[cle] = releves[cle]?.copy(solde = enNombre(l["Solde"])) ?: continue
             }
         }
+        classeur[FEUILLE_TOURS]?.let { feuille ->
+            for (l in tableau(feuille)) {
+                val fiche = fiches[enTexte(l["Compteur"])] ?: continue
+                val jour = enDate(l["Date"]) ?: continue
+                val cle = fiche.historique.id to jour.toString()
+                releves[cle] = releves[cle]?.copy(tourComplet = enNombre(l["Maximum"]) ?: 0.0) ?: continue
+            }
+        }
         val achats = classeur[FEUILLE_ACHATS]?.let { feuille ->
             tableau(feuille).mapIndexedNotNull { rang, l ->
                 val fiche = fiches[enTexte(l["Compteur"])] ?: return@mapIndexedNotNull null
@@ -398,7 +407,7 @@ object ImportClasseur {
             }.joinToString(" – ")
             val moteur = Compteur(
                 id = c.id, energie = energie, plage = plage, unite = c.unite,
-                releves = siens.map { Releve(LocalDate.parse(it.date), it.index) },
+                releves = siens.map { Releve(LocalDate.parse(it.date), it.index, tourComplet = it.tourComplet) },
             )
             // Même calcul que le serveur : sert à borner ce que l'OCR peut proposer.
             val debits = periodes(listOf(moteur)).filter { it.nbJours > 0 && it.volume > 0 }

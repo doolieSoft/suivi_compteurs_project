@@ -5,6 +5,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import kotlin.math.abs
 import org.junit.Test
 import java.time.LocalDate
 
@@ -352,5 +353,41 @@ class PrevisionNouvelUtilisateurTest {
         val reel = conso.filterKeys { it.year == 2025 }.values.sum()
         assertEquals(2025, p.annee)
         assertEquals(reel, p.totalPrevu, reel * 0.05)
+    }
+}
+
+class ImpactReleveTest {
+    private val djs = Fabrique.climat(date("2022-01-01"), date("2024-12-31"))
+    private val conso = djs.mapValues { BASE_VRAIE + K_VRAI * it.value }
+    private val dates = Fabrique.datesTousLes(date("2022-01-01"), date("2024-11-27"), 30)
+
+    private fun ligne(releves: List<Releve>) = lignes(listOf(Fabrique.compteur(Energie.GAZ, releves)), djs).single()
+
+    @Test
+    fun `un releve conforme au climat ne change presque rien`() {
+        val releves = Fabrique.releves(conso, dates)
+        val dernier = releves.last().date
+        val impact = impactDuReleve(ligne(releves), djs, dernier, dernier)!!
+
+        assertTrue(abs(impact.previsionApres - impact.previsionAvant) < impact.previsionAvant * 0.02)
+        assertEquals(30, impact.nbJours)
+        assertEquals(impact.volume, impact.attendu!!, impact.volume * 0.02)
+    }
+
+    @Test
+    fun `une forte consommation releve la prevision`() {
+        val releves = Fabrique.releves(conso, dates).toMutableList()
+        releves[releves.lastIndex] = releves.last().copy(index = releves.last().index + 200.0)
+        val dernier = releves.last().date
+        val impact = impactDuReleve(ligne(releves), djs, dernier, dernier)!!
+
+        assertTrue(impact.previsionApres > impact.previsionAvant)
+        assertTrue(impact.volume > impact.attendu!!)
+    }
+
+    @Test
+    fun `seul le dernier releve a un impact`() {
+        val releves = Fabrique.releves(conso, dates)
+        assertNull(impactDuReleve(ligne(releves), djs, releves[releves.lastIndex - 1].date, releves.last().date))
     }
 }

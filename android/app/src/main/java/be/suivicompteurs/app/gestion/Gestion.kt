@@ -22,11 +22,18 @@ import be.suivicompteurs.app.moteur.Radiateur
 import be.suivicompteurs.app.moteur.SoldeReleve
 import be.suivicompteurs.app.moteur.indexCumules
 import be.suivicompteurs.app.moteur.indexPrepayes
+import be.suivicompteurs.app.moteur.maximumApresTour
 import java.time.LocalDate
 import kotlin.math.abs
 
 /** Refus d'enregistrer, avec un motif à montrer tel quel. */
 class Refus(val motif: Motif, vararg val details: Any) : Exception(motif.name) {
+
+    /** Index précédent, si un tour complet peut expliquer que [index] soit plus bas. */
+    fun precedentAvantTour(index: Double): Double? =
+        (details.getOrNull(1) as? Double)?.takeIf {
+            motif == Motif.INDEX_RECULE && maximumApresTour(it, index) != null
+        }
 
     /** Le motif en clair, dans la langue de l'interface. */
     fun texte(contexte: Context): String {
@@ -163,10 +170,10 @@ class Gestion(contexte: Context) {
         val autres = dao.relevesDe(releve.compteurId).filter { it.date != dateAvant }
         if (autres.any { it.date == releve.date }) throw Refus(Motif.DATE_DEJA_RELEVEE, releve.date)
         autres.filter { it.date < releve.date }.maxByOrNull { it.date }?.let {
-            if (releve.index < it.index) throw Refus(Motif.INDEX_RECULE, it.date, it.index)
+            if (releve.index < it.index && releve.tourComplet == 0.0) throw Refus(Motif.INDEX_RECULE, it.date, it.index)
         }
         autres.filter { it.date > releve.date }.minByOrNull { it.date }?.let {
-            if (releve.index > it.index) throw Refus(Motif.INDEX_DEPASSE, it.date, it.index)
+            if (releve.index > it.index && it.tourComplet == 0.0) throw Refus(Motif.INDEX_DEPASSE, it.date, it.index)
         }
         if (dateAvant != null && dateAvant != releve.date) dao.supprimerReleve(releve.compteurId, dateAvant)
         dao.enregistrerReleve(releve)

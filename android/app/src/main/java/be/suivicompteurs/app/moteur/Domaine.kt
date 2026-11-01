@@ -57,6 +57,8 @@ data class Releve(
     val index: Double,
     /** Relevé qui clôt l'année : il devient la borne des prévisions. */
     val annuel: Boolean = false,
+    /** Maximum du compteur s'il l'a dépassé avant ce relevé et repassé par zéro. */
+    val tourComplet: Double = 0.0,
 )
 
 /**

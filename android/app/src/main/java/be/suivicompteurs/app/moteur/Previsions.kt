@@ -476,7 +476,12 @@ private fun periodesRejouables(ligne: Ligne): Map<Int, PeriodeRejouable> {
  * ancien dans la période, le plus ancien de la période sert. Absente s'il n'y
  * a aucun autre relevé dans la même période.
  */
-fun prevoirAuRelevePrecedent(ligne: Ligne, djsStation: Map<LocalDate, Double>, actuelle: Prevision): PrevisionPrecedente? {
+fun prevoirAuRelevePrecedent(
+    ligne: Ligne,
+    djsStation: Map<LocalDate, Double>,
+    actuelle: Prevision,
+    recul: Long = RECUL_TENDANCE,
+): PrevisionPrecedente? {
     val dates = ligne.compteurs.flatMap { c -> c.releves.map { it.date } }
         .filter { ligne.jusqua == null || it <= ligne.jusqua }
         .distinct().sorted()
@@ -484,7 +489,7 @@ fun prevoirAuRelevePrecedent(ligne: Ligne, djsStation: Map<LocalDate, Double>, a
     val dernier = dates.last()
     // Le relevé qui ouvre la période compte : c'est la première prévision de l'année.
     val candidats = dates.filter { it >= actuelle.debut.minusDays(1) && it < dernier }
-    val precedent = candidats.lastOrNull { it <= dernier.minusDays(RECUL_TENDANCE) }
+    val precedent = candidats.lastOrNull { it <= dernier.minusDays(recul) }
         ?: candidats.firstOrNull() ?: return null
     val ligneAvant = lignes(ligne.compteurs, djsStation, jusqua = precedent)
         .firstOrNull { it.energie == ligne.energie && it.plage == ligne.plage } ?: return null
@@ -495,6 +500,40 @@ fun prevoirAuRelevePrecedent(ligne: Ligne, djsStation: Map<LocalDate, Double>, a
 
 /** Recul minimal de la tendance, en jours. */
 const val RECUL_TENDANCE = 30L
+
+/** Ce qu'un relevé qui vient d'être saisi a changé. */
+data class ImpactReleve(
+    val previsionAvant: Double,
+    val previsionApres: Double,
+    val volume: Double,
+    val nbJours: Int,
+    /** Ce que le climat laissait attendre, si le modèle est fiable. */
+    val attendu: Double?,
+    val unite: String,
+)
+
+/**
+ * Effet du dernier relevé de [ligne], [date], sur la prévision : la même
+ * période, vue juste avant lui et juste après. Absent si ce n'est pas le
+ * dernier relevé, ou s'il ouvre la période.
+ */
+fun impactDuReleve(
+    ligne: Ligne,
+    djsStation: Map<LocalDate, Double>,
+    date: LocalDate,
+    aujourdhui: LocalDate,
+): ImpactReleve? {
+    val apres = prevoir(ligne, aujourdhui, DegresJours.normales(djsStation, aujourdhui)) ?: return null
+    val avant = prevoirAuRelevePrecedent(ligne, djsStation, apres, recul = 0)?.prevision ?: return null
+    val periode = periodes(ligne.compteurs, ligne.jusqua).lastOrNull { it.fin == date } ?: return null
+    if (periode.fin != ligne.compteurs.flatMap { c -> c.releves.map { it.date } }.max()) return null
+    val modele = ligne.serie.modele
+    val jours = periode.jours.toList()
+    val attendu = if (modele.fiable && jours.all { it in djsStation }) {
+        jours.sumOf { modele.attendu(djsStation.getValue(it)) }.takeIf { it > 0 }
+    } else null
+    return ImpactReleve(avant.totalPrevu, apres.totalPrevu, periode.volume, periode.nbJours, attendu, ligne.unite)
+}
 
 /** Une prévision et le relevé auquel elle a été faite. */
 data class PrevisionPrecedente(val releve: LocalDate, val prevision: Prevision)

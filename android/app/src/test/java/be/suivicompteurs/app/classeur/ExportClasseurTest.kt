@@ -156,6 +156,24 @@ class ExportClasseurTest {
     }
 
     @Test
+    fun `un tour complet survit a l'export`() {
+        val base = synthetique()
+        val compteur = CompteurHistorique(9000, base.maisons.first().id, "EAU", "UNIQUE", "m³", "tour", "2026-01-01")
+        val h = base.copy(
+            compteurs = base.compteurs + compteur,
+            releves = base.releves + listOf(
+                ReleveHistorique(compteur.id, "2026-01-01", 99870.0, false),
+                ReleveHistorique(compteur.id, "2026-02-01", 120.0, false, tourComplet = 100000.0),
+            ),
+        )
+
+        val apres = importer(exporter(h).inputStream()).historique
+
+        val repris = apres.compteurs.single { it.libelle == "tour" }
+        assertEquals(listOf(0.0, 100000.0), apres.releves.filter { it.compteurId == repris.id }.map { it.tourComplet })
+    }
+
+    @Test
     fun `sans repartiteur ni prepaye le classeur ne change pas`() {
         val noms = Classeur.lire(exporter(synthetique()).inputStream()).noms
         assertTrue("Répartiteurs" !in noms)

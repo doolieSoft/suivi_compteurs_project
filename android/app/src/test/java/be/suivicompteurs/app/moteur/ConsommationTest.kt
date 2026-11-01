@@ -64,6 +64,35 @@ class VentilationTest {
     }
 }
 
+class TourCompletTest {
+    @Test
+    fun `le maximum se deduit du nombre de chiffres`() {
+        assertEquals(100000.0, maximumApresTour(99870.0, 120.0)!!, 0.0)
+        assertEquals(1000000.0, maximumApresTour(999870.5, 120.0)!!, 0.0)
+    }
+
+    @Test
+    fun `un saut trop grand reste une faute de frappe`() {
+        assertNull(maximumApresTour(870.0, 120.0))
+        assertNull(maximumApresTour(50000.0, 120.0))
+        assertNull(maximumApresTour(99870.0, 99900.0))
+    }
+
+    @Test
+    fun `la consommation passe le cap du maximum`() {
+        val compteur = Fabrique.compteur(
+            Energie.GAZ,
+            listOf(
+                Releve(date("2026-01-01"), 99000.0),
+                Releve(date("2026-02-01"), 99870.0),
+                Releve(date("2026-03-01"), 120.0, tourComplet = 100000.0),
+                Releve(date("2026-04-01"), 500.0),
+            ),
+        )
+        assertEquals(listOf(870.0, 250.0, 380.0), periodes(listOf(compteur)).map { it.volume })
+    }
+}
+
 class RemplacementDeCompteurTest {
     private val djs = Fabrique.climat(date("2023-01-01"), date("2023-12-31"))
     private val ancien = Fabrique.compteur(

@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -22,6 +23,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.lifecycleScope
+import be.suivicompteurs.app.analyse.Analyse
+import be.suivicompteurs.app.analyse.Textes
 import be.suivicompteurs.app.databinding.ActivitySaisieBinding
 import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.CompteurLocal
@@ -29,12 +32,14 @@ import be.suivicompteurs.app.donnees.nomAffiche
 import be.suivicompteurs.app.donnees.ReleveHistorique
 import be.suivicompteurs.app.gestion.Gestion
 import be.suivicompteurs.app.gestion.Refus
+import be.suivicompteurs.app.moteur.maximumApresTour
 import be.suivicompteurs.app.ocr.Explication
 import be.suivicompteurs.app.ocr.LecteurIndex
 import be.suivicompteurs.app.ocr.Proposition
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -452,7 +457,8 @@ class SaisieActivity : AppCompatActivity() {
 
     // --- enregistrement ----------------------------------------------------
 
-    private fun enregistrer() {
+    /** [tourComplet] : maximum dépassé, une fois le tour confirmé. */
+    private fun enregistrer(tourComplet: Double = 0.0) {
         val compteur = compteur ?: return
         val saisi = vues.champIndex.text?.toString()?.replace(',', '.')?.trim()
         val valeur = saisi?.toDoubleOrNull()
@@ -477,11 +483,28 @@ class SaisieActivity : AppCompatActivity() {
                         source = "MANUEL",
                         commentaire = vues.champCommentaire.text?.toString()?.trim().orEmpty().take(200),
                         photo = photo?.absolutePath,
+                        tourComplet = tourComplet,
                     ),
                     dateAvant = null,
                 )
             } catch (refus: Refus) {
-                vues.champIndexConteneur.error = refus.texte(this@SaisieActivity)
+                val precedent = refus.precedentAvantTour(valeur)
+                if (precedent != null) proposerTourComplet(precedent, valeur)
+                else vues.champIndexConteneur.error = refus.texte(this@SaisieActivity)
+                return@launch
+            }
+
+            val impact = runCatching {
+                Analyse(this@SaisieActivity).impactReleve(compteur.id.toLong(), LocalDate.parse(formatIso.format(dateChoisie)))
+            }.getOrNull()
+            if (impact != null) {
+                setResult(RESULT_OK)
+                AlertDialog.Builder(this@SaisieActivity)
+                    .setTitle(R.string.releve_enregistre)
+                    .setMessage(Textes(this@SaisieActivity).impact(impact))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setOnDismissListener { finish() }
+                    .show()
                 return@launch
             }
 
@@ -495,6 +518,22 @@ class SaisieActivity : AppCompatActivity() {
             Snackbar.make(vues.root, message, Snackbar.LENGTH_SHORT).show()
             vues.root.postDelayed({ finish() }, 900)
         }
+    }
+
+    private fun proposerTourComplet(precedent: Double, valeur: Double) {
+        val compteur = compteur ?: return
+        val maximum = maximumApresTour(precedent, valeur) ?: return
+        AlertDialog.Builder(this)
+            .setTitle(R.string.tour_complet_titre)
+            .setMessage(
+                getString(
+                    R.string.tour_complet_question,
+                    formater(valeur), formater(precedent), formater(maximum - precedent + valeur), compteur.unite,
+                )
+            )
+            .setPositiveButton(R.string.tour_complet_oui) { _, _ -> enregistrer(maximum) }
+            .setNegativeButton(R.string.corriger, null)
+            .show()
     }
 
     private fun formater(valeur: Double): String =

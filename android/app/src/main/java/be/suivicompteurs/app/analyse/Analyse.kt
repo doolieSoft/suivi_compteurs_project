@@ -11,6 +11,7 @@ import be.suivicompteurs.app.moteur.ComparaisonGlissante
 import be.suivicompteurs.app.moteur.Compteur
 import be.suivicompteurs.app.moteur.DegresJours
 import be.suivicompteurs.app.moteur.Energie
+import be.suivicompteurs.app.moteur.ImpactReleve
 import be.suivicompteurs.app.moteur.Ligne
 import be.suivicompteurs.app.moteur.Plage
 import be.suivicompteurs.app.moteur.Prevision
@@ -21,6 +22,7 @@ import be.suivicompteurs.app.moteur.comparerAAnneePrecedente
 import be.suivicompteurs.app.moteur.detecterAnomalies
 import be.suivicompteurs.app.moteur.lignes
 import be.suivicompteurs.app.moteur.prevoir
+import be.suivicompteurs.app.moteur.impactDuReleve
 import be.suivicompteurs.app.moteur.prevoirAuRelevePrecedent
 import be.suivicompteurs.app.moteur.PrevisionPrecedente
 import be.suivicompteurs.app.moteur.valoriser
@@ -100,7 +102,7 @@ class Analyse(contexte: Context) {
                         datePose = c.datePose?.let(LocalDate::parse),
                         releves = releves[c.id].orEmpty()
                             .filter { entree == null || it.date >= entree }
-                            .map { Releve(LocalDate.parse(it.date), it.index, it.annuel) },
+                            .map { Releve(LocalDate.parse(it.date), it.index, it.annuel, it.tourComplet) },
                     )
                 },
                 djs = maison.stationId?.let { djsParStation[it] } ?: emptyMap(),
@@ -119,6 +121,22 @@ class Analyse(contexte: Context) {
                 evenements = evenements.filter { it.maisonId == maison.id },
                 pointsVerifies = pointsVerifies.filter { it.maisonId == maison.id },
             )
+        }
+    }
+
+    /** Ce que le relevé de [date], qui vient d'être saisi, change à la prévision. */
+    suspend fun impactReleve(
+        compteurId: Long,
+        date: LocalDate,
+        aujourdhui: LocalDate = LocalDate.now(),
+    ): ImpactReleve? {
+        val maisons = charger()
+        return withContext(Dispatchers.Default) {
+            maisons.firstNotNullOfOrNull { chargee ->
+                chargee.lignes.firstOrNull { l -> l.compteurs.any { it.id == compteurId } }?.let { ligne ->
+                    impactDuReleve(ligne, chargee.djs, date, aujourdhui)
+                }
+            }
         }
     }
 

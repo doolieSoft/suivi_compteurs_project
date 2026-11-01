@@ -32,6 +32,7 @@ import be.suivicompteurs.app.donnees.AchatLocal
 import be.suivicompteurs.app.donnees.CompteurHistorique
 import be.suivicompteurs.app.donnees.RadiateurLocal
 import be.suivicompteurs.app.donnees.ReleveHistorique
+import be.suivicompteurs.app.moteur.maximumApresTour
 import java.time.LocalDate
 import kotlinx.coroutines.launch
 
@@ -353,6 +354,8 @@ fun DialogueReleve(
     var source by remember { mutableStateOf(releve.source) }
     var commentaire by remember { mutableStateOf(releve.commentaire) }
     var refus by remember { mutableStateOf<Refus?>(null) }
+    // Index plus bas, qu'un tour complet du compteur peut expliquer.
+    var tourPropose by remember { mutableStateOf<Pair<ReleveHistorique, Double>?>(null) }
     AlertDialog(
         onDismissRequest = surFermeture,
         title = { Text(stringResource(R.string.releve)) },
@@ -385,12 +388,13 @@ fun DialogueReleve(
                 enabled = lireNombre(index) != null && date != null,
                 onClick = {
                     portee.launch {
-                        refus = surEnregistrement(
-                            releve.copy(
-                                date = date!!, index = lireNombre(index)!!, annuel = annuel,
-                                source = source, commentaire = commentaire.trim().take(200),
-                            )
+                        val nouveau = releve.copy(
+                            date = date!!, index = lireNombre(index)!!, annuel = annuel,
+                            source = source, commentaire = commentaire.trim().take(200),
                         )
+                        val raison = surEnregistrement(nouveau)
+                        val precedent = raison?.precedentAvantTour(nouveau.index)
+                        if (precedent != null) tourPropose = nouveau to precedent else refus = raison
                     }
                 },
             ) { Text(stringResource(R.string.enregistrer)) }
@@ -402,6 +406,29 @@ fun DialogueReleve(
             }
         },
     )
+    tourPropose?.let { (nouveau, precedent) ->
+        val maximum = maximumApresTour(precedent, nouveau.index) ?: 0.0
+        AlertDialog(
+            onDismissRequest = { tourPropose = null },
+            title = { Text(stringResource(R.string.tour_complet_titre)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.tour_complet_question,
+                        afficherNombre(nouveau.index), afficherNombre(precedent),
+                        afficherNombre(maximum - precedent + nouveau.index), unite,
+                    )
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    tourPropose = null
+                    portee.launch { refus = surEnregistrement(nouveau.copy(tourComplet = maximum)) }
+                }) { Text(stringResource(R.string.tour_complet_oui)) }
+            },
+            dismissButton = { TextButton(onClick = { tourPropose = null }) { Text(stringResource(R.string.corriger)) } },
+        )
+    }
 }
 
 @Composable
