@@ -46,7 +46,7 @@ thing fetched from the internet is the weather, from
 
 | Where | What |
 |---|---|
-| Google Play | automatic updates |
+| Google Play (closed test) | [join the testers group](https://groups.google.com/g/suivi-compteurs-testeurs), then [accept the test](https://play.google.com/apps/testing/be.suivicompteurs.app) and install the app from the Play Store with the same Google account. Automatic updates; your help is needed to open the public release |
 | [F-Droid](https://f-droid.org/packages/be.suivicompteurs.app/) | automatic updates, no proprietary components: you type the reading in by hand |
 | [`suivi-compteurs.apk`](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs.apk) | with automatic reading from a photo (ML Kit) |
 | [`suivi-compteurs-libre.apk`](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk) | no proprietary components: you type the reading in by hand |
