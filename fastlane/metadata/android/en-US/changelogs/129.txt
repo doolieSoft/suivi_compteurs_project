@@ -1,0 +1,2 @@
+• Heating oil tank with a gauge: read the level, note your deliveries, and the app works out your usage and its cost.
+• Prepaid meters and tanks: the home screen estimates how many days are left.

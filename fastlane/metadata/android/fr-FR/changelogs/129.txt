@@ -1,0 +1,2 @@
+• Cuve de mazout avec jauge : relevez le niveau, notez les livraisons, et l'application calcule la consommation et son coût.
+• Compteurs prépayés et cuves : l'accueil estime le nombre de jours restants.
