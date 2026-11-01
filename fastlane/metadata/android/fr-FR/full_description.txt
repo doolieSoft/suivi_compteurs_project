@@ -24,6 +24,7 @@ ET AUSSI
 • Plusieurs maisons, remplacement de compteur, compteurs bi-horaires, tarifs et événements (isolation, travaux…).
 • Répartiteurs de frais de chauffage : une ligne par radiateur avec son coefficient, remises à zéro annuelles comprises.
 • Compteurs prépayés : relevez le solde, notez vos achats, l'application en déduit la consommation.
+• Cuve de mazout avec jauge : relevez le niveau, notez les livraisons.
 • Points à vérifier : l'application repère les relevés sans doute mal saisis.
 • Graphiques : cumul de l'année, consommation mensuelle, comparaison des années, climat.
 • Disponible en français, anglais et néerlandais.

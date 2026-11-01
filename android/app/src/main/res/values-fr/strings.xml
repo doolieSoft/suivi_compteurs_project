@@ -6,6 +6,12 @@
     <string name="index_avec_unite">%1$s %2$s</string>
     <string name="aucun_index">Aucun relevé</string>
     <string name="solde_restant">%1$s %2$s restants</string>
+    <string name="solde_bientot_epuise">bientôt épuisé</string>
+    <plurals name="solde_jours_restants">
+        <item quantity="one">environ %1$d jour</item>
+        <item quantity="many">environ %1$d jours</item>
+        <item quantity="other">environ %1$d jours</item>
+    </plurals>
     <string name="releve_du">relevé du %1$s</string>
     <string name="reglages">Réglages</string>
     <string name="consulter">Consulter l\'historique et les prévisions</string>

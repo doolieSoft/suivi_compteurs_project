@@ -90,6 +90,7 @@ fun EcranCompteur(
     val repartiteur = energie == "REP"
     // Ces deux-là tiennent leurs index de leur propre saisie.
     val indexCalcule = repartiteur || prepaye
+    val cuve = prepaye && energie == "MAZ"
 
     fun enregistrer() = portee.launch {
         val c = (origine ?: CompteurHistorique(0, maisonId, energie, plage, unite, "", null)).copy(
@@ -111,7 +112,7 @@ fun EcranCompteur(
         // Un répartiteur n'a pas les mêmes relevés : on ne devient pas l'un ou l'autre en route.
         ChampChoix(
             stringResource(R.string.energie),
-            energies().filter { compteurId == 0L || ((it.first == "REP") == repartiteur && (!prepaye || it.first == "ELEC")) },
+            energies().filter { compteurId == 0L || ((it.first == "REP") == repartiteur && (!prepaye || it.first == energie)) },
             energie,
         ) {
             energie = it
@@ -120,14 +121,15 @@ fun EcranCompteur(
                 unite = when (it) { "ELEC" -> "kWh"; "MAZ" -> "L"; "REP" -> "u"; else -> "m³" }
                 // Un litre de mazout libère environ 10 kWh.
                 coef = when (it) { "GAZ" -> "11"; "MAZ" -> "10"; else -> "1" }
-                if (it != "ELEC") prepaye = false
+                // Le mazout se lit le plus souvent à la jauge de la cuve.
+                prepaye = it == "MAZ"
             }
         }
         // Le choix se fait à la création : les relevés n'ont pas le même sens.
-        if (energie == "ELEC" && compteurId == 0L) {
+        if (energie in setOf("ELEC", "MAZ") && compteurId == 0L) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = prepaye, onCheckedChange = { prepaye = it; plage = "UNIQUE"; unite = "kWh"; coef = "1" })
-                Text(stringResource(R.string.compteur_prepaye))
+                Checkbox(checked = prepaye, onCheckedChange = { prepaye = it; plage = "UNIQUE" })
+                Text(stringResource(if (energie == "MAZ") R.string.compteur_cuve else R.string.compteur_prepaye))
             }
         }
         if (energie == "ELEC" && !prepaye) ChampChoix(stringResource(R.string.plage), plages(), plage) { plage = it }
@@ -172,11 +174,15 @@ fun EcranCompteur(
         }
 
         if (compteurId != 0L && prepaye) {
-            TitreSection(stringResource(R.string.achats_titre, achats.size), icone = R.drawable.ic_electricite, action = {
+            TitreSection(
+                stringResource(if (cuve) R.string.livraisons_titre else R.string.achats_titre, achats.size),
+                icone = iconeEnergie(energie),
+                action = {
                 TextButton(onClick = { achatEdite = AchatLocal(0, compteurId, LocalDate.now().toString(), 0.0) }) {
                     IconeTexte(R.drawable.ic_ajouter, stringResource(R.string.ajouter))
                 }
-            })
+                },
+            )
             achats.forEach { a ->
                 LigneListe(
                     titre = "${jour(a.date)} · ${afficherNombre(a.quantite)} $unite",
@@ -260,6 +266,8 @@ fun EcranCompteur(
         DialogueAchat(
             a,
             datesRelevees = releves.map { it.date }.toSet(),
+            unite = unite,
+            cuve = cuve,
             surFermeture = { achatEdite = null },
             surEnregistrement = { nouveau ->
                 portee.launch { gestion.enregistrerAchat(nouveau); achatEdite = null; version++ }

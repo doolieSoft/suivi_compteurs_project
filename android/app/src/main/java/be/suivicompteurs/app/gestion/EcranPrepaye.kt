@@ -31,8 +31,10 @@ import be.suivicompteurs.app.R
 import be.suivicompteurs.app.donnees.AchatLocal
 import be.suivicompteurs.app.donnees.ReleveHistorique
 import be.suivicompteurs.app.donnees.pourMoteur
+import be.suivicompteurs.app.moteur.TOLERANCE_JAUGE
 import be.suivicompteurs.app.moteur.achatsEntre
 import be.suivicompteurs.app.moteur.consommationPrepayee
+import be.suivicompteurs.app.moteur.soldeExcedentaire
 import java.time.LocalDate
 import kotlinx.coroutines.launch
 
@@ -41,6 +43,8 @@ import kotlinx.coroutines.launch
 fun DialogueAchat(
     achat: AchatLocal,
     datesRelevees: Set<String>,
+    unite: String,
+    cuve: Boolean,
     surFermeture: () -> Unit,
     surEnregistrement: (AchatLocal) -> Unit,
     surSuppression: (() -> Unit)?,
@@ -54,17 +58,17 @@ fun DialogueAchat(
     val kwh = lireNombre(quantite)?.takeIf { it > 0 }
     AlertDialog(
         onDismissRequest = surFermeture,
-        title = { Text(stringResource(R.string.achat)) },
+        title = { Text(stringResource(if (cuve) R.string.livraison else R.string.achat)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 ChampDate(stringResource(R.string.date), date, { date = it })
-                ChampTexte(stringResource(R.string.achat_quantite), quantite, { quantite = it }, numerique = true)
+                ChampTexte(stringResource(if (cuve) R.string.livraison_quantite else R.string.achat_quantite, unite), quantite, { quantite = it }, numerique = true)
                 ChampTexte(stringResource(R.string.achat_montant, symbole), montant, { montant = it }, numerique = true)
-                ChampTexte(stringResource(R.string.achat_tarif, symbole), tarif, { tarif = it }, numerique = true)
+                ChampTexte(stringResource(R.string.achat_tarif, unite, symbole), tarif, { tarif = it }, numerique = true)
                 if (date in datesRelevees) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(checked = apresReleve, onCheckedChange = { apresReleve = it })
-                        Text(stringResource(R.string.achat_apres_releve))
+                        Text(stringResource(if (cuve) R.string.livraison_apres_releve else R.string.achat_apres_releve))
                     }
                 }
             }
@@ -92,9 +96,9 @@ fun DialogueAchat(
 }
 
 /**
- * Relevé d'un compteur prépayé : on lit le solde, et l'application en déduit
- * ce qui a été consommé. [dateInitiale] désigne le relevé à modifier ; sans
- * elle, c'est un nouveau relevé.
+ * Relevé d'un compteur prépayé ou d'une cuve : on lit le solde ou le niveau,
+ * et l'application en déduit ce qui a été consommé. [dateInitiale] désigne le
+ * relevé à modifier ; sans elle, c'est un nouveau relevé.
  */
 @Composable
 fun EcranReleveSolde(
@@ -117,8 +121,11 @@ fun EcranReleveSolde(
     var excedent by remember { mutableStateOf<Double?>(null) }
     var confirmer by remember { mutableStateOf(false) }
     var version by remember { mutableIntStateOf(0) }
+    var unite by remember { mutableStateOf("") }
+    var cuve by remember { mutableStateOf(false) }
 
     LaunchedEffect(compteurId, version) {
+        gestion.compteur(compteurId)?.let { unite = it.unite; cuve = it.energie == "MAZ" }
         releves = gestion.releves(compteurId)
         achats = gestion.achats(compteurId)
         if (!charge) {
@@ -157,11 +164,11 @@ fun EcranReleveSolde(
         if (!charge) return@Cadre
         ChampDate(stringResource(R.string.date_du_releve), date, { date = it; refus = null })
         refus?.let { Text(messageRefus(it), color = Couleurs.critique, style = MaterialTheme.typography.bodySmall) }
-        ChampTexte(stringResource(R.string.solde_lu), solde, { solde = it }, numerique = true)
+        ChampTexte(stringResource(if (cuve) R.string.niveau_lu else R.string.solde_lu, unite), solde, { solde = it }, numerique = true)
         val texteAide = MaterialTheme.typography.bodySmall
         precedent?.solde?.let {
-            Text(stringResource(R.string.solde_precedent, afficherNombre(it)), style = texteAide, color = Couleurs.encre2)
-            Text(stringResource(R.string.achats_periode, afficherNombre(achetes)), style = texteAide, color = Couleurs.encre2)
+            Text(stringResource(if (cuve) R.string.niveau_precedent else R.string.solde_precedent, afficherNombre(it), unite), style = texteAide, color = Couleurs.encre2)
+            Text(stringResource(if (cuve) R.string.livraisons_periode else R.string.achats_periode, afficherNombre(achetes), unite), style = texteAide, color = Couleurs.encre2)
         }
         Text(
             when {
@@ -170,6 +177,7 @@ fun EcranReleveSolde(
                 else -> stringResource(
                     R.string.solde_conso_periode,
                     afficherNombre(consommationPrepayee(precedent.solde!!, achetes, lu)),
+                    unite,
                 )
             },
             style = MaterialTheme.typography.bodyMedium,
@@ -178,7 +186,7 @@ fun EcranReleveSolde(
         OutlinedButton(
             onClick = { achatEdite = AchatLocal(0, compteurId, date ?: LocalDate.now().toString(), 0.0) },
             Modifier.fillMaxWidth(),
-        ) { IconeTexte(R.drawable.ic_ajouter, stringResource(R.string.achat_ajouter)) }
+        ) { IconeTexte(R.drawable.ic_ajouter, stringResource(if (cuve) R.string.livraison_ajouter else R.string.achat_ajouter)) }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(checked = annuel, onCheckedChange = { annuel = it })
             Text(stringResource(R.string.releve_annuel))
@@ -187,8 +195,10 @@ fun EcranReleveSolde(
         Button(
             enabled = date != null && lu != null,
             onClick = {
-                val trop = precedent?.solde?.let { lu!! - (it + achetes) }
-                if (trop != null && trop > 0) excedent = trop else enregistrer()
+                val trop = precedent?.solde?.let {
+                    soldeExcedentaire(it, achetes, lu!!, if (cuve) TOLERANCE_JAUGE else 0.0)
+                }
+                if (trop != null) excedent = trop else enregistrer()
             },
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         ) { IconeTexte(R.drawable.ic_valider, stringResource(R.string.enregistrer)) }
@@ -198,6 +208,8 @@ fun EcranReleveSolde(
         DialogueAchat(
             a,
             datesRelevees = releves.map { it.date }.toSet(),
+            unite = unite,
+            cuve = cuve,
             surFermeture = { achatEdite = null },
             surEnregistrement = { nouveau ->
                 portee.launch { gestion.enregistrerAchat(nouveau); achatEdite = null; version++ }
@@ -208,13 +220,13 @@ fun EcranReleveSolde(
     excedent?.let { trop ->
         AlertDialog(
             onDismissRequest = { excedent = null },
-            title = { Text(stringResource(R.string.achat_oublie_titre)) },
-            text = { Text(stringResource(R.string.achat_oublie_question, afficherNombre(trop))) },
+            title = { Text(stringResource(if (cuve) R.string.livraison_oubliee_titre else R.string.achat_oublie_titre)) },
+            text = { Text(stringResource(if (cuve) R.string.livraison_oubliee_question else R.string.achat_oublie_question, afficherNombre(trop), unite)) },
             confirmButton = {
                 TextButton(onClick = {
                     excedent = null
                     achatEdite = AchatLocal(0, compteurId, date!!, trop)
-                }) { Text(stringResource(R.string.achat_oublie_oui)) }
+                }) { Text(stringResource(if (cuve) R.string.livraison_oubliee_oui else R.string.achat_oublie_oui)) }
             },
             dismissButton = { TextButton(onClick = { excedent = null }) { Text(stringResource(R.string.corriger)) } },
         )

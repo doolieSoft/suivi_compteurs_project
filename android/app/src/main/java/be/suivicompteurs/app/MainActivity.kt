@@ -1,6 +1,7 @@
 package be.suivicompteurs.app
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -28,10 +29,15 @@ import be.suivicompteurs.app.databinding.ItemCompteurBinding
 import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.CompteurLocal
 import be.suivicompteurs.app.donnees.nomAffiche
+import be.suivicompteurs.app.donnees.pourMoteur
+import be.suivicompteurs.app.moteur.SoldeReleve
+import be.suivicompteurs.app.moteur.epuisementEstime
 import be.suivicompteurs.app.sync.Synchroniseur
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
@@ -107,7 +113,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun observerDonnees() {
         lifecycleScope.launch {
-            BaseLocale.obtenir(this@MainActivity).compteurs().suivre().collect { afficher(it) }
+            BaseLocale.obtenir(this@MainActivity).compteurs().suivre().collect {
+                adaptateur.epuisements = epuisements(it)
+                afficher(it)
+            }
         }
     }
 
@@ -207,6 +216,18 @@ class MainActivity : AppCompatActivity() {
                 Snackbar.LENGTH_LONG,
             ).show()
         }
+    }
+
+    /** Le jour plutôt qu'un nombre de jours : il reste juste demain, sans nouveau relevé. */
+    private suspend fun epuisements(compteurs: List<CompteurLocal>): Map<Int, LocalDate> {
+        val historique = BaseLocale.obtenir(this).historique()
+        return compteurs.filter { it.prepaye }.mapNotNull { c ->
+            val id = c.id.toLong()
+            epuisementEstime(
+                historique.relevesDe(id).mapNotNull { r -> r.solde?.let { SoldeReleve(LocalDate.parse(r.date), it) } },
+                historique.achatsDe(id).map { it.pourMoteur() },
+            )?.let { c.id to it }
+        }.toMap()
     }
 
     private fun ouvrirSaisie(compteur: CompteurLocal) {
@@ -328,6 +349,8 @@ class CompteurAdapter(
     var elements: List<CompteurLocal> = emptyList()
         private set
 
+    var epuisements: Map<Int, LocalDate> = emptyMap()
+
     fun remplacer(nouveaux: List<CompteurLocal>) {
         elements = nouveaux
         notifyDataSetChanged()
@@ -341,14 +364,24 @@ class CompteurAdapter(
 
     override fun getItemCount() = elements.size
 
+    private fun soldeRestant(contexte: Context, compteur: CompteurLocal, solde: Double): String {
+        val texte = contexte.getString(R.string.solde_restant, formaterIndex(solde), compteur.unite)
+        val jours = epuisements[compteur.id]?.let { ChronoUnit.DAYS.between(LocalDate.now(), it) }?.toInt()
+            ?: return texte
+        return texte + " · " + if (jours > 0) {
+            contexte.resources.getQuantityString(R.plurals.solde_jours_restants, jours, jours)
+        } else {
+            contexte.getString(R.string.solde_bientot_epuise)
+        }
+    }
+
     override fun onBindViewHolder(cellule: Cellule, position: Int) {
         val compteur = elements[position]
         val contexte = cellule.vues.root.context
 
         cellule.vues.libelle.text = compteur.nomAffiche(contexte)
         cellule.vues.index.text = when {
-            compteur.solde != null ->
-                contexte.getString(R.string.solde_restant, formaterIndex(compteur.solde), compteur.unite)
+            compteur.solde != null -> soldeRestant(contexte, compteur, compteur.solde)
             else -> compteur.dernierIndex?.let {
                 contexte.getString(R.string.index_avec_unite, formaterIndex(it), compteur.unite)
             } ?: contexte.getString(R.string.aucun_index)

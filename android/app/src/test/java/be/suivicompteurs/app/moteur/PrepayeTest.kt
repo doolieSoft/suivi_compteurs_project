@@ -79,6 +79,45 @@ class PrepayeTest {
     }
 
     @Test
+    fun `le solde s epuise au rythme des derniers releves`() {
+        // 10 kWh par jour, il reste 100 kWh : dix jours.
+        val soldes = listOf(solde("2026-11-01", 200.0), solde("2026-11-11", 100.0))
+        assertEquals(jour("2026-11-21"), epuisementEstime(soldes, emptyList()))
+    }
+
+    @Test
+    fun `les achats comptent dans le rythme et dans le solde`() {
+        val soldes = listOf(solde("2026-11-01", 100.0), solde("2026-11-11", 200.0))
+        val achats = listOf(achat("2026-11-05", 200.0), achat("2026-11-12", 100.0))
+        assertEquals(jour("2026-12-11"), epuisementEstime(soldes, achats))
+    }
+
+    @Test
+    fun `seuls les derniers mois donnent le rythme`() {
+        val soldes = listOf(solde("2026-01-01", 1000.0), solde("2026-10-01", 980.0), solde("2026-11-10", 580.0))
+        assertEquals(jour("2027-01-07"), epuisementEstime(soldes, emptyList()))
+    }
+
+    @Test
+    fun `sans recul suffisant on ne dit rien`() {
+        assertNull(epuisementEstime(listOf(solde("2026-11-01", 100.0)), emptyList()))
+        assertNull(epuisementEstime(listOf(solde("2026-11-01", 100.0), solde("2026-11-04", 90.0)), emptyList()))
+        assertNull(epuisementEstime(listOf(solde("2026-11-01", 100.0), solde("2026-11-20", 100.0)), emptyList()))
+    }
+
+    @Test
+    fun `un solde au dessus de l attendu fait soupconner un achat oublie`() {
+        assertEquals(80.0, soldeExcedentaire(120.0, 200.0, 400.0)!!, 1e-9)
+        assertNull(soldeExcedentaire(120.0, 200.0, 320.0))
+    }
+
+    @Test
+    fun `une jauge imprecise tolere quelques pour cent`() {
+        assertNull(soldeExcedentaire(1000.0, 0.0, 1040.0, TOLERANCE_JAUGE))
+        assertEquals(100.0, soldeExcedentaire(1000.0, 0.0, 1100.0, TOLERANCE_JAUGE)!!, 1e-9)
+    }
+
+    @Test
     fun `un achat paye donne son prix au kwh jusqu au suivant`() {
         val tarifs = tarifsDesAchats(
             listOf(achat("2026-01-01", 100.0, montant = 300.0), achat("2026-02-01", 50.0), achat("2026-03-01", 100.0, montant = 350.0)),

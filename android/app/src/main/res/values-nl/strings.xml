@@ -6,6 +6,11 @@
     <string name="index_avec_unite">%1$s %2$s</string>
     <string name="aucun_index">Geen meterstand</string>
     <string name="solde_restant">Nog %1$s %2$s</string>
+    <string name="solde_bientot_epuise">bijna op</string>
+    <plurals name="solde_jours_restants">
+        <item quantity="one">ongeveer %1$d dag</item>
+        <item quantity="other">ongeveer %1$d dagen</item>
+    </plurals>
     <string name="releve_du">opgenomen op %1$s</string>
     <string name="reglages">Instellingen</string>
     <string name="consulter">Geschiedenis en voorspellingen bekijken</string>

@@ -68,6 +68,7 @@ désinstaller, donc d'exporter ses données en Excel avant.
 - répartiteurs de frais de chauffage : une ligne par radiateur avec son
   coefficient, remises à zéro annuelles comprises ;
 - compteurs prépayés : relevé du solde et suivi des achats ;
+- cuves de mazout à jauge : relevé du niveau et suivi des livraisons ;
 - points à vérifier, dont les relevés sans doute mal saisis ;
 - import et export Excel, qui tient lieu de sauvegarde (Google Drive compris) ;
 - rappels de relevé ;
@@ -155,12 +156,14 @@ jamais : courbes, prévisions et correction climatique le traitent comme n'impor
 quel compteur. Il reste une valeur relative, sans kWh ni coût, puisque la facture
 dépend de tout l'immeuble.
 
-### Les compteurs prépayés
+### Les compteurs prépayés et les cuves
 
 Ils affichent un solde qui descend et remonte à chaque achat. L'application en
 déduit `consommation = solde précédent + achats depuis − solde actuel` et tient
 un cumul (`Prepaye.kt`) semblable à l'index de tout autre compteur. Chaque achat
-payé fixe le prix du kWh jusqu'à l'achat suivant.
+payé fixe le prix de l'unité jusqu'à l'achat suivant, et le rythme récent donne une
+estimation des jours restants. Une cuve de mazout fonctionne de même : le niveau
+descend, et remonte à chaque livraison.
 
 ### Les degrés-jours
 

@@ -71,6 +71,7 @@ first.
 - heat cost allocators: one line per radiator with its factor, annual resets
   included;
 - prepaid meters: read the balance, note your purchases;
+- heating oil tanks with a gauge: read the level, note your deliveries;
 - points to check, including readings that were probably mistyped;
 - Excel import and export, which doubles as a backup (Google Drive included);
 - reading reminders;
@@ -154,12 +155,14 @@ year. For each reading, the app adds up the weighted difference for each radiato
 weather adjustment treat it like any other meter. It stays a relative figure: no
 kWh and no cost, since the bill depends on the whole building.
 
-### Prepaid meters
+### Prepaid meters and tanks
 
 These show a balance that goes down and rises with each purchase. The app works
 out usage as `previous balance + purchases since − current balance` and keeps a
-running total (`Prepaye.kt`) that any other meter would give. Each paid purchase
-sets the price per kWh until the next one.
+running total (`Prepaye.kt`) like the reading of any other meter. Each paid
+purchase sets the price per unit until the next one, and the recent pace gives an
+estimate of how many days are left. A heating oil tank works the same way: its
+level goes down and rises with each delivery.
 
 ### Degree days
 
