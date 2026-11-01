@@ -1,0 +1,2 @@
+• Prepaid meters: read the balance, note your purchases, and the app works out your usage and its cost.
+• New point to check: the app spots a reading that was probably mistyped, with too much use before it and too little after (or the reverse).

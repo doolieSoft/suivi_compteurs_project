@@ -1,0 +1,2 @@
+• Compteurs prépayés : relevez le solde, notez vos achats, et l'application calcule votre consommation et son coût.
+• Nouveau point à vérifier : l'application repère un relevé sans doute mal saisi, trop de consommation avant lui et trop peu après (ou l'inverse).

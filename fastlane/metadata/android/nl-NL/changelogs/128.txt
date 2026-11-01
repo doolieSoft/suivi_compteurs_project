@@ -1,0 +1,2 @@
+• Prepaidmeters: lees het saldo af, noteer je aankopen en de app berekent je verbruik en de kosten.
+• Nieuw aandachtspunt: de app spoort een stand op die waarschijnlijk verkeerd is ingevoerd, met te veel verbruik ervoor en te weinig erna (of omgekeerd).
