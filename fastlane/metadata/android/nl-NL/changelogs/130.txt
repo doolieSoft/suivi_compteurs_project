@@ -1,0 +1,3 @@
+• Na een stand toont de app wat die aan de prognose verandert, en je verbruik tegenover wat het weer deed verwachten.
+• Meters die hun maximum voorbijgaan en opnieuw vanaf nul tellen, worden nu verwerkt.
+• Herinneringen: een knop opent de instellingen als Android niet meer vraagt om meldingen.

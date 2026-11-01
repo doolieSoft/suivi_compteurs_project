@@ -1,0 +1,3 @@
+• After a reading, the app shows what it changes in the forecast, and your use compared with what the weather suggested.
+• Meters that roll over past their maximum are now handled.
+• Reminders: a button opens the settings when Android no longer asks about notifications.

@@ -1,0 +1,4 @@
+• Après un relevé, l'application montre ce qu'il change à la prévision, et votre consommation face à ce que le climat laissait attendre.
+• Un compteur qui repasse par zéro est maintenant pris en charge.
+• Rappels : un bouton mène aux réglages quand Android ne pose plus la question des notifications.
+• « Mazout » devient « Mazout / fioul ».
