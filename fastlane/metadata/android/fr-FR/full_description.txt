@@ -1,3 +1,5 @@
+Utilisateurs F-Droid : depuis la version 1.6.1, l'application est signée par son développeur. Si la mise à jour ne s'installe pas, exportez vos données, réinstallez, puis importez-les.
+
 Notez vos compteurs d'eau, de gaz, d'électricité et de mazout (fioul), et voyez où va votre année.
 
 RELEVER EN QUELQUES SECONDES

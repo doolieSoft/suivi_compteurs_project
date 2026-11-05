@@ -52,9 +52,11 @@ thing fetched from the internet is the weather, from
 | [`suivi-compteurs-libre.apk`](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk) | no proprietary components: you type the reading in by hand |
 
 To install an APK, open it from your phone's file manager and allow the
-installation when Android asks. The three versions are signed differently, so
-switching from one to another means uninstalling: export your data to Excel
-first.
+installation when Android asks. Since version 1.6.1, the F-Droid build and these
+APKs are signed with the same key, so you can switch between them. The Google Play
+version is signed differently: switching to or from it means uninstalling, so
+export your data to Excel first. The same applies once if you installed an F-Droid
+version older than 1.6.1.
 
 ## What the app does
 

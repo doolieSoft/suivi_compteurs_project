@@ -51,9 +51,11 @@ téléphone. Seule la météo vient d'Internet, d'[Open-Meteo](https://open-mete
 | [`suivi-compteurs-libre.apk`](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk) | sans composant propriétaire : l'index se saisit à la main |
 
 Pour installer un APK : l'ouvrir depuis le gestionnaire de fichiers du
-téléphone, et autoriser l'installation quand Android le demande. Les trois
-versions sont signées différemment : passer de l'une à l'autre impose de
-désinstaller, donc d'exporter ses données en Excel avant.
+téléphone, et autoriser l'installation quand Android le demande. Depuis la
+version 1.6.1, la version F-Droid et ces APK sont signés avec la même clé : on
+peut passer de l'une à l'autre. La version Google Play est signée autrement :
+passer de l'une à l'autre impose de désinstaller, donc d'exporter ses données en
+Excel avant. Il en va de même, une fois, pour une version F-Droid antérieure à la 1.6.1.
 
 ## Ce que fait l'application
 
