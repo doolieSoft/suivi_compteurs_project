@@ -1,0 +1,1 @@
+• F-Droid users: the app is now signed by its developer, as on GitHub. If this update won't install, first export your data (☰ menu › Export), uninstall the app, install this version, then import your workbook. This is a one-time step.
