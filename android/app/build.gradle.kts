@@ -123,6 +123,13 @@ android {
         buildConfig = true
     }
 
+    // F-Droid distribue l'APK publié sur GitHub, après avoir vérifié qu'il est
+    // identique à sa propre construction : il refuse le bloc de dépendances
+    // que Google ajoute à la signature. L'AAB du Play Store le garde.
+    dependenciesInfo {
+        includeInApk = false
+    }
+
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }

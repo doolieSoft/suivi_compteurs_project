@@ -1,4 +1,4 @@
-F-Droid-gebruikers: sinds versie 1.6.1 wordt de app door de ontwikkelaar ondertekend. Installeert de update niet, exporteer dan je gegevens, installeer opnieuw en importeer ze.
+F-Droid-gebruikers: sinds versie 1.6.2 wordt de app door de ontwikkelaar ondertekend. Installeert de update niet, exporteer dan je gegevens, installeer opnieuw en importeer ze.
 
 Noteer je meters voor water, gas, elektriciteit en stookolie, en zie waar je jaar naartoe gaat.
 
