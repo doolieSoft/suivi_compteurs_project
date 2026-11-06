@@ -1,0 +1,3 @@
+• Neuer Zählertyp: Wärme (Fernwärme, Wärmemengenzähler), in kWh.
+• Zähler, für die du Verbrauchswerte erhältst (zum Beispiel kWh pro Monat) statt eines Zählerstands: Option beim Anlegen des Zählers ankreuzen.
+• Die App ist jetzt auf Deutsch verfügbar.

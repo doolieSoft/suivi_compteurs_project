@@ -1,0 +1,3 @@
+• New meter type: Heat (district heating, heat meters), in kWh.
+• Meters you get consumption figures for (for example kWh per month) rather than a reading: tick the option when creating the meter.
+• The app is now available in German.

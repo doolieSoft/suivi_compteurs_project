@@ -1,0 +1,3 @@
+• Nouveau type de compteur : Chaleur (réseau de chaleur, compteur de chaleur), en kWh.
+• Compteurs dont on reçoit des consommations (par exemple des kWh par mois) plutôt qu'un index : cochez l'option à la création du compteur.
+• L'application est disponible en allemand.
