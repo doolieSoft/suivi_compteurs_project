@@ -1,0 +1,1 @@
+• Utilisateurs F-Droid : l'application est désormais signée par son développeur, comme sur GitHub. Si cette mise à jour ne s'installe pas, exportez d'abord vos données (menu ☰ › Exporter), désinstallez l'application, installez cette version, puis importez votre classeur. C'est la seule fois.

@@ -1,0 +1,1 @@
+• F-Droid-gebruikers: de app wordt nu door de ontwikkelaar ondertekend, zoals op GitHub. Installeert deze update niet, exporteer dan eerst je gegevens (menu ☰ › Exporteren), verwijder de app, installeer deze versie en importeer daarna je werkmap. Dit is eenmalig.
