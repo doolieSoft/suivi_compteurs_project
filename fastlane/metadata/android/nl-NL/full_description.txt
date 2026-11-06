@@ -28,9 +28,10 @@ EN OOK
 • Warmtekostenverdelers: een regel per radiator met de coëfficiënt, jaarlijkse nulstelling inbegrepen.
 • Prepaidmeters: lees het saldo af, noteer je aankopen en de app berekent je verbruik.
 • Stookolietank met peilmeter: lees het niveau af, noteer je leveringen.
+• Warmte (warmtenet, warmtemeter) en meters waarvoor je verbruikscijfers krijgt, zoals kWh per maand.
 • Aandachtspunten: de app spoort standen op die waarschijnlijk verkeerd zijn ingevoerd.
 • Grafieken: cumulatief sinds 1 januari, maandverbruik, jaarvergelijking, klimaat.
-• Beschikbaar in het Nederlands, Frans en Engels.
+• Beschikbaar in het Nederlands, Frans, Engels en Duits.
 • Volledig vrije F-Droid-versie: zonder automatisch lezen, de stand wordt met de hand ingevoerd.
 
 Weergegevens: Open-Meteo.com (CC BY 4.0).

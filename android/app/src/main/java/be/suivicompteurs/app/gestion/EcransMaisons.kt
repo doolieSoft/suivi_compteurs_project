@@ -69,6 +69,7 @@ fun energies() = listOf(
     "GAZ" to stringResource(R.string.energie_gaz),
     "ELEC" to stringResource(R.string.energie_electricite),
     "MAZ" to stringResource(R.string.energie_mazout),
+    "CHA" to stringResource(R.string.energie_chaleur),
     "REP" to stringResource(R.string.energie_repartiteur),
 )
 

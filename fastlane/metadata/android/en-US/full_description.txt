@@ -28,9 +28,10 @@ AND ALSO
 • Heat cost allocators: one line per radiator with its factor, annual resets included.
 • Prepaid meters: read the balance, note your purchases, and the app works out your usage.
 • Heating oil tank with a gauge: read the level, note your deliveries.
+• Heat (district heating, heat meters) and meters you get consumption figures for, such as kWh per month.
 • Points to check: the app spots readings that were probably mistyped.
 • Charts: year to date, monthly consumption, year comparison, climate.
-• Available in English, French and Dutch, in any currency.
+• Available in English, French, Dutch and German, in any currency.
 • Fully free F-Droid version: no automatic reading, the index is typed by hand.
 
 Weather data: Open-Meteo.com (CC BY 4.0).

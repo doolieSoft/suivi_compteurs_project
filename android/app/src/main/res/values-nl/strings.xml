@@ -6,6 +6,7 @@
     <string name="index_avec_unite">%1$s %2$s</string>
     <string name="aucun_index">Geen meterstand</string>
     <string name="solde_restant">Nog %1$s %2$s</string>
+    <string name="derniere_consommation">+%1$s %2$s de laatste periode</string>
     <string name="solde_bientot_epuise">bijna op</string>
     <plurals name="solde_jours_restants">
         <item quantity="one">ongeveer %1$d dag</item>
@@ -116,6 +117,7 @@
     <string name="energie_electricite">Elektriciteit</string>
     <string name="energie_mazout">Stookolie</string>
     <string name="energie_repartiteur">Warmtekostenverdelers</string>
+    <string name="energie_chaleur">Warmte</string>
     <string name="plage_haute">piekuren</string>
     <string name="plage_basse">daluren</string>
     <string name="libelle_plage">%1$s – %2$s</string>

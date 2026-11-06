@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Suivi compteurs</string>
+
+    <!-- Startseite -->
+    <string name="index_avec_unite">%1$s %2$s</string>
+    <string name="aucun_index">Kein Zählerstand</string>
+    <string name="solde_restant">noch %1$s %2$s</string>
+    <string name="derniere_consommation">+%1$s %2$s im letzten Zeitraum</string>
+    <string name="solde_bientot_epuise">bald aufgebraucht</string>
+    <plurals name="solde_jours_restants">
+        <item quantity="one">etwa %1$d Tag</item>
+        <item quantity="other">etwa %1$d Tage</item>
+    </plurals>
+    <string name="releve_du">abgelesen am %1$s</string>
+    <string name="reglages">Einstellungen</string>
+    <string name="consulter">Verlauf und Prognosen anzeigen</string>
+    <string name="exporter">Exportieren</string>
+    <string name="export_en_cours">Arbeitsmappe wird erstellt…</string>
+    <string name="export_reussi">Arbeitsmappe gespeichert.</string>
+    <string name="export_ecriture_impossible">Die Arbeitsmappe konnte an diesem Ort nicht gespeichert werden.</string>
+    <string name="importer">Importieren</string>
+    <string name="import_titre">Arbeitsmappe importieren?</string>
+    <string name="import_confirmation">Die Daten auf diesem Gerät werden durch die der Arbeitsmappe ersetzt; auf dem Telefon erfasste Zählerstände, die in der Arbeitsmappe fehlen, bleiben erhalten.</string>
+    <string name="importer_confirmer">Importieren</string>
+    <string name="annuler">Abbrechen</string>
+    <string name="import_en_cours">Arbeitsmappe wird gelesen…</string>
+    <string name="import_illisible">Diese Datei konnte nicht als Excel-Arbeitsmappe gelesen werden.</string>
+    <plurals name="import_reussi">
+        <item quantity="one">Arbeitsmappe importiert: %1$d Zählerstand.</item>
+        <item quantity="other">Arbeitsmappe importiert: %1$d Zählerstände.</item>
+    </plurals>
+    <string name="tirer_pour_synchroniser">Zum Aktualisieren des Wetters nach unten ziehen</string>
+
+    <!-- Ablesung -->
+    <string name="titre_saisie">Neue Ablesung</string>
+    <string name="compteur_introuvable">Zähler nicht gefunden</string>
+    <string name="dernier_index">Letzter bekannter Zählerstand: %1$s %2$s</string>
+    <string name="cadrer_le_compteur">Näher heran: Die Ziffern sollten die ganze Breite füllen</string>
+    <string name="declencher">Foto aufnehmen</string>
+    <string name="reprendre">Neues Foto</string>
+    <string name="sans_photo">Ohne Foto</string>
+    <string name="depuis_galerie">Aus der Galerie</string>
+    <string name="lampe_allumer">Taschenlampe</string>
+    <string name="lampe_eteindre">Taschenlampe an</string>
+    <string name="lampe_indisponible">Keine Taschenlampe auf diesem Gerät</string>
+    <string name="entourer_le_cadran">Umkreise die Ziffern des Zählwerks mit dem Finger und lies dann erneut.</string>
+    <string name="lire_la_zone">Umkreisten Bereich lesen</string>
+    <string name="photo_echouee">Das Foto konnte nicht aufgenommen werden</string>
+    <string name="camera_refusee">Kamera nicht verfügbar: Zählerstand bitte von Hand eingeben.</string>
+    <string name="ocr_en_cours">Zähler wird gelesen…</string>
+    <string name="ocr_echec">Keine Ziffern erkannt. Zählerstand bitte von Hand eingeben.</string>
+    <string name="ocr_lu_sur_la_photo">Auf dem Foto gelesen: %1$s</string>
+    <string name="ocr_autres_suites">Weitere gelesene Ziffernfolgen: %1$s</string>
+    <string name="ocr_aucun_chiffre">Keine Ziffern auf dem Foto erkannt.</string>
+    <string name="ocr_sans_historique">Kein vorheriger Zählerstand: bitte sorgfältig prüfen.</string>
+    <string name="ocr_rien_ne_ressemble">Keine Ziffernfolge sieht wie ein Zählerstand aus: bitte von Hand eingeben.</string>
+    <string name="ocr_inhabituelle">Ungewöhnlicher Anstieg um %1$s: bitte bestätigen.</string>
+    <string name="ocr_progression">Das sind %1$s seit der letzten Ablesung.</string>
+    <string name="ocr_recul">Niedriger als der letzte Zählerstand: bitte von Hand korrigieren.</string>
+    <string name="ocr_resultat">Auf dem Foto gelesen: %1$s. %2$s</string>
+    <string name="index_releve">Zählerstand</string>
+    <string name="index_obligatoire">Bitte einen Zählerstand eingeben</string>
+    <string name="date_du_releve">Ablesedatum</string>
+    <string name="commentaire">Kommentar (optional)</string>
+    <string name="releve_annuel">Jahresablesung</string>
+    <string name="releve_annuel_aide">Für die Ablesung ankreuzen, die das Jahr abschließt: Die Prognosen beginnen ab diesem Datum.</string>
+    <string name="enregistrer">Speichern</string>
+    <string name="releve_enregistre">Ablesung gespeichert</string>
+    <string name="releve_enregistre_avec_ecart">Ablesung gespeichert: %1$s %2$s seit der vorherigen</string>
+
+    <!-- Prognosen, auf dem Gerät berechnet -->
+    <string name="titre_tableau_de_bord">Prognosen</string>
+    <string name="tableau_vide">Keine Daten auf diesem Gerät. Importiere eine Excel-Arbeitsmappe über das Menü der Startseite oder lege dein Haus und seine Zähler an.</string>
+    <string name="tiret">—</string>
+    <string name="valeur_unite">%1$s %2$s</string>
+    <string name="pourcent">%1$s %%</string>
+    <string name="pas_de_releve_sur_la_periode">Keine Ablesung im laufenden Jahr</string>
+    <string name="periode_releve_annuel">erwartet bis %2$s, seit der Jahresablesung vom %1$s</string>
+    <string name="periode_annee_civile">erwartet für %1$d</string>
+    <string name="detail_realise">%1$s %2$s abgelesen über %3$d Tage, %4$s %2$s geschätzt über %5$d Tage</string>
+    <string name="fourchette">Spanne %1$s – %2$s</string>
+    <string name="evolution_vs">%1$s im Vergleich zu %2$d (%3$s %4$s)</string>
+    <string name="evolution_climat_egal">%1$s bei gleichem Wetter</string>
+    <string name="cout_estime">≈ %1$s</string>
+    <string name="methode_employee">Methode: %1$s</string>
+    <string name="methode_thermique">Wärmemodell (normale Gradtage)</string>
+    <plurals name="methode_profil">
+        <item quantity="one">saisonales Profil (%1$d Referenzjahr)</item>
+        <item quantity="other">saisonales Profil (%1$d Referenzjahre)</item>
+    </plurals>
+    <plurals name="methode_moyenne">
+        <item quantity="one">Durchschnitt von %1$d vergangenem Jahr</item>
+        <item quantity="other">Durchschnitt von %1$d vergangenen Jahren</item>
+    </plurals>
+    <string name="methode_prorata">anteilig nach verstrichener Zeit (keine vollständige Historie)</string>
+    <string name="methode_aucune">nichts zu schätzen</string>
+    <plurals name="points_a_verifier">
+        <item quantity="one">⚠ %1$d Punkt zu prüfen</item>
+        <item quantity="other">⚠ %1$d Punkte zu prüfen</item>
+    </plurals>
+    <string name="periode_du_au">vom %1$s bis %2$s</string>
+    <string name="anomalie_avec_periode">%1$s: %2$s</string>
+    <plurals name="anomalie_lacune">
+        <item quantity="one">%1$d Tag ohne verwertbare Ablesung</item>
+        <item quantity="other">%1$d Tage ohne verwertbare Ablesung</item>
+    </plurals>
+    <plurals name="anomalie_index_fige">
+        <item quantity="one">Zählerstand %1$d Tag unverändert, wahrscheinlich fehlt eine Ablesung</item>
+        <item quantity="other">Zählerstand %1$d Tage unverändert, wahrscheinlich fehlt eine Ablesung</item>
+    </plurals>
+    <string name="anomalie_releve_douteux">Ablesung vom %1$s möglicherweise falsch: davor %2$s %6$s verbraucht (etwa %3$s erwartet), danach %4$s %6$s (etwa %5$s erwartet)</string>
+    <string name="anomalie_surconso_climat">%1$s %2$s in %3$d Tagen, %4$s× so viel wie nach dem Wetter zu erwarten</string>
+    <string name="anomalie_surconso">%1$s %2$s in %3$d Tagen, %4$s× der übliche Verbrauch</string>
+    <string name="energie_eau">Wasser</string>
+    <string name="energie_gaz">Gas</string>
+    <string name="energie_electricite">Strom</string>
+    <string name="energie_mazout">Heizöl</string>
+    <string name="energie_repartiteur">Heizkostenverteiler</string>
+    <string name="energie_chaleur">Wärme</string>
+    <string name="plage_haute">Hochtarif</string>
+    <string name="plage_basse">Niedertarif</string>
+    <string name="libelle_plage">%1$s – %2$s</string>
+
+    <!-- Einstellungen -->
+    <string name="titre_reglages">Einstellungen</string>
+    <string name="rappel_titre_reglage">An die Ablesung erinnern</string>
+    <string name="rappel_intervalle">Alle wie viele Tage?</string>
+    <string name="notifications_refusees">Ohne Erlaubnis für Benachrichtigungen kann die Erinnerung nicht funktionieren.</string>
+
+    <string name="langue">Sprache</string>
+    <string name="langue_actuelle">Sprache: %1$s</string>
+    <string name="langue_appareil">Gerätesprache</string>
+
+    <!-- Erinnerungen -->
+    <string name="canal_rappels">Ableseerinnerungen</string>
+    <string name="canal_rappels_description">Regelmäßige Benachrichtigung, die zum Ablesen der Zähler einlädt.</string>
+    <string name="rappel_titre">Zählerablesung</string>
+    <string name="rappel_texte">Zeit, deine Zählerstände zu notieren.</string>
+    <string name="accueil_vide">Willkommen! Lege zuerst dein Haus und seine Zähler an.\n\nTipp: Trage die Zählerstände deiner früheren Jahresabrechnungen ein („Frühere Zählerstände hinzufügen“ bei jedem Zähler): Die Prognosen stimmen dann sofort. Lies im ersten Monat einmal pro Woche ab.</string>
+    <string name="reprendre_sauvegarde">Eine Excel-Datei importieren</string>
+    <string name="reprendre_sauvegarde_aide">Daten aus einer früheren Version oder von einem anderen Telefon exportiert? Importiere diese Datei, um sie wiederherzustellen.</string>
+    <string name="creer_maison">Mein Haus anlegen</string>
+    <string name="donnees_sur_appareil">Deine Daten bleiben auf diesem Gerät</string>
+    <string name="meteo_a_jour">Wetter aktualisiert %1$s</string>
+    <string name="meteo_mise_a_jour">Wetter aktuell</string>
+    <string name="meteo_hors_ligne">Kein Netz: Das Wetter wird später aktualisiert. Alles andere funktioniert offline.</string>
+    <string name="meteo_echec">Wetter nicht verfügbar: %1$s</string>
+    <string name="devise">Währung der Tarife</string>
+    <string name="devise_actuelle">Währung: %1$s</string>
+    <string name="devise_region">Aus der Region (%1$s)</string>
+    <string name="source_meteo">Wetterdaten: Open-Meteo.com (CC BY 4.0)</string>
+    <string name="soutenir">Die Entwicklung unterstützen (beliebiger Betrag)</string>
+    <string name="version_application">Version %1$s (%2$d)</string>
+    <string name="enregistre">Gespeichert</string>
+    <string name="reglages_enregistres">Einstellungen gespeichert</string>
+    <string name="accueil_sans_compteur_a_relever">Keine Zähler abzulesen: Deine Häuser werden nicht mehr abgelesen. Ihr Verlauf bleibt unten einsehbar.</string>
+    <string name="import_export">Excel-Import / -Export</string>
+    <string name="import_export_explication">Export: speichert alle deine Daten in einer Excel-Datei, als Sicherung (Google Drive, E-Mail…).\n\nImport: stellt die Daten aus einer von der App exportierten Datei wieder her, zum Beispiel auf einem neuen Telefon. Du wirst um Bestätigung gebeten.</string>
+    <string name="titre_historique">Verlauf</string>
+    <string name="consulter_historique">Verlauf anzeigen</string>
+    <string name="releves_jusqua">Ablesungen bis %1$s</string>
+    <string name="tendance_stable">→ unverändert seit der Ablesung vom %1$s</string>
+    <string name="tendance_hausse">↑ +%1$s %2$s seit der Ablesung vom %3$s</string>
+    <string name="tendance_baisse">↓ −%1$s %2$s seit der Ablesung vom %3$s</string>
+    <string name="prochain_rappel">Nächste Erinnerung: %1$s</string>
+    <string name="prochain_rappel_apres_enregistrement">Das Datum der nächsten Erinnerung wird beim Speichern festgelegt.</string>
+    <string name="reglages_enregistres_rappel">Einstellungen gespeichert. Nächste Erinnerung am %1$s.</string>
+    <string name="estime_avant_premier_releve">davon %1$s %2$s geschätzt für die %3$d Tage vor deiner ersten Ablesung</string>
+    <string name="menu">Menü</string>
+    <string name="impact_prevision">Prognose: %1$s → %2$s %3$s (%4$s)</string>
+    <string name="impact_prevision_stable">Prognose: %1$s %2$s, unverändert</string>
+    <string name="impact_periode">%1$s %2$s in %3$d Tagen</string>
+    <string name="impact_comme_attendu">%1$s %2$s in %3$d Tagen, wie bei diesem Wetter erwartet</string>
+    <string name="impact_moins_attendu">%1$s %2$s in %3$d Tagen, %4$s %% weniger als bei diesem Wetter erwartet</string>
+    <string name="impact_plus_attendu">%1$s %2$s in %3$d Tagen, %4$s %% mehr als bei diesem Wetter erwartet</string>
+    <string name="ouvrir_reglages">Einstellungen öffnen</string>
+</resources>

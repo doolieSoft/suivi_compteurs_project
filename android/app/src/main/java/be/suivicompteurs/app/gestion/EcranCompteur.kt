@@ -45,6 +45,7 @@ fun EcranCompteur(
     surCompteur: (Long) -> Unit,
     surReleveRadiateurs: (Long, String?) -> Unit,
     surReleveSolde: (Long, String?) -> Unit,
+    surReleveConsommation: (Long, String?) -> Unit,
 ) {
     val portee = rememberCoroutineScope()
     // Confirmation brève après un enregistrement : l'écran ne change pas.
@@ -64,6 +65,7 @@ fun EcranCompteur(
     var radiateurs by remember { mutableStateOf<List<RadiateurLocal>>(emptyList()) }
     var radiateurEdite by remember { mutableStateOf<RadiateurLocal?>(null) }
     var prepaye by remember { mutableStateOf(false) }
+    var parConsommation by remember { mutableStateOf(false) }
     var achats by remember { mutableStateOf<List<AchatLocal>>(emptyList()) }
     var achatEdite by remember { mutableStateOf<AchatLocal?>(null) }
     var releveEdite by remember { mutableStateOf<Pair<ReleveHistorique, String?>?>(null) }
@@ -81,6 +83,7 @@ fun EcranCompteur(
             energie = c.energie; plage = c.plage; libelle = c.libelle; numero = c.numero
             unite = c.unite; coef = ecrireNombre(c.coefKwh); pose = c.datePose; depose = c.dateDepose
             prepaye = c.prepaye
+            parConsommation = c.parConsommation
         }
         origine = c
         nomMaison = gestion.maison(c.maisonId)?.nom.orEmpty()
@@ -89,14 +92,15 @@ fun EcranCompteur(
         achats = gestion.achats(compteurId).sortedByDescending { it.date }
     }
     val repartiteur = energie == "REP"
-    // Ces deux-là tiennent leurs index de leur propre saisie.
-    val indexCalcule = repartiteur || prepaye
+    // Ceux-là tiennent leurs index de leur propre saisie.
+    val indexCalcule = repartiteur || prepaye || parConsommation
     val cuve = prepaye && energie == "MAZ"
 
     fun enregistrer() = portee.launch {
         val c = (origine ?: CompteurHistorique(0, maisonId, energie, plage, unite, "", null)).copy(
             energie = energie, plage = plage, libelle = libelle, numero = numero.trim(), unite = unite.trim(),
             coefKwh = lireNombre(coef) ?: 1.0, datePose = pose, dateDepose = depose, prepaye = prepaye,
+            parConsommation = parConsommation,
         )
         compteurId = gestion.enregistrerCompteur(c)
         portee.launch { messages.showSnackbar(enregistre) }
@@ -119,24 +123,31 @@ fun EcranCompteur(
             energie = it
             // Valeurs usuelles : le gaz se relève en m³ et se convertit à ~11 kWh/m³.
             if (compteurId == 0L) {
-                unite = when (it) { "ELEC" -> "kWh"; "MAZ" -> "L"; "REP" -> "u"; else -> "m³" }
+                unite = when (it) { "ELEC", "CHA" -> "kWh"; "MAZ" -> "L"; "REP" -> "u"; else -> "m³" }
                 // Un litre de mazout libère environ 10 kWh.
                 coef = when (it) { "GAZ" -> "11"; "MAZ" -> "10"; else -> "1" }
                 // Le mazout se lit le plus souvent à la jauge de la cuve.
                 prepaye = it == "MAZ"
+                if (it == "REP") parConsommation = false
             }
         }
         // Le choix se fait à la création : les relevés n'ont pas le même sens.
         if (energie in setOf("ELEC", "MAZ") && compteurId == 0L) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = prepaye, onCheckedChange = { prepaye = it; plage = "UNIQUE" })
+                Checkbox(checked = prepaye, onCheckedChange = { prepaye = it; plage = "UNIQUE"; if (it) parConsommation = false })
                 Text(stringResource(if (energie == "MAZ") R.string.compteur_cuve else R.string.compteur_prepaye))
+            }
+        }
+        if (energie != "REP" && !prepaye && compteurId == 0L) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(checked = parConsommation, onCheckedChange = { parConsommation = it })
+                Text(stringResource(R.string.compteur_par_consommation))
             }
         }
         if (energie == "ELEC" && !prepaye) ChampChoix(stringResource(R.string.plage), plages(), plage) { plage = it }
         ChampTexte(stringResource(R.string.libelle_facultatif), libelle, { libelle = it })
         ChampTexte(stringResource(R.string.numero_compteur), numero, { numero = it })
-        if (!indexCalcule) Row {
+        if (!repartiteur && !prepaye) Row {
             ChampTexte(stringResource(R.string.unite), unite, { unite = it }, Modifier.weight(1f).padding(end = 8.dp))
             ChampTexte(stringResource(R.string.coef_kwh), coef, { coef = it }, Modifier.weight(1f), numerique = true)
         }
@@ -198,6 +209,7 @@ fun EcranCompteur(
                 TextButton(onClick = {
                     if (repartiteur) surReleveRadiateurs(compteurId, null)
                     else if (prepaye) surReleveSolde(compteurId, null)
+                    else if (parConsommation) surReleveConsommation(compteurId, null)
                     else releveEdite = ReleveHistorique(compteurId, LocalDate.now().toString(), releves.firstOrNull()?.index ?: 0.0, false) to null
                 }) { IconeTexte(R.drawable.ic_ajouter, stringResource(R.string.ajouter)) }
             })
@@ -214,7 +226,8 @@ fun EcranCompteur(
             }
             releves.forEach { r ->
                 LigneListe(
-                    titre = "${jour(r.date)} · ${afficherNombre(r.solde ?: r.index)} $unite",
+                    titre = if (parConsommation) "${jour(r.date)} · +${afficherNombre(r.consommation ?: 0.0)} $unite"
+                        else "${jour(r.date)} · ${afficherNombre(r.solde ?: r.index)} $unite",
                     detail = listOfNotNull(
                         if (r.annuel) stringResource(R.string.releve_annuel) else null,
                         r.commentaire.ifEmpty { null },
@@ -223,6 +236,7 @@ fun EcranCompteur(
                         when {
                             repartiteur -> surReleveRadiateurs(compteurId, r.date)
                             prepaye -> surReleveSolde(compteurId, r.date)
+                            parConsommation -> surReleveConsommation(compteurId, r.date)
                             else -> releveEdite = r to r.date
                         }
                     },

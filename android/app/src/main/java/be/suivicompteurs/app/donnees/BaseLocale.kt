@@ -45,7 +45,7 @@ interface CompteurDao {
         ReleveRadiateur::class,
         AchatLocal::class,
     ],
-    version = 12,
+    version = 13,
     exportSchema = true,
 )
 abstract class BaseLocale : RoomDatabase() {
@@ -234,6 +234,16 @@ abstract class BaseLocale : RoomDatabase() {
             }
         }
 
+        /** Compteurs saisis en consommations par période plutôt qu'en index. */
+        private val MIGRATION_12_13 = object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `historique_compteurs` ADD COLUMN `parConsommation` INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `historique_releves` ADD COLUMN `consommation` REAL")
+                db.execSQL("ALTER TABLE `compteurs` ADD COLUMN `parConsommation` INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `compteurs` ADD COLUMN `derniereConsommation` REAL")
+            }
+        }
+
         @Volatile
         private var instance: BaseLocale? = null
 
@@ -243,7 +253,7 @@ abstract class BaseLocale : RoomDatabase() {
                     contexte.applicationContext,
                     BaseLocale::class.java,
                     "suivi-compteurs.db",
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13).build().also { instance = it }
             }
     }
 }

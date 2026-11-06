@@ -53,11 +53,12 @@ object ImportClasseur {
     private const val FEUILLE_ACHATS = "Achats"
     private const val FEUILLE_SOLDES = "Soldes"
     private const val FEUILLE_TOURS = "Tours complets"
+    private const val FEUILLE_CONSOMMATIONS = "Consommations"
     private const val FEUILLE_POINTS_VERIFIES = "Points vérifiés"
     private val FEUILLES_TABLEAUX = setOf(
         FEUILLE_MAISONS, FEUILLE_COMPTEURS, FEUILLE_TARIFS, FEUILLE_DJ, FEUILLE_EVENEMENTS,
         FEUILLE_POINTS_VERIFIES, FEUILLE_RADIATEURS, FEUILLE_RELEVES_RADIATEURS,
-        FEUILLE_ACHATS, FEUILLE_SOLDES, FEUILLE_TOURS, "Par année",
+        FEUILLE_ACHATS, FEUILLE_SOLDES, FEUILLE_TOURS, FEUILLE_CONSOMMATIONS, "Par année",
     )
 
     /** Libellés des sources de relevé, tels que le serveur les écrit. */
@@ -136,6 +137,7 @@ object ImportClasseur {
                     coefKwh = enNombre(l["Coefficient kWh"]) ?: 1.0,
                     dateDepose = enDate(l["Déposé le"])?.toString(),
                     prepaye = enTexte(l["Prépayé"]).lowercase() == "oui",
+                    parConsommation = enTexte(l["Saisi en consommations"]).lowercase() == "oui",
                 ),
                 depose = enDate(l["Déposé le"]) != null,
                 maison = maison,
@@ -266,6 +268,14 @@ object ImportClasseur {
                 val jour = enDate(l["Date"]) ?: continue
                 val cle = fiche.historique.id to jour.toString()
                 releves[cle] = releves[cle]?.copy(solde = enNombre(l["Solde"])) ?: continue
+            }
+        }
+        classeur[FEUILLE_CONSOMMATIONS]?.let { feuille ->
+            for (l in tableau(feuille)) {
+                val fiche = fiches[enTexte(l["Compteur"])] ?: continue
+                val jour = enDate(l["Date"]) ?: continue
+                val cle = fiche.historique.id to jour.toString()
+                releves[cle] = releves[cle]?.copy(consommation = enNombre(l["Consommation"])) ?: continue
             }
         }
         classeur[FEUILLE_TOURS]?.let { feuille ->
@@ -422,6 +432,8 @@ object ImportClasseur {
                 dernierIndex = siens.lastOrNull()?.index,
                 dernierReleve = siens.lastOrNull()?.date,
                 prepaye = c.prepaye,
+                parConsommation = c.parConsommation,
+                derniereConsommation = if (c.parConsommation) siens.lastOrNull()?.consommation else null,
                 solde = if (!c.prepaye) null else soldeEstime(
                     siens.mapNotNull { r -> r.solde?.let { SoldeReleve(LocalDate.parse(r.date), it) } },
                     historique.achats.filter { it.compteurId == c.id }.map { it.pourMoteur() },

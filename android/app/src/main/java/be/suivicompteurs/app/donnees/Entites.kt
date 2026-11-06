@@ -44,6 +44,9 @@ data class CompteurLocal(
     @ColumnInfo(defaultValue = "0") val prepaye: Boolean = false,
     /** Compteur prépayé : dernier solde lu, plus ce qui a été acheté depuis. */
     val solde: Double? = null,
+    @ColumnInfo(defaultValue = "0") val parConsommation: Boolean = false,
+    /** Compteur saisi en consommations : celle de la dernière période. */
+    val derniereConsommation: Double? = null,
 )
 
 /** « Ma maison – Gaz – (compteur 2) », l'énergie et la plage dans la langue de l'interface. */
@@ -56,6 +59,7 @@ fun CompteurLocal.nomAffiche(contexte: Context): String = buildList {
                 "GAZ" -> R.string.energie_gaz
                 "MAZ" -> R.string.energie_mazout
                 "REP" -> R.string.energie_repartiteur
+                "CHA" -> R.string.energie_chaleur
                 else -> R.string.energie_electricite
             }
         )

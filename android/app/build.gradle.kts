@@ -109,7 +109,7 @@ android {
 
     androidResources {
         // Langues de l'interface ; l'anglais (values/) sert pour les autres.
-        localeFilters += listOf("fr", "en", "nl")
+        localeFilters += listOf("fr", "en", "nl", "de")
         // Déclare au système les langues proposées : Android 13 et au-delà
         // les offrent alors dans les réglages de l'application.
         generateLocaleConfig = true

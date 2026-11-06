@@ -135,4 +135,11 @@
     <string name="tour_complet_titre">Le compteur a-t-il fait un tour complet ?</string>
     <string name="tour_complet_question">Ce relevé (%1$s) est plus bas que le précédent (%2$s). Si le compteur a dépassé son maximum et repassé par zéro, vous avez consommé %3$s %4$s.</string>
     <string name="tour_complet_oui">Oui, tour complet</string>
+    <string name="compteur_par_consommation">Je reçois des consommations (par exemple des kWh par mois) plutôt qu\'un index</string>
+    <string name="consommation_premiere">Première saisie : indiquez le début de la période qu\'elle couvre.</string>
+    <string name="consommation_debut">Début de la période</string>
+    <string name="consommation_fin">Fin de la période</string>
+    <string name="consommation_depuis">Période depuis le relevé du %1$s</string>
+    <string name="consommation_valeur">Consommation (%1$s)</string>
+    <string name="consommation_debut_avant_fin">Le début doit précéder la fin.</string>
 </resources>

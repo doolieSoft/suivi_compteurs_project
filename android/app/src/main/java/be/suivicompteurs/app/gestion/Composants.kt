@@ -60,6 +60,7 @@ object Couleurs {
     val elec = Color(0xFFEDA100)
     val mazout = Color(0xFF8A5A2B)
     val repartiteur = Color(0xFFB8336A)
+    val chaleur = Color(0xFFC2185B)
     val primaire = Color(0xFF3D7A4A)
     val encre = Color(0xFF0B0B0B)
     val encre2 = Color(0xFF52514E)
@@ -76,6 +77,7 @@ object Couleurs {
         "GAZ" -> gaz
         "MAZ" -> mazout
         "REP" -> repartiteur
+        "CHA" -> chaleur
         else -> elec
     }
 }
@@ -321,6 +323,7 @@ fun iconeEnergie(code: String): Int = when (code) {
     "GAZ" -> R.drawable.ic_gaz
     "MAZ" -> R.drawable.ic_mazout
     "REP" -> R.drawable.ic_repartiteur
+    "CHA" -> R.drawable.ic_chaleur
     else -> R.drawable.ic_electricite
 }
 

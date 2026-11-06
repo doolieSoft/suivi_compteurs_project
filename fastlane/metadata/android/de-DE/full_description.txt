@@ -1,0 +1,37 @@
+F-Droid-Nutzer: Seit Version 1.6.2 ist die App vom Entwickler signiert. Lässt sich das Update nicht installieren, exportiere deine Daten, installiere neu und importiere sie wieder.
+
+Erfasse deine Wasser-, Gas-, Strom- und Heizölzähler und sieh, wohin dein Jahr steuert.
+
+ABLESEN IN SEKUNDEN
+• Fotografiere den Zähler: Der Stand wird automatisch erkannt, auf dem Telefon, offline (nicht in der F-Droid-Version).
+• Die App prüft die Ablesung: Ein Zähler läuft nie rückwärts, und eine Seriennummer wird nicht für einen Zählerstand gehalten.
+• Ableseerinnerungen, so oft du willst.
+• Nach jeder Ablesung: was sie an der Prognose ändert, und dein Verbrauch im Vergleich zu dem, was das Wetter erwarten ließ.
+
+DEIN JAHR VORHERSAGEN
+• Prognose deines Verbrauchs bis zur nächsten Jahresablesung oder bis zum 31. Dezember.
+• Beim Heizen folgt die Prognose dem Wetter: Ein milder Herbst wird nicht auf den Januar hochgerechnet.
+• Geschätzte Kosten anhand deiner Tarife.
+
+VERGLEICHEN BEI GLEICHEM WETTER
+• Jedes Jahr wird mit Gradtagen um seine Kälte bereinigt: Ein Rückgang durch einen milden Winter sieht nicht mehr wie eine Einsparung aus.
+• Energiesignatur: Sieh, wie viel dein Haus pro Grad Kälte verbraucht und was eine Dämmung bringt.
+• Genauigkeit der Prognosen: Spiele ein vergangenes Jahr nach, um zu sehen, was die App angekündigt hätte.
+
+DEINE DATEN BLEIBEN BEI DIR
+• Kein Konto, kein Server, keine Werbung.
+• Alle Daten bleiben auf dem Telefon; nur der Standort des Hauses wird für das Wetter an Open-Meteo gesendet.
+• Excel-Export und -Import: Sicherung auf Google Drive oder anderswo, Übernahme eines vorhandenen Verlaufs.
+
+UND AUSSERDEM
+• Mehrere Häuser, Zählertausch, Zweitarifzähler, Tarife und Ereignisse (Dämmung, Arbeiten…).
+• Heizkostenverteiler: eine Zeile pro Heizkörper mit seinem Faktor, jährliche Rücksetzung inbegriffen.
+• Prepaid-Zähler: Guthaben ablesen, Käufe notieren, und die App berechnet deinen Verbrauch.
+• Heizöltank mit Füllstandsanzeige: Füllstand ablesen, Lieferungen notieren.
+• Wärme (Fernwärme, Wärmemengenzähler) und Zähler, für die du Verbrauchswerte erhältst, etwa kWh pro Monat.
+• Zu prüfende Punkte: Die App erkennt wahrscheinlich falsch eingegebene Ablesungen.
+• Diagramme: laufendes Jahr, Monatsverbrauch, Jahresvergleich, Wetter.
+• Verfügbar auf Deutsch, Englisch, Französisch und Niederländisch, in jeder Währung.
+• Vollständig freie F-Droid-Version: ohne automatische Erkennung, der Zählerstand wird von Hand eingegeben.
+
+Wetterdaten: Open-Meteo.com (CC BY 4.0).

@@ -6,6 +6,7 @@
     <string name="index_avec_unite">%1$s %2$s</string>
     <string name="aucun_index">Aucun relevé</string>
     <string name="solde_restant">%1$s %2$s restants</string>
+    <string name="derniere_consommation">+%1$s %2$s la dernière période</string>
     <string name="solde_bientot_epuise">bientôt épuisé</string>
     <plurals name="solde_jours_restants">
         <item quantity="one">environ %1$d jour</item>
@@ -123,6 +124,7 @@
     <string name="energie_electricite">Électricité</string>
     <string name="energie_mazout">Mazout / fioul</string>
     <string name="energie_repartiteur">Répartiteurs de chauffage</string>
+    <string name="energie_chaleur">Chaleur</string>
     <string name="plage_haute">heures pleines</string>
     <string name="plage_basse">heures creuses</string>
     <string name="libelle_plage">%1$s – %2$s</string>

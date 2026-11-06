@@ -60,8 +60,8 @@ object ExportClasseur {
 
         // --- une feuille par énergie ------------------------------------------
         for (energie in Energie.entries) {
-            // Les répartiteurs sont rares : pas de feuille vide pour tout le monde.
-            if (energie == Energie.REPARTITEUR && compteurs.none { it.energie == energie.code }) continue
+            // Répartiteurs et chaleur sont plus rares : pas de feuille vide pour tout le monde.
+            if (energie in setOf(Energie.REPARTITEUR, Energie.CHALEUR) && compteurs.none { it.energie == energie.code }) continue
             val f = x.feuille(energie.libelle)
             f.largeurs(12, 13, 11, 7, 10, 11, 13, 18, 40)
             for (c in compteurs.filter { it.energie == energie.code }) {
@@ -167,7 +167,7 @@ object ExportClasseur {
             x, "Compteurs",
             listOf(
                 "Code", "Maison", "Énergie", "Plage", "Libellé", "Numéro", "Unité",
-                "Coefficient kWh", "Posé le", "Déposé le", "Remplace", "Prépayé",
+                "Coefficient kWh", "Posé le", "Déposé le", "Remplace", "Prépayé", "Saisi en consommations",
             ),
             compteurs.map { c ->
                 listOf(
@@ -176,9 +176,10 @@ object ExportClasseur {
                     Cellule(c.libelle), Cellule(c.numero), Cellule(c.unite), Cellule(c.coefKwh),
                     date(c.datePose), date(c.dateDepose), Cellule(c.remplaceId?.let { codesCompteurs[it] }),
                     Cellule(if (c.prepaye) "oui" else null),
+                    Cellule(if (c.parConsommation) "oui" else null),
                 )
             },
-            largeurs = listOf(34, 14, 12, 15, 16, 14, 7, 16, 12, 12, 34, 10),
+            largeurs = listOf(34, 14, 12, 15, 16, 14, 7, 16, 12, 12, 34, 10, 22),
         )
         if (h.radiateurs.isNotEmpty()) {
             tableau(
@@ -219,6 +220,15 @@ object ExportClasseur {
                     )
                 },
                 largeurs = listOf(34, 12, 12, 12, 12, 16),
+            )
+        }
+        val parConsommation = h.compteurs.filter { it.parConsommation }.map { it.id }.toSet()
+        h.releves.filter { it.compteurId in parConsommation && it.consommation != null }.takeIf { it.isNotEmpty() }?.let { liste ->
+            tableau(
+                x, "Consommations",
+                listOf("Compteur", "Date", "Consommation"),
+                liste.map { r -> listOf(Cellule(codesCompteurs[r.compteurId]), date(r.date), Cellule(r.consommation, Format.DECIMALES_3)) },
+                largeurs = listOf(34, 12, 14),
             )
         }
         h.releves.filter { it.tourComplet > 0 }.takeIf { it.isNotEmpty() }?.let { tours ->

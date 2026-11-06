@@ -71,6 +71,8 @@ data class CompteurHistorique(
     val remplaceId: Long? = null,
     /** On y lit un solde qui descend, et non un index qui monte. */
     @ColumnInfo(defaultValue = "0") val prepaye: Boolean = false,
+    /** On en reçoit des consommations par période (les kWh du mois), pas un index. */
+    @ColumnInfo(defaultValue = "0") val parConsommation: Boolean = false,
 )
 
 @Entity(tableName = "historique_releves", primaryKeys = ["compteurId", "date"])
@@ -89,6 +91,8 @@ data class ReleveHistorique(
     val solde: Double? = null,
     /** Maximum du compteur s'il l'a dépassé avant ce relevé et repassé par zéro. */
     @ColumnInfo(defaultValue = "0") val tourComplet: Double = 0.0,
+    /** Compteur saisi en consommations : celle de la période qui s'achève ici. */
+    val consommation: Double? = null,
 )
 
 /** Achat d'énergie pour un compteur prépayé. */

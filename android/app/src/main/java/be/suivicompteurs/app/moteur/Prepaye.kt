@@ -43,6 +43,21 @@ fun achatsEntre(achats: List<AchatEnergie>, depuis: LocalDate?, jusqua: LocalDat
 fun consommationPrepayee(soldePrecedent: Double, achats: Double, soldeActuel: Double): Double =
     max(0.0, soldePrecedent + achats - soldeActuel)
 
+/**
+ * Compteur dont on reçoit des consommations (les kWh du mois) plutôt qu'un
+ * index : l'index de chaque relevé est la somme des consommations jusqu'à lui.
+ * Comme pour les prépayés, le moteur ne voit qu'un compteur ordinaire.
+ */
+fun indexDesConsommations(consommations: List<Pair<LocalDate, Double>>): Map<LocalDate, Double> {
+    var cumul = 0.0
+    val resultat = LinkedHashMap<LocalDate, Double>()
+    for ((date, volume) in consommations.sortedBy { it.first }) {
+        cumul += volume
+        resultat[date] = round(cumul * 1e6) / 1e6
+    }
+    return resultat
+}
+
 /** Une jauge de cuve se lit à quelques pour cent près. */
 const val TOLERANCE_JAUGE = 0.05
 

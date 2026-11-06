@@ -34,7 +34,10 @@ enum class Energie(
      * Répartiteurs de frais de chauffage, voir `Repartiteurs.kt`. L'index est
      * un cumul d'unités sans valeur physique : ni kWh, ni tarif.
      */
-    REPARTITEUR("REP", "Répartiteurs", true, 4);
+    REPARTITEUR("REP", "Répartiteurs", true, 4),
+
+    /** Chaleur livrée en kWh : réseau de chaleur, compteur de chaleur d'appartement. */
+    CHALEUR("CHA", "Chaleur", true, 5);
 
     companion object {
         fun depuisCode(code: String): Energie = entries.first { it.code == code }

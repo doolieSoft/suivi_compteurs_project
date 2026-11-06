@@ -118,6 +118,15 @@ class PrepayeTest {
     }
 
     @Test
+    fun `des consommations mensuelles donnent un index cumule`() {
+        val index = indexDesConsommations(
+            listOf(jour("2026-10-31") to 1240.0, jour("2026-10-01") to 0.0, jour("2026-11-30") to 1800.0)
+        )
+        assertEquals(listOf(jour("2026-10-01"), jour("2026-10-31"), jour("2026-11-30")), index.keys.toList())
+        assertEquals(listOf(0.0, 1240.0, 3040.0), index.values.toList())
+    }
+
+    @Test
     fun `un achat paye donne son prix au kwh jusqu au suivant`() {
         val tarifs = tarifsDesAchats(
             listOf(achat("2026-01-01", 100.0, montant = 300.0), achat("2026-02-01", 50.0), achat("2026-03-01", 100.0, montant = 350.0)),

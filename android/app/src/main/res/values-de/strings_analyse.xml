@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Auf dem Gerät berechnete Auswertungen. -->
+<resources>
+    <string name="comparaison_climat">Jahresvergleich und Wetter</string>
+    <string name="justesse_previsions">Genauigkeit der Prognosen</string>
+
+    <string name="prevision_annee">Prognose %1$d</string>
+    <string name="evolution_vs_titre">Veränderung gegenüber %1$d</string>
+    <string name="reference_valeur">%1$d: %2$s %3$s</string>
+    <string name="depuis_janvier">Seit dem 1. Januar, bis %1$s</string>
+    <string name="an_dernier_a_date">letztes Jahr zum selben Datum: %1$s %2$s (%3$s)</string>
+    <string name="climat_vs_an_dernier">Wetter: %1$s Gradtage</string>
+    <string name="graphique_cumul">Kumuliert seit dem 1. Januar</string>
+    <string name="graphique_mensuel">Monatsverbrauch (%1$s)</string>
+    <string name="graphique_signature">Energiesignatur</string>
+    <string name="periodes_entre_releves">Zeiträume zwischen den Ablesungen</string>
+    <string name="releves_annee">Ablesungen %1$d</string>
+    <string name="modele_ajuste">Modell</string>
+    <string name="modele_resume">Waagerecht die Gradtage pro Tag, senkrecht der Verbrauch pro Tag. Grundlast %1$s pro Tag, %2$s pro Gradtag, R² %3$s; das Heizen macht etwa %4$s %% des Verbrauchs aus.</string>
+    <string name="modele_non_fiable">Waagerecht die Gradtage pro Tag, senkrecht der Verbrauch pro Tag. Der Zusammenhang mit dem Wetter ist nicht deutlich genug für ein verlässliches Modell.</string>
+    <string name="par_annee">Pro Jahr</string>
+    <string name="annee">Jahr</string>
+    <string name="consommation_unite">Verbr. (%1$s)</string>
+    <string name="jours">Tage</string>
+    <string name="degres_jours_court">GT</string>
+    <string name="degres_jours">Gradtage</string>
+    <string name="climat_normal">Normales Wetter</string>
+    <string name="annee_incomplete">* unvollständiges Jahr</string>
+    <string name="couts">Kosten</string>
+    <string name="cout_variable">Verbrauch</string>
+    <string name="cout_abonnement">Grundpreis</string>
+    <string name="cout_total">Gesamt</string>
+    <string name="graphique_index">Zählerstände (%1$s)</string>
+    <string name="compteur_n">Zähler %1$d</string>
+
+    <string name="titre_comparaison">Vergleich</string>
+    <string name="mesuree">Gemessen</string>
+    <string name="voir_le_detail">Details ›</string>
+    <string name="titre_climat">Wetter: Gradtage pro Jahr</string>
+    <string name="normale">Normal</string>
+    <string name="ecart_normale">Abweichung vom Normalwert</string>
+    <string name="climat_explication">Je mehr Gradtage, desto kälter das Jahr. Der Normalwert ist der Durchschnitt der letzten zehn Jahre.</string>
+
+    <string name="titre_justesse">Genauigkeit der Prognosen</string>
+    <string name="justesse_explication">Was die Prognose bei jeder Ablesung des Jahres angekündigt hätte, ohne alles Spätere zu kennen, im Vergleich zum tatsächlich gemessenen Verbrauch.</string>
+    <string name="rien_a_rejouer">Noch kein vollständiges Jahr zum Nachspielen.</string>
+    <string name="reel_et_ecart">Tatsächlich: %1$s %2$s · mittlere Abweichung %3$s %%</string>
+    <string name="periode_annuelle">Vom %1$s bis %2$s, von einer Jahresablesung zur nächsten</string>
+    <string name="periode_civile">Kalenderjahr: Der Verbrauch um den 1. Januar wird geschätzt.</string>
+    <string name="borne_estimee">Keine Jahresablesung um den %1$s: Grenze vollständig geschätzt.</string>
+    <string name="borne_pile">Jahresablesung vom %1$s, genau auf der Grenze.</string>
+    <string name="borne_ecart">Jahresablesung vom %1$s, %2$d Tage von der Grenze entfernt: %3$s %4$s geschätzt, um die Lücke zu schließen.</string>
+    <string name="au">Am</string>
+    <string name="prevu">Prognose</string>
+    <string name="ecart">Abweichung</string>
+    <string name="fourchette_court">In der Spanne</string>
+    <string name="oui">ja</string>
+    <string name="non">nein</string>
+    <string name="marquer_resolu">Als geprüft und erledigt markieren</string>
+    <string name="points_verifies">Geprüfte Punkte (%1$d)</string>
+    <string name="resolu_le">erledigt am %1$s</string>
+    <string name="point_resolu">Punkt geprüft und erledigt</string>
+    <string name="resolu_le_champ">Erledigt am</string>
+    <string name="ce_qui_a_ete_fait">Was getan wurde</string>
+    <string name="rouvrir">Wieder öffnen</string>
+    <string name="modifier">Bearbeiten</string>
+</resources>

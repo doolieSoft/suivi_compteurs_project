@@ -74,11 +74,13 @@ version older than 1.6.2.
 - heat cost allocators: one line per radiator with its factor, annual resets
   included;
 - prepaid meters: read the balance, note your purchases;
+- heat (district heating, heat meters), and meters you get consumption figures
+  for per period rather than a reading;
 - heating oil tanks with a gauge: read the level, note your deliveries;
 - points to check, including readings that were probably mistyped;
 - Excel import and export, which doubles as a backup (Google Drive included);
 - reading reminders;
-- French, English and Dutch; your choice of currency.
+- French, English, Dutch and German; your choice of currency.
 
 ## How the numbers are calculated
 

@@ -8,6 +8,7 @@
     <string name="index_avec_unite">%1$s %2$s</string>
     <string name="aucun_index">No reading</string>
     <string name="solde_restant">%1$s %2$s left</string>
+    <string name="derniere_consommation">+%1$s %2$s last period</string>
     <string name="solde_bientot_epuise">running out</string>
     <plurals name="solde_jours_restants">
         <item quantity="one">about %1$d day</item>
@@ -118,6 +119,7 @@
     <string name="energie_electricite">Electricity</string>
     <string name="energie_mazout">Heating oil</string>
     <string name="energie_repartiteur">Heat cost allocators</string>
+    <string name="energie_chaleur">Heat</string>
     <string name="plage_haute">peak hours</string>
     <string name="plage_basse">off-peak hours</string>
     <string name="libelle_plage">%1$s – %2$s</string>

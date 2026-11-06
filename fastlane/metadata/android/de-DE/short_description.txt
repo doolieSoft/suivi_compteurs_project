@@ -1,0 +1,1 @@
+Zähler ablesen und den Verbrauch vorhersagen, wetterbereinigt.

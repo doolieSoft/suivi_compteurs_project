@@ -64,6 +64,20 @@ class VentilationTest {
     }
 }
 
+class ChaleurTest {
+    private val djs = Fabrique.climat(date("2022-01-01"), date("2024-12-31"))
+
+    @Test
+    fun `la chaleur suit le climat comme le gaz`() {
+        val conso = djs.mapValues { 2.0 + 3.0 * it.value }
+        val dates = Fabrique.datesTousLes(date("2022-01-01"), date("2024-12-31"), 30)
+        val ligne = lignes(listOf(Fabrique.compteur(Energie.CHALEUR, Fabrique.releves(conso, dates), unite = "kWh")), djs).single()
+        assertTrue(ligne.thermosensible)
+        assertTrue(ligne.serie.modele.fiable)
+        assertEquals(3.0, ligne.serie.modele.k, 0.1)
+    }
+}
+
 class TourCompletTest {
     @Test
     fun `le maximum se deduit du nombre de chiffres`() {

@@ -174,9 +174,31 @@ class ExportClasseurTest {
     }
 
     @Test
+    fun `un compteur saisi en consommations survit a l'export`() {
+        val base = synthetique()
+        val compteur = CompteurHistorique(9000, base.maisons.first().id, "CHA", "UNIQUE", "kWh", "mensuel", "2026-10-01", parConsommation = true)
+        val h = base.copy(
+            compteurs = base.compteurs + compteur,
+            releves = base.releves + listOf(
+                ReleveHistorique(compteur.id, "2026-10-01", 0.0, false, consommation = 0.0),
+                ReleveHistorique(compteur.id, "2026-10-31", 1240.0, false, consommation = 1240.0),
+            ),
+        )
+
+        val apres = importer(exporter(h).inputStream())
+
+        val repris = apres.historique.compteurs.single { it.libelle == "mensuel" }
+        assertTrue(repris.parConsommation)
+        assertEquals("CHA", repris.energie)
+        assertEquals(listOf(0.0, 1240.0), apres.historique.releves.filter { it.compteurId == repris.id }.map { it.consommation })
+        assertEquals(1240.0, apres.compteursASaisir.single { it.id.toLong() == repris.id }.derniereConsommation!!, 0.0)
+    }
+
+    @Test
     fun `sans repartiteur ni prepaye le classeur ne change pas`() {
         val noms = Classeur.lire(exporter(synthetique()).inputStream()).noms
         assertTrue("Répartiteurs" !in noms)
+        assertTrue("Chaleur" !in noms)
         assertTrue("Radiateurs" !in noms)
         assertTrue("Achats" !in noms)
         assertTrue("Soldes" !in noms)

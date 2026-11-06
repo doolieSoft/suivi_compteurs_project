@@ -232,9 +232,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun ouvrirSaisie(compteur: CompteurLocal) {
         startActivity(
-            if (compteur.energie == "REP" || compteur.prepaye) {
-                val cle = if (compteur.prepaye) be.suivicompteurs.app.gestion.GestionActivity.RELEVE_SOLDE
-                    else be.suivicompteurs.app.gestion.GestionActivity.RELEVE_RADIATEURS
+            if (compteur.energie == "REP" || compteur.prepaye || compteur.parConsommation) {
+                val cle = when {
+                    compteur.prepaye -> be.suivicompteurs.app.gestion.GestionActivity.RELEVE_SOLDE
+                    compteur.parConsommation -> be.suivicompteurs.app.gestion.GestionActivity.RELEVE_CONSOMMATION
+                    else -> be.suivicompteurs.app.gestion.GestionActivity.RELEVE_RADIATEURS
+                }
                 Intent(this, be.suivicompteurs.app.gestion.GestionActivity::class.java).putExtra(cle, compteur.id.toLong())
             } else {
                 Intent(this, SaisieActivity::class.java)
@@ -382,6 +385,9 @@ class CompteurAdapter(
         cellule.vues.libelle.text = compteur.nomAffiche(contexte)
         cellule.vues.index.text = when {
             compteur.solde != null -> soldeRestant(contexte, compteur, compteur.solde)
+            compteur.derniereConsommation != null -> contexte.getString(
+                R.string.derniere_consommation, formaterIndex(compteur.derniereConsommation), compteur.unite,
+            )
             else -> compteur.dernierIndex?.let {
                 contexte.getString(R.string.index_avec_unite, formaterIndex(it), compteur.unite)
             } ?: contexte.getString(R.string.aucun_index)
@@ -394,6 +400,7 @@ class CompteurAdapter(
             "GAZ" -> R.drawable.ic_gaz to R.color.gaz
             "MAZ" -> R.drawable.ic_mazout to R.color.mazout
             "REP" -> R.drawable.ic_repartiteur to R.color.repartiteur
+            "CHA" -> R.drawable.ic_chaleur to R.color.chaleur
             else -> R.drawable.ic_electricite to R.color.elec
         }
         cellule.vues.pastille.setImageResource(icone)

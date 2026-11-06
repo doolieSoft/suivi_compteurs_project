@@ -26,6 +26,14 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
    `gitlab.com/fdroid/fdroiddata`) demande une merge request.
    Le workflow `suivi-fdroid.yml` ouvre chaque jour au besoin une issue : version
    parue, construction échouée, ou retard de 14 jours.
+   Constructions reproductibles (MR fdroiddata !55776, fusionnée le 6/11/2026,
+   à partir de la 1.6.2) :
+   F-Droid distribue l'APK libre publié sur GitHub, signé par le développeur,
+   après avoir vérifié qu'il est identique au sien. Une version qui ne l'est
+   pas n'est pas publiée : ne rien changer à l'environnement de construction
+   sans vérifier, et garder `dependenciesInfo { includeInApk = false }` (F-Droid
+   refuse ce bloc dans la signature). Une erreur dans l'APK publié impose une
+   nouvelle version ; une erreur de recette se corrige dans fdroiddata.
 7. Le téléphone du développeur a la version **Play Store** (signée par la clé
    de Google) : aucun APK construit ici ne s'installe par-dessus. Ne jamais
    la désinstaller (ses relevés seraient perdus) ; elle se met à jour par le

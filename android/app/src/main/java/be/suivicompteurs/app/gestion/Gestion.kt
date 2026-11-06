@@ -21,6 +21,7 @@ import be.suivicompteurs.app.moteur.DegresJours
 import be.suivicompteurs.app.moteur.Radiateur
 import be.suivicompteurs.app.moteur.SoldeReleve
 import be.suivicompteurs.app.moteur.indexCumules
+import be.suivicompteurs.app.moteur.indexDesConsommations
 import be.suivicompteurs.app.moteur.indexPrepayes
 import be.suivicompteurs.app.moteur.maximumApresTour
 import java.time.LocalDate
@@ -271,10 +272,35 @@ class Gestion(contexte: Context) {
         rafraichirSaisie()
     }
 
+    /**
+     * Enregistre la consommation d'une période qui s'achève à la date de
+     * [releve]. [debut], à la première saisie, crée le relevé qui ouvre la
+     * période. L'index de [releve] est ignoré : il se déduit des consommations.
+     */
+    suspend fun enregistrerReleveConsommation(releve: ReleveHistorique, debut: String?, dateAvant: String?) {
+        val compteurId = releve.compteurId
+        val existants = dao.relevesDe(compteurId)
+        if (existants.any { it.date == releve.date && it.date != dateAvant }) {
+            throw Refus(Motif.DATE_DEJA_RELEVEE, releve.date)
+        }
+        base.withTransaction {
+            dateAvant?.let { dao.supprimerReleve(compteurId, it) }
+            if (debut != null && debut < releve.date && existants.none { it.date == debut }) {
+                dao.enregistrerReleve(ReleveHistorique(compteurId, debut, 0.0, false, consommation = 0.0))
+            }
+            dao.enregistrerReleve(releve)
+            recalculerIndex(compteurId)
+        }
+        rafraichirSaisie()
+    }
+
     /** Sans radiateurs ni solde, comme pour tout compteur ordinaire, rien ne change. */
     private suspend fun recalculerIndex(compteurId: Long) {
         val releves = dao.relevesDe(compteurId)
-        val cumuls = if (dao.compteur(compteurId)?.prepaye == true) {
+        val compteur = dao.compteur(compteurId)
+        val cumuls = if (compteur?.parConsommation == true) {
+            indexDesConsommations(releves.map { LocalDate.parse(it.date) to (it.consommation ?: 0.0) })
+        } else if (compteur?.prepaye == true) {
             indexPrepayes(
                 releves.mapNotNull { r -> r.solde?.let { SoldeReleve(LocalDate.parse(r.date), it) } },
                 dao.achatsDe(compteurId).map { it.pourMoteur() },

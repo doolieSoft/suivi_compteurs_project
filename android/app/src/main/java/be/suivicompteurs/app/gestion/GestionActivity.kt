@@ -52,7 +52,8 @@ class GestionActivity : AppCompatActivity() {
         val gestion = Gestion(this)
         val relever = intent.getLongExtra(RELEVE_RADIATEURS, 0L)
         val releverSolde = intent.getLongExtra(RELEVE_SOLDE, 0L)
-        val depuisAccueil = relever != 0L || releverSolde != 0L
+        val releverConsommation = intent.getLongExtra(RELEVE_CONSOMMATION, 0L)
+        val depuisAccueil = relever != 0L || releverSolde != 0L || releverConsommation != 0L
         // Venu de l'accueil, on y retourne.
         fun retour(nav: NavHostController): () -> Unit = { if (depuisAccueil) finish() else nav.popBackStack() }
         setContent {
@@ -96,6 +97,9 @@ class GestionActivity : AppCompatActivity() {
                             surReleveSolde = { compteur, date ->
                                 nav.navigate("releve_solde/$compteur" + date?.let { "?date=$it" }.orEmpty())
                             },
+                            surReleveConsommation = { compteur, date ->
+                                nav.navigate("releve_consommation/$compteur" + date?.let { "?date=$it" }.orEmpty())
+                            },
                         )
                     }
                     composable(
@@ -113,6 +117,21 @@ class GestionActivity : AppCompatActivity() {
                             dateInitiale = entree.arguments!!.getString("date"),
                             surRetour = retour(nav),
                             surCompteur = { nav.navigate("compteur/$compteur") },
+                        )
+                    }
+                    composable(
+                        "releve_consommation/{id}?date={date}",
+                        arguments = listOf(
+                            navArgument("id") { type = NavType.LongType },
+                            navArgument("date") { type = NavType.StringType; nullable = true; defaultValue = null },
+                        ),
+                    ) { entree ->
+                        BackHandler(onBack = retour(nav))
+                        EcranReleveConsommation(
+                            gestion,
+                            compteurId = entree.arguments!!.getLong("id"),
+                            dateInitiale = entree.arguments!!.getString("date"),
+                            surRetour = retour(nav),
                         )
                     }
                     composable(
@@ -138,7 +157,13 @@ class GestionActivity : AppCompatActivity() {
                 }
                 if (etat == null && depuisAccueil) {
                     androidx.compose.runtime.LaunchedEffect(Unit) {
-                        nav.navigate(if (relever != 0L) "releve_radiateurs/$relever" else "releve_solde/$releverSolde")
+                        nav.navigate(
+                            when {
+                                relever != 0L -> "releve_radiateurs/$relever"
+                                releverSolde != 0L -> "releve_solde/$releverSolde"
+                                else -> "releve_consommation/$releverConsommation"
+                            }
+                        )
                     }
                 }
             }
@@ -153,6 +178,9 @@ class GestionActivity : AppCompatActivity() {
 
         /** Compteur prépayé dont ouvrir le relevé, depuis l'accueil. */
         const val RELEVE_SOLDE = "releveSolde"
+
+        /** Compteur saisi en consommations dont ouvrir le relevé, depuis l'accueil. */
+        const val RELEVE_CONSOMMATION = "releveConsommation"
     }
 }
 

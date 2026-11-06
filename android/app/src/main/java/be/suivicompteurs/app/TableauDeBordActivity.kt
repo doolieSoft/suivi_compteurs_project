@@ -110,6 +110,7 @@ class TableauDeBordActivity : AppCompatActivity() {
             Energie.ELECTRICITE -> R.drawable.ic_electricite to R.color.elec
             Energie.MAZOUT -> R.drawable.ic_mazout to R.color.mazout
             Energie.REPARTITEUR -> R.drawable.ic_repartiteur to R.color.repartiteur
+            Energie.CHALEUR -> R.drawable.ic_chaleur to R.color.chaleur
         }
         tuile.pastille.setImageResource(icone)
         tuile.pastille.imageTintList = ContextCompat.getColorStateList(this, couleur)

@@ -72,11 +72,13 @@ Excel avant. Il en va de même, une fois, pour une version F-Droid antérieure �
 - répartiteurs de frais de chauffage : une ligne par radiateur avec son
   coefficient, remises à zéro annuelles comprises ;
 - compteurs prépayés : relevé du solde et suivi des achats ;
+- chaleur (réseau de chaleur, compteur de chaleur), et compteurs dont on reçoit
+  des consommations par période plutôt qu'un index ;
 - cuves de mazout (fioul) à jauge : relevé du niveau et suivi des livraisons ;
 - points à vérifier, dont les relevés sans doute mal saisis ;
 - import et export Excel, qui tient lieu de sauvegarde (Google Drive compris) ;
 - rappels de relevé ;
-- français, anglais, néerlandais ; devise au choix.
+- français, anglais, néerlandais, allemand ; devise au choix.
 
 ## Comment les chiffres sont calculés
 

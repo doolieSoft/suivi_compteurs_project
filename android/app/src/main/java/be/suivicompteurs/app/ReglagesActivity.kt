@@ -29,7 +29,7 @@ class ReglagesActivity : AppCompatActivity() {
      * Langues proposées, chacune dans sa propre langue : quelqu'un qui ne lit
      * pas le français doit pouvoir retrouver la sienne.
      */
-    private val langues = listOf("" to null, "fr" to "Français", "en" to "English", "nl" to "Nederlands")
+    private val langues = listOf("" to null, "fr" to "Français", "en" to "English", "nl" to "Nederlands", "de" to "Deutsch")
 
     /**
      * Lien de dons, présent dans la seule version publiée sur GitHub : le Play
