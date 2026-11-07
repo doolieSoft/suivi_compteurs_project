@@ -14,6 +14,8 @@ on:
 permissions:
   # Nécessaire pour créer la publication et y attacher l'APK.
   contents: write
+  # Pour commenter les issues traitées par la version.
+  issues: write
 
 jobs:
   publier:
@@ -126,21 +128,72 @@ jobs:
           # Sans lecture automatique de l'index : aucun composant propriétaire.
           cp $SORTIES/libre/release/app-libre-release.apk suivi-compteurs-libre.apk
 
-      - name: Publier
+      # Issues citées « #N » dans les messages de commit depuis l'étiquette
+      # précédente, pull requests exclues.
+      - name: Repérer les issues traitées
+        id: issues
         env:
           GH_TOKEN: ${{ github.token }}
+        run: |
+          PRECEDENTE=$(git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD^ 2>/dev/null || true)
+          if [ -z "$PRECEDENTE" ]; then exit 0; fi
+          LISTE=""
+          for N in $(git log --format='%B' "$PRECEDENTE..HEAD" | grep -oE '#[0-9]+' | tr -d '#' | sort -nu); do
+            if [ "$(gh api "repos/${{ github.repository }}/issues/$N" --jq '.pull_request == null' 2>/dev/null)" = "true" ]; then
+              LISTE="$LISTE $N"
+            fi
+          done
+          echo "Depuis $PRECEDENTE :${LISTE:- aucune issue}"
+          echo "liste=${LISTE# }" >> "$GITHUB_OUTPUT"
+
+      - name: Publier
+        id: publier
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUES: ${{ steps.issues.outputs.liste }}
         run: |
           ETIQUETTE="${{ github.ref_name }}"
           if [ "${{ github.ref_type }}" != "tag" ]; then
             ETIQUETTE="essai-${{ github.run_number }}"
             git tag "$ETIQUETTE" && git push origin "$ETIQUETTE"
           fi
-          # En tête des notes : lequel des deux APK prendre. La question revient
-          # souvent : l'APK libre n'a pas la lecture par photo.
+          # Notes : les nouveautés (celles du store, en anglais), les issues
+          # citées « #N » dans les commits depuis l'étiquette précédente, puis
+          # lequel des deux APK prendre (l'APK libre n'a pas la lecture par
+          # photo : la question revient souvent).
+          CHANGELOG=fastlane/metadata/android/en-US/changelogs/${{ steps.version.outputs.code }}.txt
+          {
+            if [ -f "$CHANGELOG" ]; then
+              echo "**What's new**"
+              echo
+              sed 's/^• /- /' "$CHANGELOG"
+              echo
+            fi
+            if [ -n "$ISSUES" ]; then
+              echo "Issues: $(printf '#%s ' $ISSUES | sed 's/ $//; s/ /, /g')"
+              echo
+            fi
+            cat .github/quel-apk.md
+          } > notes.md
           gh release create "$ETIQUETTE" suivi-compteurs.apk suivi-compteurs-libre.apk \
             --title "Suivi compteurs ${{ steps.version.outputs.nom }}" \
-            --notes "$(cat .github/quel-apk.md)" \
+            --notes-file notes.md \
             --generate-notes
+          echo "url=https://github.com/${{ github.repository }}/releases/tag/$ETIQUETTE" >> "$GITHUB_OUTPUT"
+
+      # Chaque issue citée reçoit un lien vers la publication : son auteur est
+      # prévenu. Facultatif : un échec ici n'annule pas la publication.
+      - name: Prévenir les issues
+        if: github.ref_type == 'tag' && steps.issues.outputs.liste != ''
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for N in ${{ steps.issues.outputs.liste }}; do
+            gh issue comment "$N" --body "Released in version ${{ steps.version.outputs.nom }}: ${{ steps.publier.outputs.url }}
+
+          On F-Droid within a few days."
+          done
 
       # Envoi au Play Store, seulement une fois le compte de service déposé
       # dans le secret PLAY_SERVICE_ACCOUNT_JSON : jusque-là, l'étape est
