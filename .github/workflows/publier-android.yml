@@ -135,8 +135,11 @@ jobs:
             ETIQUETTE="essai-${{ github.run_number }}"
             git tag "$ETIQUETTE" && git push origin "$ETIQUETTE"
           fi
+          # En tête des notes : lequel des deux APK prendre. La question revient
+          # souvent : l'APK libre n'a pas la lecture par photo.
           gh release create "$ETIQUETTE" suivi-compteurs.apk suivi-compteurs-libre.apk \
             --title "Suivi compteurs ${{ steps.version.outputs.nom }}" \
+            --notes "$(cat .github/quel-apk.md)" \
             --generate-notes
 
       # Envoi au Play Store, seulement une fois le compte de service déposé

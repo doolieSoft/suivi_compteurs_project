@@ -47,8 +47,8 @@ téléphone. Seule la météo vient d'Internet, d'[Open-Meteo](https://open-mete
 |---|---|
 | Google Play (test fermé) | [rejoignez le groupe des testeurs](https://groups.google.com/g/suivi-compteurs-testeurs), puis [acceptez le test](https://play.google.com/apps/testing/be.suivicompteurs.app) et installez l'application depuis le Play Store avec le même compte Google. Mises à jour automatiques ; votre aide permet d'ouvrir la version publique |
 | [F-Droid](https://f-droid.org/packages/be.suivicompteurs.app/) | mises à jour automatiques, sans composant propriétaire : l'index se saisit à la main |
-| [`suivi-compteurs.apk`](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs.apk) | avec lecture automatique de l'index sur photo (ML Kit) |
-| [`suivi-compteurs-libre.apk`](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk) | sans composant propriétaire : l'index se saisit à la main |
+| [`suivi-compteurs.apk`](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs.apk) | **lit le compteur sur une photo** (Google ML Kit, sur le téléphone) : à choisir en cas de doute |
+| [`suivi-compteurs-libre.apk`](https://github.com/doolieSoft/suivi_compteurs_project/releases/latest/download/suivi-compteurs-libre.apk) | même application que sur F-Droid, **sans lecture par photo** : aucun composant propriétaire, l'index se saisit à la main |
 
 Pour installer un APK : l'ouvrir depuis le gestionnaire de fichiers du
 téléphone, et autoriser l'installation quand Android le demande. Depuis la
