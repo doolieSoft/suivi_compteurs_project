@@ -129,7 +129,7 @@ jobs:
           cp $SORTIES/libre/release/app-libre-release.apk suivi-compteurs-libre.apk
 
       # Issues citées « #N » dans les messages de commit depuis l'étiquette
-      # précédente, pull requests exclues.
+      # précédente, encore ouvertes (pull requests exclues).
       - name: Repérer les issues traitées
         id: issues
         env:
@@ -139,7 +139,7 @@ jobs:
           if [ -z "$PRECEDENTE" ]; then exit 0; fi
           LISTE=""
           for N in $(git log --format='%B' "$PRECEDENTE..HEAD" | grep -oE '#[0-9]+' | tr -d '#' | sort -nu); do
-            if [ "$(gh api "repos/${{ github.repository }}/issues/$N" --jq '.pull_request == null' 2>/dev/null)" = "true" ]; then
+            if [ "$(gh api "repos/${{ github.repository }}/issues/$N" --jq '.pull_request == null and .state == "open"' 2>/dev/null)" = "true" ]; then
               LISTE="$LISTE $N"
             fi
           done

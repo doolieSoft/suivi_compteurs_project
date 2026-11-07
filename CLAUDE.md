@@ -18,8 +18,9 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
    workflow GitHub publie les APK (« Suivi compteurs X.Y.Z »), avec en notes
    le changelog anglais et « Which APK? » (`.github/quel-apk.md`).
    Citer `(#N)` dans le message d'un commit qui traite l'issue N : le workflow
-   la mentionne dans les notes et y commente le lien de la version. Pas de
-   `Closes #N` : le développeur ferme lui-même, après le retour de l'auteur.
+   la mentionne dans les notes et, si elle est ouverte, y commente le lien de
+   la version. Pas de `Closes #N` : le développeur ferme lui-même, après le
+   retour de l'auteur.
 5. **Page GitHub Pages** (`docs/`) : la mettre à jour quand l'application
    change de façon visible — textes de `docs/index.html` (trois langues),
    captures `docs/captures/{fr,en,nl}/`, liens. Le numéro de version s'y
