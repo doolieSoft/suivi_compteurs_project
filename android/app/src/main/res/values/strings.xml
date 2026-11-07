@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Suivi compteurs</string>
+    <string name="app_name">Meter Tracker</string>
     <!-- Under the phone's icon, where space is short. -->
-    <string name="nom_lanceur" translatable="false">Compteurs</string>
+    <string name="nom_lanceur">Meters</string>
 
     <!-- Home -->
     <string name="index_avec_unite">%1$s %2$s</string>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Suivi compteurs</string>
+    <string name="app_name">Meterstanden</string>
+    <string name="nom_lanceur">Meters</string>
 
     <!-- Startscherm -->
     <string name="index_avec_unite">%1$s %2$s</string>

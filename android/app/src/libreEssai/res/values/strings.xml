@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Version d'essai : se distingue de l'application du Play Store. -->
-    <string name="nom_lanceur" translatable="false">Essai libre</string>
+    <!-- Version d'essai : se distingue de l'application du Play Store, dans
+         toutes les langues (voir AndroidManifest.xml). -->
+    <string name="nom_essai" translatable="false">Essai libre</string>
 </resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nom sous l'icône de la version d'essai. Il remplace nom_lanceur, traduit
+     dans chaque langue, qui l'emporterait sinon sur un téléphone en français,
+     néerlandais ou allemand. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application
+        android:label="@string/nom_essai"
+        tools:replace="android:label" />
+</manifest>
