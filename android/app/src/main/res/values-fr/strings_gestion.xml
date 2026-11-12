@@ -142,4 +142,13 @@
     <string name="consommation_depuis">Période depuis le relevé du %1$s</string>
     <string name="consommation_valeur">Consommation (%1$s)</string>
     <string name="consommation_debut_avant_fin">Le début doit précéder la fin.</string>
+    <string name="consommations_passees">Ajouter des consommations passées</string>
+    <string name="consommations_passees_explication">Consommations par mois civil, ou pour une année civile entière, telles que les donne votre fournisseur ou le service de relevé. Les cases vides sont ignorées.</string>
+    <string name="consommations_decoupage">Consommations données</string>
+    <string name="consommations_par_mois">Par mois</string>
+    <string name="consommations_par_annee">Pour l\'année entière</string>
+    <string name="consommations_annee_en_cours">Cette année n\'est pas finie : saisissez-la mois par mois.</string>
+    <string name="consommations_chevauchement">Chevauche la période du %1$s au %2$s, déjà saisie autrement. Modifiez-la ou supprimez-la d\'abord dans la liste des relevés.</string>
+    <string name="consommations_trou">Rien entre le %1$s et le %2$s : remplissez aussi les mois manquants, pour que les périodes se suivent.</string>
+    <string name="astuce_par_consommation">S\'agit-il de consommations (les kWh d\'un mois, par exemple) plutôt que d\'index ? Sur la page du compteur, supprimez ses relevés, puis cochez « Je reçois des consommations ».</string>
 </resources>

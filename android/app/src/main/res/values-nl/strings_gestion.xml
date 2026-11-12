@@ -142,4 +142,13 @@
     <string name="consommation_depuis">Periode sinds de stand van %1$s</string>
     <string name="consommation_valeur">Verbruik (%1$s)</string>
     <string name="consommation_debut_avant_fin">Het begin moet voor het einde liggen.</string>
+    <string name="consommations_passees">Vroeger verbruik toevoegen</string>
+    <string name="consommations_passees_explication">Verbruik per kalendermaand, of voor een volledig kalenderjaar, zoals uw leverancier of opnamedienst het meedeelt. Lege vakjes worden genegeerd.</string>
+    <string name="consommations_decoupage">Verbruik gegeven</string>
+    <string name="consommations_par_mois">Per maand</string>
+    <string name="consommations_par_annee">Voor het hele jaar</string>
+    <string name="consommations_annee_en_cours">Dit jaar is nog niet voorbij: vul het per maand in.</string>
+    <string name="consommations_chevauchement">Overlapt de periode van %1$s tot %2$s, die al anders is ingevuld. Wijzig of verwijder die eerst in de lijst met meterstanden.</string>
+    <string name="consommations_trou">Niets tussen %1$s en %2$s: vul ook de ontbrekende maanden in, zodat de periodes op elkaar aansluiten.</string>
+    <string name="astuce_par_consommation">Gaat het om verbruikscijfers (bijvoorbeeld de kWh van een maand) in plaats van meterstanden? Verwijder op de pagina van de meter de meterstanden en vink dan „Ik krijg verbruikscijfers” aan.</string>
 </resources>

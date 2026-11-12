@@ -100,6 +100,7 @@ class GestionActivity : AppCompatActivity() {
                             surReleveConsommation = { compteur, date ->
                                 nav.navigate("releve_consommation/$compteur" + date?.let { "?date=$it" }.orEmpty())
                             },
+                            surConsommationsPassees = { nav.navigate("consommations_passees/$it") },
                         )
                     }
                     composable(
@@ -118,6 +119,13 @@ class GestionActivity : AppCompatActivity() {
                             surRetour = retour(nav),
                             surCompteur = { nav.navigate("compteur/$compteur") },
                         )
+                    }
+                    composable(
+                        "consommations_passees/{id}",
+                        arguments = listOf(navArgument("id") { type = NavType.LongType }),
+                    ) { entree ->
+                        BackHandler(onBack = retour(nav))
+                        EcranConsommationsPassees(gestion, entree.arguments!!.getLong("id"), surRetour = retour(nav))
                     }
                     composable(
                         "releve_consommation/{id}?date={date}",
@@ -225,7 +233,8 @@ fun Cadre(
                 FloatingActionButton(onClick = surAjout) { Icon(Icons.Filled.Add, stringResource(R.string.ajouter)) }
             }
         },
-        snackbarHost = { SnackbarHost(messages) },
+        // Au-dessus du clavier : sinon la confirmation s'affiche dessous, invisible.
+        snackbarHost = { SnackbarHost(messages, Modifier.imePadding()) },
     ) { marges ->
         // imePadding : le contenu défile au-dessus du clavier au lieu d'être caché dessous.
         val modificateur = Modifier.fillMaxSize().padding(marges).imePadding().padding(horizontal = 16.dp)

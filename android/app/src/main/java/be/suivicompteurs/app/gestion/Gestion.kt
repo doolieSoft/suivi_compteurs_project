@@ -17,12 +17,14 @@ import be.suivicompteurs.app.donnees.StationLocale
 import be.suivicompteurs.app.donnees.TarifLocal
 import be.suivicompteurs.app.donnees.pourMoteur
 import be.suivicompteurs.app.moteur.ChiffreRadiateur
+import be.suivicompteurs.app.moteur.ConsommationSaisie
 import be.suivicompteurs.app.moteur.DegresJours
 import be.suivicompteurs.app.moteur.Radiateur
 import be.suivicompteurs.app.moteur.SoldeReleve
 import be.suivicompteurs.app.moteur.indexCumules
 import be.suivicompteurs.app.moteur.indexDesConsommations
 import be.suivicompteurs.app.moteur.indexPrepayes
+import be.suivicompteurs.app.moteur.integrerConsommations
 import be.suivicompteurs.app.moteur.maximumApresTour
 import java.time.LocalDate
 import kotlin.math.abs
@@ -42,7 +44,8 @@ class Refus(val motif: Motif, vararg val details: Any) : Exception(motif.name) {
             .format(java.time.format.DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.MEDIUM))
         fun nombre(x: Any) = java.text.NumberFormat.getNumberInstance().format(x as Double)
         return when (motif) {
-            Motif.INDEX_RECULE -> contexte.getString(R.string.refus_index_recule, jour(details[0]), nombre(details[1]))
+            Motif.INDEX_RECULE -> contexte.getString(R.string.refus_index_recule, jour(details[0]), nombre(details[1])) +
+                (if (details.getOrNull(2) == true) "\n" + contexte.getString(R.string.astuce_par_consommation) else "")
             Motif.INDEX_DEPASSE -> contexte.getString(R.string.refus_index_depasse, jour(details[0]), nombre(details[1]))
             Motif.DATE_DEJA_RELEVEE -> contexte.getString(R.string.refus_date_deja_relevee, jour(details[0]))
             Motif.NOM_OBLIGATOIRE -> contexte.getString(R.string.nom_obligatoire)
@@ -171,7 +174,11 @@ class Gestion(contexte: Context) {
         val autres = dao.relevesDe(releve.compteurId).filter { it.date != dateAvant }
         if (autres.any { it.date == releve.date }) throw Refus(Motif.DATE_DEJA_RELEVEE, releve.date)
         autres.filter { it.date < releve.date }.maxByOrNull { it.date }?.let {
-            if (releve.index < it.index && releve.tourComplet == 0.0) throw Refus(Motif.INDEX_RECULE, it.date, it.index)
+            // Sur un compteur qui débute, c'est souvent une consommation tapée
+            // comme un index : le message rappelle l'option.
+            if (releve.index < it.index && releve.tourComplet == 0.0) {
+                throw Refus(Motif.INDEX_RECULE, it.date, it.index, autres.size <= 3)
+            }
         }
         autres.filter { it.date > releve.date }.minByOrNull { it.date }?.let {
             if (releve.index > it.index && it.tourComplet == 0.0) throw Refus(Motif.INDEX_DEPASSE, it.date, it.index)
@@ -289,6 +296,33 @@ class Gestion(contexte: Context) {
                 dao.enregistrerReleve(ReleveHistorique(compteurId, debut, 0.0, false, consommation = 0.0))
             }
             dao.enregistrerReleve(releve)
+            recalculerIndex(compteurId)
+        }
+        rafraichirSaisie()
+    }
+
+    /** Consommations connues du compteur, par date de relevé. */
+    suspend fun consommations(compteurId: Long): Map<LocalDate, Double?> =
+        dao.relevesDe(compteurId).associate { LocalDate.parse(it.date) to it.consommation }
+
+    /**
+     * Plusieurs périodes d'un coup (les mois d'une année, ou l'année entière).
+     * Tout ou rien : [ConflitConsommation] si elles chevauchent des périodes
+     * connues ou laissent un trou.
+     */
+    suspend fun enregistrerConsommationsPassees(compteurId: Long, saisies: List<ConsommationSaisie>) {
+        if (saisies.isEmpty()) return
+        base.withTransaction {
+            val existants = dao.relevesDe(compteurId).associateBy { LocalDate.parse(it.date) }
+            val resultat = integrerConsommations(existants.mapValues { it.value.consommation }, saisies)
+            dao.enregistrerReleves(resultat.mapNotNull { (date, volume) ->
+                val avant = existants[date]
+                when {
+                    avant == null -> ReleveHistorique(compteurId, date.toString(), 0.0, false, consommation = volume)
+                    avant.consommation != volume -> avant.copy(consommation = volume)
+                    else -> null
+                }
+            })
             recalculerIndex(compteurId)
         }
         rafraichirSaisie()

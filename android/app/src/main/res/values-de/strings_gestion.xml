@@ -142,4 +142,13 @@
     <string name="consommation_depuis">Zeitraum ab der Ablesung vom %1$s</string>
     <string name="consommation_valeur">Verbrauch (%1$s)</string>
     <string name="consommation_debut_avant_fin">Der Beginn muss vor dem Ende liegen.</string>
+    <string name="consommations_passees">Frühere Verbräuche hinzufügen</string>
+    <string name="consommations_passees_explication">Verbräuche je Kalendermonat oder für ein ganzes Kalenderjahr, wie sie Ihr Versorger oder Ablesedienst mitteilt. Leere Felder werden ignoriert.</string>
+    <string name="consommations_decoupage">Verbrauch angegeben</string>
+    <string name="consommations_par_mois">Monatlich</string>
+    <string name="consommations_par_annee">Für das ganze Jahr</string>
+    <string name="consommations_annee_en_cours">Dieses Jahr ist noch nicht vorbei: bitte monatlich eingeben.</string>
+    <string name="consommations_chevauchement">Überschneidet sich mit dem Zeitraum vom %1$s bis %2$s, der bereits anders erfasst ist. Ändern oder löschen Sie ihn zuerst in der Liste der Ablesungen.</string>
+    <string name="consommations_trou">Nichts zwischen %1$s und %2$s: Bitte auch die fehlenden Monate ausfüllen, damit die Zeiträume lückenlos aufeinander folgen.</string>
+    <string name="astuce_par_consommation">Handelt es sich um Verbrauchswerte (zum Beispiel die kWh eines Monats) statt Zählerständen? Löschen Sie auf der Seite des Zählers dessen Ablesungen und setzen Sie dann das Häkchen bei „Ich erhalte Verbrauchswerte“.</string>
 </resources>

@@ -142,4 +142,13 @@
     <string name="consommation_depuis">Period starting at the reading of %1$s</string>
     <string name="consommation_valeur">Consumption (%1$s)</string>
     <string name="consommation_debut_avant_fin">The start must come before the end.</string>
+    <string name="consommations_passees">Add past consumption</string>
+    <string name="consommations_passees_explication">Figures for calendar months, or for a whole calendar year, as your supplier or meter reading service reports them. Empty boxes are ignored.</string>
+    <string name="consommations_decoupage">Figures given</string>
+    <string name="consommations_par_mois">By month</string>
+    <string name="consommations_par_annee">For the whole year</string>
+    <string name="consommations_annee_en_cours">This year isn\'t over yet: enter it month by month.</string>
+    <string name="consommations_chevauchement">Overlaps the period from %1$s to %2$s, already entered differently. Change or delete it in the list of readings first.</string>
+    <string name="consommations_trou">Nothing between %1$s and %2$s: fill in the missing months too, so that the periods follow on from each other.</string>
+    <string name="astuce_par_consommation">Are these consumption figures (for example a month\'s kWh) rather than meter readings? On the meter\'s page, delete its readings, then tick “I get consumption figures”.</string>
 </resources>

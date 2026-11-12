@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,12 +47,15 @@ fun EcranCompteur(
     surReleveRadiateurs: (Long, String?) -> Unit,
     surReleveSolde: (Long, String?) -> Unit,
     surReleveConsommation: (Long, String?) -> Unit,
+    surConsommationsPassees: (Long) -> Unit,
 ) {
     val portee = rememberCoroutineScope()
     // Confirmation brève après un enregistrement : l'écran ne change pas.
     val messages = remember { SnackbarHostState() }
     val enregistre = stringResource(R.string.enregistre)
-    var compteurId by remember { mutableStateOf(id) }
+    // Gardé au retour d'un écran ouvert d'ici : un compteur qui vient d'être
+    // créé ne redevient pas un formulaire vide.
+    var compteurId by rememberSaveable { mutableStateOf(id) }
     var origine by remember { mutableStateOf<CompteurHistorique?>(null) }
     var energie by remember { mutableStateOf("GAZ") }
     var plage by remember { mutableStateOf("UNIQUE") }
@@ -138,7 +142,8 @@ fun EcranCompteur(
                 Text(stringResource(if (energie == "MAZ") R.string.compteur_cuve else R.string.compteur_prepaye))
             }
         }
-        if (energie != "REP" && !prepaye && compteurId == 0L) {
+        // Modifiable tant que le compteur n'a aucun relevé : rien à réinterpréter.
+        if (energie != "REP" && !prepaye && (compteurId == 0L || releves.isEmpty())) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = parConsommation, onCheckedChange = { parConsommation = it })
                 Text(stringResource(R.string.compteur_par_consommation))
@@ -223,6 +228,11 @@ fun EcranCompteur(
             }
             if (!indexCalcule) OutlinedButton(onClick = { indexPasses = true }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                 IconeTexte(R.drawable.ic_releve, stringResource(R.string.index_passes))
+            }
+            if (parConsommation && origine?.parConsommation == true) {
+                OutlinedButton(onClick = { surConsommationsPassees(compteurId) }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                    IconeTexte(R.drawable.ic_releve, stringResource(R.string.consommations_passees))
+                }
             }
             releves.forEach { r ->
                 LigneListe(
@@ -346,7 +356,8 @@ fun EcranCompteur(
 
 @Composable
 fun messageRefus(refus: Refus): String = when (refus.motif) {
-    Motif.INDEX_RECULE -> stringResource(R.string.refus_index_recule, jour(refus.details[0] as String), ecrireNombre(refus.details[1] as Double))
+    Motif.INDEX_RECULE -> stringResource(R.string.refus_index_recule, jour(refus.details[0] as String), ecrireNombre(refus.details[1] as Double)) +
+        (if (refus.details.getOrNull(2) == true) "\n" + stringResource(R.string.astuce_par_consommation) else "")
     Motif.INDEX_DEPASSE -> stringResource(R.string.refus_index_depasse, jour(refus.details[0] as String), ecrireNombre(refus.details[1] as Double))
     Motif.DATE_DEJA_RELEVEE -> stringResource(R.string.refus_date_deja_relevee, jour(refus.details[0] as String))
     Motif.NOM_OBLIGATOIRE -> stringResource(R.string.nom_obligatoire)
