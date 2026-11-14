@@ -72,13 +72,22 @@ data class Prevision(
      */
     val estimeAvant: Double = 0.0,
     val joursEstimesAvant: Int = 0,
+    /**
+     * [totalPrevu] dont la part déjà relevée est ramenée au climat normal
+     * (le reste l'est déjà) : le pendant de [referenceNormalisee].
+     */
+    val totalPrevuNormalise: Double? = null,
 ) {
     val evolutionPct: Double?
         get() = reference?.takeIf { it != 0.0 }?.let { 100.0 * (totalPrevu - it) / it }
 
     /** Évolution une fois l'effet du climat retiré des deux termes. */
     val evolutionNormaliseePct: Double?
-        get() = referenceNormalisee?.takeIf { it != 0.0 }?.let { 100.0 * (totalPrevu - it) / it }
+        get() {
+            val ref = referenceNormalisee?.takeIf { it != 0.0 } ?: return null
+            val total = totalPrevuNormalise ?: return null
+            return 100.0 * (total - ref) / ref
+        }
 
     val avancementPct: Double get() = 100.0 * joursRealises / (ecartJours(debut, fin) + 1)
 
@@ -289,6 +298,28 @@ fun prevoir(
 
     val totalPrevu = realise + estime + estimeAvant
 
+    // La part relevée a connu le climat réel : on la ramène au climat normal,
+    // comme la référence, sans quoi un début d'année doux passerait pour une
+    // économie « à climat égal ». Les jours sans météo n'entrent ni d'un côté
+    // ni de l'autre.
+    var totalPrevuNormalise: Double? = null
+    if (serie.modele.fiable && normales.isNotEmpty()) {
+        var djReels = 0.0
+        var djNormal = 0.0
+        for (jour in joursPeriode) {
+            val dj = serie.djs[jour] ?: continue
+            djReels += dj
+            djNormal += normales[cleCalendaire(jour)] ?: 0.0
+        }
+        totalPrevuNormalise = if (joursPeriode.isEmpty()) {
+            totalPrevu
+        } else if (djReels > 0 && djNormal > 0) {
+            max(0.0, totalPrevu + serie.modele.k * (djNormal - djReels))
+        } else {
+            null
+        }
+    }
+
     // Référence : dernière période complète disponible.
     var reference: Double? = null
     var referenceAnnee: Int? = null
@@ -328,6 +359,7 @@ fun prevoir(
         surReleveAnnuel = surReleveAnnuel,
         estimeAvant = estimeAvant,
         joursEstimesAvant = joursEstimesAvant,
+        totalPrevuNormalise = totalPrevuNormalise,
     )
 }
 

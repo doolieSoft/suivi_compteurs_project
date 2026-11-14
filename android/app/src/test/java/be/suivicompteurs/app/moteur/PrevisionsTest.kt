@@ -103,6 +103,27 @@ class PrevisionGazTest {
     }
 }
 
+/** Une consommation qui suit exactement le modèle ne change pas « à climat égal ». */
+class PrevisionClimatEgalTest {
+    // 2024 nettement plus douce (+3 °C) que les années d'avant.
+    private val djs = LinkedHashMap<LocalDate, Double>().apply {
+        putAll(Fabrique.climat(date("2019-01-01"), date("2023-12-31")))
+        for (jour in jours(date("2024-01-01"), date("2024-12-31"))) {
+            put(jour, Fabrique.arrondi(DegresJours.calculer(Fabrique.temperature(jour) + 3.0), 3))
+        }
+    }
+    private val compteur = gazTousLes30Jours(djs, "2019-01-01", "2024-12-31")
+    private val normales = DegresJours.normales(djs, date("2023-12-31"))
+
+    @Test
+    fun `une annee douce n'est pas une economie a climat egal`() {
+        val jour = date("2024-10-31")
+        val p = prevoir(lignes(listOf(masquerApres(compteur, jour)), djs).single(), jour, normales, annee = 2024)!!
+        assertTrue("brut : ${p.evolutionPct}", p.evolutionPct!! < -10.0)
+        assertEquals(0.0, p.evolutionNormaliseePct!!, 2.0)
+    }
+}
+
 class PrevisionSansModeleTest {
     @Test
     fun `la projection retrouve le total annuel`() {
