@@ -1,0 +1,3 @@
+• Past consumption in a table, month by month or for the whole year, for meters entered as consumption figures.
+• "At equal climate" now also corrects the part of the year already gone: a mild start of the year no longer looks like a saving.
+• App name translated.

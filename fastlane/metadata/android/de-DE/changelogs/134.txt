@@ -1,0 +1,3 @@
+• Frühere Verbräuche in einer Tabelle, Monat für Monat oder für das ganze Jahr, für Zähler mit Verbrauchswerten.
+• „Bei gleichem Wetter“ korrigiert jetzt auch den bereits vergangenen Teil des Jahres: Ein milder Jahresbeginn sieht nicht mehr wie eine Einsparung aus.
+• App-Name übersetzt.

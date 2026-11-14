@@ -1,0 +1,3 @@
+• Consommations passées en tableau, mois par mois ou par année, pour les compteurs saisis en consommations.
+• « À climat égal » corrige désormais aussi la partie déjà écoulée de l'année : un début d'année doux ne passe plus pour une économie.
+• Nom de l'application traduit.
