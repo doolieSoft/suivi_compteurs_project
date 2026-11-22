@@ -1,3 +1,5 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Properties
 
 plugins {
@@ -89,6 +91,10 @@ android {
             initWith(getByName("release"))
             matchingFallbacks += "release"
             signingConfig = signingConfigs.getByName("debug")
+            // Date et heure de construction après le numéro (Réglages, en bas) :
+            // on voit d'un coup d'œil quel essai est installé. Jamais sur une
+            // version publiée, qui doit rester reproductible.
+            versionNameSuffix = " essai " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM HH:mm"))
             // -PsuiviEssaiRapide : sans R8, quelques minutes de moins à chaque
             // essai. À repasser avec R8 avant de publier.
             if (hasProperty("suiviEssaiRapide")) {
