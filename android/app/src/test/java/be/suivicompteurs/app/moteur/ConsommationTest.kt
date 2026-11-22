@@ -64,6 +64,39 @@ class VentilationTest {
     }
 }
 
+/** Le jour d'un relevé, la météo s'arrête la veille : la période suit quand même le climat. */
+class VentilationDjManquantsTest {
+    private val djs = Fabrique.climat(date("2022-01-01"), date("2024-12-31"))
+    private val conso = djs.mapValues { BASE_VRAIE + K_VRAI * it.value }
+    private val dates = Fabrique.datesTousLes(date("2022-01-01"), date("2024-12-31"), 40)
+    private val compteur = Fabrique.compteur(Energie.GAZ, Fabrique.releves(conso, dates))
+    private val derniere = periodes(listOf(compteur)).last()
+
+    private fun derniersJours(sansDj: Set<java.time.LocalDate>): Map<java.time.LocalDate, Double> {
+        val serie = ventiler(listOf(compteur), djs.filterKeys { it !in sansDj })
+        return derniere.jours.associateWith { serie.jours.getValue(it) }
+    }
+
+    @Test
+    fun `un dernier jour sans meteo ne rend pas la periode uniforme`() {
+        val jours = derniersJours(setOf(derniere.fin))
+        val modele = ventiler(listOf(compteur), djs).modele
+        // Les jours connus restent proportionnels à base + k × DJ.
+        val rapports = jours.filterKeys { it != derniere.fin }
+            .map { (jour, v) -> v / modele.attendu(djs.getValue(jour)) }
+        assertEquals(rapports.min(), rapports.max(), 1e-6)
+        assertTrue(jours.values.max() > 1.2 * jours.values.min())
+        assertEquals(derniere.volume, jours.values.sum(), 1e-5)
+    }
+
+    @Test
+    fun `trop de jours sans meteo, la periode reste uniforme`() {
+        val sansDj = derniere.jours.take(derniere.nbJours / 2).toSet()
+        val jours = derniersJours(sansDj)
+        assertEquals(jours.values.min(), jours.values.max(), 1e-9)
+    }
+}
+
 class ChaleurTest {
     private val djs = Fabrique.climat(date("2022-01-01"), date("2024-12-31"))
 

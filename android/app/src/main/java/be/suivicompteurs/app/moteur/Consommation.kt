@@ -56,6 +56,12 @@ data class Periode(
     val jours: Sequence<LocalDate> get() = jours(debut.plusDays(1), fin)
 }
 
+/**
+ * Part des jours d'une période dont les DJ doivent être connus pour la
+ * ventiler selon le climat ; les autres prennent la moyenne de la période.
+ */
+const val PART_DJ_CONNUS = 0.75
+
 /** Après un tour, la consommation ne dépasse pas cette part du maximum. */
 const val PART_TOUR_COMPLET = 0.1
 
@@ -287,8 +293,15 @@ fun ventiler(
         if (jours.isEmpty()) continue
 
         var poids: List<Double>? = null
-        if (modeleRetenu.fiable && jours.all { it in djs }) {
-            val brut = jours.map { modeleRetenu.attendu(djs.getValue(it)) }
+        // La météo s'arrête à la veille : le jour d'un relevé, sa période n'a
+        // pas encore les DJ de son dernier jour. Les jours manquants, s'ils
+        // sont rares, prennent la moyenne des autres plutôt que de rendre
+        // toute la période uniforme ; le lendemain, les vraies valeurs prennent
+        // le relais.
+        val connus = jours.mapNotNull { djs[it] }
+        if (modeleRetenu.fiable && connus.size >= jours.size * PART_DJ_CONNUS) {
+            val djMoyen = connus.average()
+            val brut = jours.map { modeleRetenu.attendu(djs[it] ?: djMoyen) }
             val somme = brut.somme { it }
             if (somme > 0) poids = brut.map { it / somme }
         }
