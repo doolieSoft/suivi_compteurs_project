@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Beheer van de gegevens op het toestel (zelfstandige modus). -->
 <resources>
-    <string name="gerer_donnees">Woningen en meters beheren</string>
+    <string name="gerer_donnees">Woningen, meters en meterstanden</string>
+    <string name="voir_releves">Meterstanden bekijken en corrigeren</string>
     <string name="titre_gestion">Woningen</string>
     <string name="aucune_maison">Geen woningen. Voeg er een toe met de knop +.</string>
     <string name="occupee_depuis">bewoond sinds %1$s</string>

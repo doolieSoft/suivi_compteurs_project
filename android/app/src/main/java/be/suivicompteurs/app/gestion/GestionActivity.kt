@@ -53,7 +53,9 @@ class GestionActivity : AppCompatActivity() {
         val relever = intent.getLongExtra(RELEVE_RADIATEURS, 0L)
         val releverSolde = intent.getLongExtra(RELEVE_SOLDE, 0L)
         val releverConsommation = intent.getLongExtra(RELEVE_CONSOMMATION, 0L)
-        val depuisAccueil = relever != 0L || releverSolde != 0L || releverConsommation != 0L
+        val fiche = intent.getLongExtra(FICHE_COMPTEUR, 0L)
+        val ficheDate = intent.getStringExtra(FICHE_DATE)
+        val depuisAccueil = relever != 0L || releverSolde != 0L || releverConsommation != 0L || fiche != 0L
         // Venu de l'accueil, on y retourne.
         fun retour(nav: NavHostController): () -> Unit = { if (depuisAccueil) finish() else nav.popBackStack() }
         setContent {
@@ -85,11 +87,14 @@ class GestionActivity : AppCompatActivity() {
                             navArgument("maison") { type = NavType.LongType; defaultValue = 0L },
                         ),
                     ) { entree ->
+                        val id = entree.arguments!!.getLong("id")
                         EcranCompteur(
                             gestion,
-                            id = entree.arguments!!.getLong("id"),
+                            id = id,
                             maisonId = entree.arguments!!.getLong("maison"),
-                            surRetour = { nav.popBackStack() },
+                            // Ouverte depuis la saisie : le retour y ramène.
+                            surRetour = if (id == fiche) retour(nav) else ({ nav.popBackStack(); Unit }),
+                            dateAOuvrir = ficheDate.takeIf { id == fiche },
                             surCompteur = { nav.navigate("compteur/$it") { popUpTo("compteur/{id}?maison={maison}") { inclusive = true } } },
                             surReleveRadiateurs = { compteur, date ->
                                 nav.navigate("releve_radiateurs/$compteur" + date?.let { "?date=$it" }.orEmpty())
@@ -167,11 +172,16 @@ class GestionActivity : AppCompatActivity() {
                     androidx.compose.runtime.LaunchedEffect(Unit) {
                         nav.navigate(
                             when {
+                                fiche != 0L -> "compteur/$fiche"
                                 relever != 0L -> "releve_radiateurs/$relever"
                                 releverSolde != 0L -> "releve_solde/$releverSolde"
                                 else -> "releve_consommation/$releverConsommation"
                             }
-                        )
+                        ) {
+                            // À la place de la liste des maisons : le retour du
+                            // téléphone ramène tout de suite à l'écran d'origine.
+                            popUpTo("maisons") { inclusive = true }
+                        }
                     }
                 }
             }
@@ -189,6 +199,12 @@ class GestionActivity : AppCompatActivity() {
 
         /** Compteur saisi en consommations dont ouvrir le relevé, depuis l'accueil. */
         const val RELEVE_CONSOMMATION = "releveConsommation"
+
+        /** Compteur dont ouvrir la fiche, depuis la saisie : pour corriger un relevé. */
+        const val FICHE_COMPTEUR = "ficheCompteur"
+
+        /** Avec [FICHE_COMPTEUR] : date (AAAA-MM-JJ) du relevé à ouvrir. */
+        const val FICHE_DATE = "ficheDate"
     }
 }
 

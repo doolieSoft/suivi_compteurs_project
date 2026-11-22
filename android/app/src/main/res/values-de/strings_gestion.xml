@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Verwaltung der Daten auf dem Gerät. -->
 <resources>
-    <string name="gerer_donnees">Häuser und Zähler verwalten</string>
+    <string name="gerer_donnees">Häuser, Zähler und Zählerstände</string>
+    <string name="voir_releves">Zählerstände ansehen und korrigieren</string>
     <string name="titre_gestion">Häuser</string>
     <string name="aucune_maison">Keine Häuser. Füge eines mit der Schaltfläche + hinzu.</string>
     <string name="occupee_depuis">bewohnt seit %1$s</string>

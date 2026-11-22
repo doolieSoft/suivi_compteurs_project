@@ -48,7 +48,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var vues: ActivityMainBinding
     private lateinit var reglages: Reglages
-    private val adaptateur = CompteurAdapter { compteur -> ouvrirSaisie(compteur) }
+    private val adaptateur = CompteurAdapter(
+        auClic = { compteur -> ouvrirSaisie(compteur) },
+        auClicLong = { compteur -> ouvrirFiche(compteur) },
+    )
 
     private val demanderNotifications =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -230,6 +233,14 @@ class MainActivity : AppCompatActivity() {
         }.toMap()
     }
 
+    /** Fiche du compteur et ses relevés, pour en corriger un. */
+    private fun ouvrirFiche(compteur: CompteurLocal) {
+        startActivity(
+            Intent(this, be.suivicompteurs.app.gestion.GestionActivity::class.java)
+                .putExtra(be.suivicompteurs.app.gestion.GestionActivity.FICHE_COMPTEUR, compteur.id.toLong())
+        )
+    }
+
     private fun ouvrirSaisie(compteur: CompteurLocal) {
         startActivity(
             if (compteur.energie == "REP" || compteur.prepaye || compteur.parConsommation) {
@@ -344,9 +355,10 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-/** Liste des compteurs : un appui ouvre directement la saisie. */
+/** Liste des compteurs : un appui ouvre directement la saisie, un appui long la fiche du compteur. */
 class CompteurAdapter(
     private val auClic: (CompteurLocal) -> Unit,
+    private val auClicLong: (CompteurLocal) -> Unit,
 ) : RecyclerView.Adapter<CompteurAdapter.Cellule>() {
 
     var elements: List<CompteurLocal> = emptyList()
@@ -406,6 +418,7 @@ class CompteurAdapter(
         cellule.vues.pastille.setImageResource(icone)
         cellule.vues.pastille.imageTintList = androidx.core.content.ContextCompat.getColorStateList(contexte, couleur)
         cellule.vues.root.setOnClickListener { auClic(compteur) }
+        cellule.vues.root.setOnLongClickListener { auClicLong(compteur); true }
     }
 
     /** Jusqu'à trois décimales, sans zéros ni séparateur décimal superflus, dans toutes les langues. */

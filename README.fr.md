@@ -61,6 +61,9 @@ Excel avant. Il en va de même, une fois, pour une version F-Droid antérieure �
 
 - relevé d'un compteur, avec lecture automatique de l'index sur la photo,
   toujours soumise à confirmation ;
+- correction ou suppression de n'importe quel relevé : « Corriger » juste après
+  l'avoir enregistré, ou un appui long sur un compteur de l'accueil pour voir
+  tous ses relevés ;
 - contrôle de cohérence : un index ne recule pas, sauf tour complet du compteur,
   et une date ne porte qu'un relevé ;
 - après chaque relevé, ce qu'il change à la prévision ;
@@ -77,6 +80,9 @@ Excel avant. Il en va de même, une fois, pour une version F-Droid antérieure �
 - cuves de mazout (fioul) à jauge : relevé du niveau et suivi des livraisons ;
 - points à vérifier, dont les relevés sans doute mal saisis ;
 - import et export Excel, qui tient lieu de sauvegarde (Google Drive compris) ;
+- reprise de l'historique d'un compteur depuis une autre application, en
+  fichier CSV à deux colonnes (date, index), avec un aperçu avant tout
+  enregistrement ;
 - rappels de relevé ;
 - français, anglais, néerlandais, allemand ; devise au choix.
 

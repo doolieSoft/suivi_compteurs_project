@@ -1,6 +1,7 @@
 package be.suivicompteurs.app
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -497,12 +498,14 @@ class SaisieActivity : AppCompatActivity() {
             val impact = runCatching {
                 Analyse(this@SaisieActivity).impactReleve(compteur.id.toLong(), LocalDate.parse(formatIso.format(dateChoisie)))
             }.getOrNull()
+            val dateIso = formatIso.format(dateChoisie)
             if (impact != null) {
                 setResult(RESULT_OK)
                 AlertDialog.Builder(this@SaisieActivity)
                     .setTitle(R.string.releve_enregistre)
                     .setMessage(Textes(this@SaisieActivity).impact(impact))
                     .setPositiveButton(android.R.string.ok, null)
+                    .setNeutralButton(R.string.corriger) { _, _ -> corriger(dateIso) }
                     .setOnDismissListener { finish() }
                     .show()
                 return@launch
@@ -515,9 +518,28 @@ class SaisieActivity : AppCompatActivity() {
                 getString(R.string.releve_enregistre)
             }
             setResult(RESULT_OK)
-            Snackbar.make(vues.root, message, Snackbar.LENGTH_SHORT).show()
-            vues.root.postDelayed({ finish() }, 900)
+            // Une faute de frappe se corrige tout de suite, sans chercher le
+            // relevé dans la gestion.
+            Snackbar.make(vues.root, message, Snackbar.LENGTH_LONG)
+                .setAction(R.string.corriger) { corriger(dateIso) }
+                .addCallback(object : Snackbar.Callback() {
+                    override fun onDismissed(barre: Snackbar?, evenement: Int) {
+                        if (evenement != DISMISS_EVENT_ACTION) finish()
+                    }
+                })
+                .show()
         }
+    }
+
+    /** Fiche du compteur, le relevé qu'on vient d'enregistrer ouvert. */
+    private fun corriger(date: String) {
+        val compteur = compteur ?: return
+        startActivity(
+            Intent(this, be.suivicompteurs.app.gestion.GestionActivity::class.java)
+                .putExtra(be.suivicompteurs.app.gestion.GestionActivity.FICHE_COMPTEUR, compteur.id.toLong())
+                .putExtra(be.suivicompteurs.app.gestion.GestionActivity.FICHE_DATE, date)
+        )
+        finish()
     }
 
     private fun proposerTourComplet(precedent: Double, valeur: Double) {

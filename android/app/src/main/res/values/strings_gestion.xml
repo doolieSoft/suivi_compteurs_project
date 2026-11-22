@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Managing the data on the device (standalone mode). -->
 <resources>
-    <string name="gerer_donnees">Manage houses and meters</string>
+    <string name="gerer_donnees">Houses, meters and readings</string>
+    <string name="voir_releves">View and correct readings</string>
     <string name="titre_gestion">Houses</string>
     <string name="aucune_maison">No houses. Add one with the + button.</string>
     <string name="occupee_depuis">lived in since %1$s</string>

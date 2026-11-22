@@ -55,6 +55,8 @@ fun EcranCompteur(
     surReleveSolde: (Long, String?) -> Unit,
     surReleveConsommation: (Long, String?) -> Unit,
     surConsommationsPassees: (Long) -> Unit,
+    /** Relevé à ouvrir d'emblée, pour le corriger juste après l'avoir saisi. */
+    dateAOuvrir: String? = null,
 ) {
     val portee = rememberCoroutineScope()
     // Confirmation brève après un enregistrement : l'écran ne change pas.
@@ -84,6 +86,7 @@ fun EcranCompteur(
     var indexPasses by remember { mutableStateOf(false) }
     var confirmer by remember { mutableStateOf(false) }
     var version by remember { mutableIntStateOf(0) }
+    var releveOuvert by rememberSaveable { mutableStateOf(false) }
     // Fichier CSV lu, en attente de confirmation.
     var importCsv by remember { mutableStateOf<Pair<ImportCsv.Lecture, ImportCsv.Tri>?>(null) }
     val contexte = LocalContext.current
@@ -131,6 +134,10 @@ fun EcranCompteur(
         origine = c
         nomMaison = gestion.maison(c.maisonId)?.nom.orEmpty()
         releves = gestion.releves(compteurId).sortedByDescending { it.date }
+        if (!releveOuvert && dateAOuvrir != null) {
+            releveOuvert = true
+            releves.firstOrNull { it.date == dateAOuvrir }?.let { releveEdite = it to it.date }
+        }
         radiateurs = gestion.radiateurs(compteurId).filter { it.dateRetrait == null }
         achats = gestion.achats(compteurId).sortedByDescending { it.date }
     }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Gestion des données de l'appareil (mode autonome). -->
 <resources>
-    <string name="gerer_donnees">Gérer maisons et compteurs</string>
+    <string name="gerer_donnees">Maisons, compteurs et relevés</string>
+    <string name="voir_releves">Voir et corriger les relevés</string>
     <string name="titre_gestion">Maisons</string>
     <string name="aucune_maison">Aucune maison. Ajoutez-en une avec le bouton +.</string>
     <string name="occupee_depuis">occupée depuis le %1$s</string>

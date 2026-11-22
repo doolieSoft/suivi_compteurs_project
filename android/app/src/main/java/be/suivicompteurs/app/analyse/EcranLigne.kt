@@ -1,5 +1,9 @@
 package be.suivicompteurs.app.analyse
 
+import android.content.Intent
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.layout.fillMaxWidth
+import be.suivicompteurs.app.gestion.GestionActivity
 import androidx.compose.material3.SnackbarHostState
 import be.suivicompteurs.app.gestion.iconeEnergie
 import be.suivicompteurs.app.gestion.BoutonIcone
@@ -97,6 +101,12 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
     val gestion = remember { Gestion(contexte) }
     // Point en cours de résolution, ou point vérifié en cours de modification.
     var aResoudre by remember { mutableStateOf<PointVerifie?>(null) }
+    // Revenu de la fiche du compteur : un relevé a pu changer.
+    var ficheOuverte by remember { mutableStateOf(false) }
+    androidx.lifecycle.compose.LifecycleResumeEffect(Unit) {
+        if (ficheOuverte) { ficheOuverte = false; version++ }
+        onPauseOrDispose { }
+    }
 
     LaunchedEffect(maisonId, energie, plage, version) {
         val maison = Analyse(contexte).charger().firstOrNull { it.maison.id == maisonId } ?: return@LaunchedEffect
@@ -180,6 +190,20 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
                     c.evolutionDjPct?.takeIf { ligne.thermosensible }?.let { stringResource(R.string.climat_vs_an_dernier, textes.pourcent(it)) },
                 ),
             )
+        }
+
+        // Les relevés derrière ces chiffres, pour en corriger un : ceux du
+        // compteur relevé en dernier (après un remplacement, le nouveau).
+        ligne.compteurs.maxByOrNull { c -> c.releves.maxOfOrNull { it.date } ?: LocalDate.MIN }?.let { c ->
+            OutlinedButton(
+                onClick = {
+                    ficheOuverte = true
+                    contexte.startActivity(
+                        Intent(contexte, GestionActivity::class.java).putExtra(GestionActivity.FICHE_COMPTEUR, c.id)
+                    )
+                },
+                Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            ) { IconeTexte(R.drawable.ic_releve, stringResource(R.string.voir_releves)) }
         }
 
         // --- cumul depuis le 1er janvier, une courbe par année ---------------

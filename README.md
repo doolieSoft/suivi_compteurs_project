@@ -62,6 +62,8 @@ version older than 1.6.2.
 
 - record a meter reading, with automatic recognition from a photo that you
   always confirm;
+- correct or delete any reading: "Correct" right after saving it, or a long
+  press on a meter on the home screen to see all its readings;
 - consistency checks: a meter doesn't run backwards unless it rolled over past its
   maximum, and a date holds only one reading;
 - after each reading, what it changes in the forecast;
@@ -79,6 +81,8 @@ version older than 1.6.2.
 - heating oil tanks with a gauge: read the level, note your deliveries;
 - points to check, including readings that were probably mistyped;
 - Excel import and export, which doubles as a backup (Google Drive included);
+- a meter's history imported from another app, as a two-column CSV file (date,
+  index), with a preview before anything is saved;
 - reading reminders;
 - French, English, Dutch and German; your choice of currency.
 
