@@ -9,7 +9,7 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
 
 1. **Numéros** dans `android/app/build.gradle.kts` : `versionCode` +1 et
    `versionName` (lignes littérales, lues par F-Droid et par le workflow).
-2. **Notes de version** : `fastlane/metadata/android/{fr-FR,en-US,nl-NL}/changelogs/<versionCode>.txt`
+2. **Notes de version** : `fastlane/metadata/android/{fr-FR,en-US,nl-NL,de-DE}/changelogs/<versionCode>.txt`
    (moins de 500 caractères chacune).
 3. **Vérifier** : `./gradlew testCompletDebugUnitTest lintCompletDebug lintLibreDebug`
    et la construction des deux variantes (lancer les tâches Gradle l'une après
@@ -63,9 +63,11 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
     `donnees/` : base Room ; `reseau/OpenMeteo.kt` : météo et recherche de ville.
   - Écrans classiques (XML) : `MainActivity` (accueil), `SaisieActivity`,
     `TableauDeBordActivity` (prévisions), `ReglagesActivity`.
-- Textes en trois langues : `res/values` (anglais, langue de secours des
-  langues non prises en charge), `values-fr`, `values-nl` (toujours les trois ;
-  échapper les apostrophes `\'`).
+- Textes de l'application en quatre langues : `res/values` (anglais, langue
+  de secours des langues non prises en charge), `values-fr`, `values-nl`,
+  `values-de` (toujours les quatre ; échapper les apostrophes `\'`). La fiche
+  des stores (`fastlane/`, notes de version comprises) a aussi l'allemand,
+  sans captures ; `docs/` reste en trois langues.
 - Icônes : Material Symbols (Apache 2.0) converties en vector drawables
   `res/drawable/ic_*.xml`, servant aux écrans XML comme à Compose.
 - `fastlane/metadata/android/` : fiche des stores (titre, descriptions,
