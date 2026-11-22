@@ -75,7 +75,7 @@
     <string name="source_manuel">Manual reading</string>
     <string name="source_fournisseur">Supplier reading</string>
     <string name="source_estime">Estimate</string>
-    <string name="source_import">Excel import</string>
+    <string name="source_import">Imported file</string>
     <string name="ok">OK</string>
     <string name="effacer">Clear</string>
     <string name="retour">Back</string>
@@ -84,6 +84,35 @@
     <string name="index_passes_explication">Copy the reading and its date from your annual bills (yearly statement). Rows left empty are ignored.</string>
     <string name="index_passes_annuels">Annual readings (bills)</string>
     <string name="index_passes_ajoutes">%1$d readings added</string>
+    <string name="import_csv">Import readings from a CSV file</string>
+    <string name="import_csv_illisible">No readings found in this file. Expected: one reading per line, date and index.</string>
+    <string name="import_csv_rien">None of these readings can be added.</string>
+    <string name="import_csv_dernier">Latest: %1$s · %2$s %3$s</string>
+    <string name="import_csv_ligne">• line %1$d: %2$s</string>
+    <plurals name="import_csv_retenus">
+        <item quantity="one">%1$d reading to add, on %2$s.</item>
+        <item quantity="other">%1$d readings to add, from %2$s to %3$s.</item>
+    </plurals>
+    <plurals name="import_csv_deja">
+        <item quantity="one">%1$d date already recorded: kept as it is.</item>
+        <item quantity="other">%1$d dates already recorded: kept as they are.</item>
+    </plurals>
+    <plurals name="import_csv_meme_jour">
+        <item quantity="one">%1$d reading on the same day as another: only the highest is kept.</item>
+        <item quantity="other">%1$d readings on the same day as another: only the highest is kept.</item>
+    </plurals>
+    <plurals name="import_csv_incoherents">
+        <item quantity="one">%1$d reading left out: the index goes backwards.</item>
+        <item quantity="other">%1$d readings left out: the index goes backwards.</item>
+    </plurals>
+    <plurals name="import_csv_ignorees">
+        <item quantity="one">%1$d line not understood:</item>
+        <item quantity="other">%1$d lines not understood:</item>
+    </plurals>
+    <plurals name="import_csv_importes">
+        <item quantity="one">%1$d reading imported</item>
+        <item quantity="other">%1$d readings imported</item>
+    </plurals>
     <string name="ajouter_une_ligne">Add a row</string>
     <string name="radiateur">Radiator</string>
     <string name="radiateurs_titre">Radiators (%1$d)</string>

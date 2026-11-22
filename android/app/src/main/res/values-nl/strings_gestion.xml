@@ -75,7 +75,7 @@
     <string name="source_manuel">Handmatige opname</string>
     <string name="source_fournisseur">Stand van de leverancier</string>
     <string name="source_estime">Schatting</string>
-    <string name="source_import">Excel-import</string>
+    <string name="source_import">Geïmporteerd bestand</string>
     <string name="ok">OK</string>
     <string name="effacer">Wissen</string>
     <string name="retour">Terug</string>
@@ -84,6 +84,35 @@
     <string name="index_passes_explication">Neem de meterstand en de datum over van je jaarafrekeningen. Lege regels worden genegeerd.</string>
     <string name="index_passes_annuels">Jaarlijkse meterstanden (afrekeningen)</string>
     <string name="index_passes_ajoutes">%1$d meterstanden toegevoegd</string>
+    <string name="import_csv">Meterstanden importeren (CSV-bestand)</string>
+    <string name="import_csv_illisible">Geen meterstanden gevonden in dit bestand. Verwacht: één meterstand per regel, datum en stand.</string>
+    <string name="import_csv_rien">Geen van deze meterstanden kan worden toegevoegd.</string>
+    <string name="import_csv_dernier">Laatste: %1$s · %2$s %3$s</string>
+    <string name="import_csv_ligne">• regel %1$d: %2$s</string>
+    <plurals name="import_csv_retenus">
+        <item quantity="one">%1$d meterstand toe te voegen, op %2$s.</item>
+        <item quantity="other">%1$d meterstanden toe te voegen, van %2$s tot %3$s.</item>
+    </plurals>
+    <plurals name="import_csv_deja">
+        <item quantity="one">%1$d datum al opgenomen: die blijft ongewijzigd.</item>
+        <item quantity="other">%1$d datums al opgenomen: die blijven ongewijzigd.</item>
+    </plurals>
+    <plurals name="import_csv_meme_jour">
+        <item quantity="one">%1$d meterstand op dezelfde dag als een andere: alleen de hoogste wordt bewaard.</item>
+        <item quantity="other">%1$d meterstanden op dezelfde dag als een andere: alleen de hoogste wordt bewaard.</item>
+    </plurals>
+    <plurals name="import_csv_incoherents">
+        <item quantity="one">%1$d meterstand weggelaten: de stand daalt.</item>
+        <item quantity="other">%1$d meterstanden weggelaten: de stand daalt.</item>
+    </plurals>
+    <plurals name="import_csv_ignorees">
+        <item quantity="one">%1$d regel niet begrepen:</item>
+        <item quantity="other">%1$d regels niet begrepen:</item>
+    </plurals>
+    <plurals name="import_csv_importes">
+        <item quantity="one">%1$d meterstand geïmporteerd</item>
+        <item quantity="other">%1$d meterstanden geïmporteerd</item>
+    </plurals>
     <string name="ajouter_une_ligne">Regel toevoegen</string>
     <string name="radiateur">Radiator</string>
     <string name="radiateurs_titre">Radiatoren (%1$d)</string>

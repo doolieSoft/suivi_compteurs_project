@@ -75,7 +75,7 @@
     <string name="source_manuel">Eigene Ablesung</string>
     <string name="source_fournisseur">Ablesung des Versorgers</string>
     <string name="source_estime">Schätzung</string>
-    <string name="source_import">Excel-Import</string>
+    <string name="source_import">Importierte Datei</string>
     <string name="ok">OK</string>
     <string name="effacer">Leeren</string>
     <string name="retour">Zurück</string>
@@ -84,6 +84,35 @@
     <string name="index_passes_explication">Übertrage den Zählerstand und sein Datum aus deinen Jahresabrechnungen. Leere Zeilen werden ignoriert.</string>
     <string name="index_passes_annuels">Jahresablesungen (Abrechnungen)</string>
     <string name="index_passes_ajoutes">%1$d Zählerstände hinzugefügt</string>
+    <string name="import_csv">Zählerstände importieren (CSV-Datei)</string>
+    <string name="import_csv_illisible">Keine Zählerstände in dieser Datei gefunden. Erwartet: ein Zählerstand pro Zeile, Datum und Stand.</string>
+    <string name="import_csv_rien">Keiner dieser Zählerstände kann hinzugefügt werden.</string>
+    <string name="import_csv_dernier">Letzter: %1$s · %2$s %3$s</string>
+    <string name="import_csv_ligne">• Zeile %1$d: %2$s</string>
+    <plurals name="import_csv_retenus">
+        <item quantity="one">%1$d Zählerstand hinzuzufügen, am %2$s.</item>
+        <item quantity="other">%1$d Zählerstände hinzuzufügen, vom %2$s bis zum %3$s.</item>
+    </plurals>
+    <plurals name="import_csv_deja">
+        <item quantity="one">%1$d Tag bereits erfasst: er bleibt unverändert.</item>
+        <item quantity="other">%1$d Tage bereits erfasst: sie bleiben unverändert.</item>
+    </plurals>
+    <plurals name="import_csv_meme_jour">
+        <item quantity="one">%1$d Zählerstand am selben Tag wie ein anderer: nur der höchste wird behalten.</item>
+        <item quantity="other">%1$d Zählerstände am selben Tag wie ein anderer: nur der höchste wird behalten.</item>
+    </plurals>
+    <plurals name="import_csv_incoherents">
+        <item quantity="one">%1$d Zählerstand ausgelassen: der Stand sinkt.</item>
+        <item quantity="other">%1$d Zählerstände ausgelassen: der Stand sinkt.</item>
+    </plurals>
+    <plurals name="import_csv_ignorees">
+        <item quantity="one">%1$d Zeile nicht verstanden:</item>
+        <item quantity="other">%1$d Zeilen nicht verstanden:</item>
+    </plurals>
+    <plurals name="import_csv_importes">
+        <item quantity="one">%1$d Zählerstand importiert</item>
+        <item quantity="other">%1$d Zählerstände importiert</item>
+    </plurals>
     <string name="ajouter_une_ligne">Zeile hinzufügen</string>
     <string name="radiateur">Heizkörper</string>
     <string name="radiateurs_titre">Heizkörper (%1$d)</string>

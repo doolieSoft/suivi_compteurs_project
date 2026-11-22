@@ -1,5 +1,7 @@
 package be.suivicompteurs.app.gestion
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.Column
@@ -26,16 +28,21 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import be.suivicompteurs.app.R
+import be.suivicompteurs.app.classeur.ImportCsv
 import be.suivicompteurs.app.donnees.AchatLocal
 import be.suivicompteurs.app.donnees.CompteurHistorique
 import be.suivicompteurs.app.donnees.RadiateurLocal
 import be.suivicompteurs.app.donnees.ReleveHistorique
 import be.suivicompteurs.app.moteur.maximumApresTour
 import java.time.LocalDate
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun EcranCompteur(
@@ -77,6 +84,38 @@ fun EcranCompteur(
     var indexPasses by remember { mutableStateOf(false) }
     var confirmer by remember { mutableStateOf(false) }
     var version by remember { mutableIntStateOf(0) }
+    // Fichier CSV lu, en attente de confirmation.
+    var importCsv by remember { mutableStateOf<Pair<ImportCsv.Lecture, ImportCsv.Tri>?>(null) }
+    val contexte = LocalContext.current
+    val csvIllisible = stringResource(R.string.import_csv_illisible)
+    val choisirCsv = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        portee.launch {
+            val lecture = withContext(Dispatchers.IO) {
+                runCatching {
+                    contexte.contentResolver.openInputStream(uri)?.use { flux ->
+                        // readNBytes n'existe qu'à partir d'Android 13.
+                        val octets = flux.buffered().let { b ->
+                            val sortie = java.io.ByteArrayOutputStream()
+                            val tampon = ByteArray(64 * 1024)
+                            while (sortie.size() <= ImportCsv.TAILLE_MAX) {
+                                val n = b.read(tampon)
+                                if (n < 0) break
+                                sortie.write(tampon, 0, n)
+                            }
+                            sortie.toByteArray()
+                        }
+                        if (octets.size > ImportCsv.TAILLE_MAX) return@use null
+                        // UTF-8 le plus souvent ; un vieil export Windows est en Latin-1.
+                        val texte = String(octets, Charsets.UTF_8)
+                        ImportCsv.lire(if ('\uFFFD' in texte) String(octets, Charsets.ISO_8859_1) else texte)
+                    }
+                }.getOrNull()
+            }
+            if (lecture == null || lecture.releves.isEmpty()) messages.showSnackbar(csvIllisible)
+            else importCsv = lecture to gestion.trierImport(compteurId, lecture.releves)
+        }
+    }
     // La maison du compteur, pour le titre.
     var nomMaison by remember { mutableStateOf("") }
 
@@ -229,6 +268,12 @@ fun EcranCompteur(
             if (!indexCalcule) OutlinedButton(onClick = { indexPasses = true }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                 IconeTexte(R.drawable.ic_releve, stringResource(R.string.index_passes))
             }
+            if (!indexCalcule) OutlinedButton(
+                onClick = { choisirCsv.launch(arrayOf("text/*", "application/csv", "application/vnd.ms-excel", "application/octet-stream")) },
+                Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            ) {
+                IconeTexte(R.drawable.ic_releve, stringResource(R.string.import_csv))
+            }
             if (parConsommation && origine?.parConsommation == true) {
                 OutlinedButton(onClick = { surConsommationsPassees(compteurId) }, Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                     IconeTexte(R.drawable.ic_releve, stringResource(R.string.consommations_passees))
@@ -330,6 +375,21 @@ fun EcranCompteur(
                     portee.launch { messages.showSnackbar(nbAjoutes.format(ajoutes)) }
                 }
                 refus
+            },
+        )
+    }
+    importCsv?.let { (lecture, tri) ->
+        val resources = contexte.resources
+        DialogueImportCsv(
+            lecture, tri, unite,
+            surFermeture = { importCsv = null },
+            surImport = {
+                portee.launch {
+                    val n = gestion.importerReleves(compteurId, lecture.releves)
+                    importCsv = null
+                    version++
+                    messages.showSnackbar(resources.getQuantityString(R.plurals.import_csv_importes, n, n))
+                }
             },
         )
     }
@@ -551,6 +611,63 @@ fun DialogueIndexPasses(
                     index.clear(); index.addAll(nouveauxIndex)
                 }
             }) { Text(stringResource(R.string.enregistrer)) }
+        },
+        dismissButton = { TextButton(onClick = surFermeture) { Text(stringResource(R.string.annuler)) } },
+    )
+}
+
+/** Aperçu d'un fichier CSV avant import : ce qui sera repris, ce qui ne le sera pas. */
+@Composable
+fun DialogueImportCsv(
+    lecture: ImportCsv.Lecture,
+    tri: ImportCsv.Tri,
+    unite: String,
+    surFermeture: () -> Unit,
+    surImport: () -> Unit,
+) {
+    val petit = MaterialTheme.typography.bodySmall
+    AlertDialog(
+        onDismissRequest = surFermeture,
+        title = { Text(stringResource(R.string.import_csv)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                if (tri.retenus.isEmpty()) {
+                    Text(stringResource(R.string.import_csv_rien))
+                } else {
+                    Text(
+                        pluralStringResource(
+                            R.plurals.import_csv_retenus, tri.retenus.size, tri.retenus.size,
+                            jour(tri.retenus.first().first.toString()), jour(tri.retenus.last().first.toString()),
+                        )
+                    )
+                    val (dernierJour, dernierIndex) = tri.retenus.last()
+                    Text(
+                        stringResource(R.string.import_csv_dernier, jour(dernierJour.toString()), afficherNombre(dernierIndex), unite),
+                        style = petit, color = Couleurs.encre2, modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
+                if (tri.dejaReleves.isNotEmpty()) {
+                    Text(pluralStringResource(R.plurals.import_csv_deja, tri.dejaReleves.size, tri.dejaReleves.size), style = petit, modifier = Modifier.padding(top = 8.dp))
+                }
+                if (lecture.memeJour > 0) {
+                    Text(pluralStringResource(R.plurals.import_csv_meme_jour, lecture.memeJour, lecture.memeJour), style = petit, modifier = Modifier.padding(top = 8.dp))
+                }
+                if (tri.incoherents.isNotEmpty()) {
+                    Text(pluralStringResource(R.plurals.import_csv_incoherents, tri.incoherents.size, tri.incoherents.size), style = petit, color = Couleurs.critique, modifier = Modifier.padding(top = 8.dp))
+                    tri.incoherents.take(5).forEach { (j, v) ->
+                        Text("• ${jour(j.toString())} · ${afficherNombre(v)} $unite", style = petit, color = Couleurs.encre2)
+                    }
+                }
+                if (lecture.ignorees.isNotEmpty()) {
+                    Text(pluralStringResource(R.plurals.import_csv_ignorees, lecture.ignorees.size, lecture.ignorees.size), style = petit, color = Couleurs.critique, modifier = Modifier.padding(top = 8.dp))
+                    lecture.ignorees.take(5).forEach {
+                        Text(stringResource(R.string.import_csv_ligne, it.numero, it.contenu.take(40)), style = petit, color = Couleurs.encre2)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = tri.retenus.isNotEmpty(), onClick = surImport) { Text(stringResource(R.string.importer)) }
         },
         dismissButton = { TextButton(onClick = surFermeture) { Text(stringResource(R.string.annuler)) } },
     )

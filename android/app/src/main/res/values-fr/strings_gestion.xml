@@ -75,7 +75,7 @@
     <string name="source_manuel">Relevé manuel</string>
     <string name="source_fournisseur">Index fournisseur</string>
     <string name="source_estime">Estimation</string>
-    <string name="source_import">Import Excel</string>
+    <string name="source_import">Fichier importé</string>
     <string name="ok">OK</string>
     <string name="effacer">Effacer</string>
     <string name="retour">Retour</string>
@@ -84,6 +84,41 @@
     <string name="index_passes_explication">Recopiez l\'index et la date de relevé de vos factures annuelles (décompte de régularisation). Les lignes laissées vides sont ignorées.</string>
     <string name="index_passes_annuels">Relevés annuels (factures)</string>
     <string name="index_passes_ajoutes">%1$d index ajoutés</string>
+    <string name="import_csv">Importer des relevés (fichier CSV)</string>
+    <string name="import_csv_illisible">Aucun relevé trouvé dans ce fichier. Attendu : un relevé par ligne, date et index.</string>
+    <string name="import_csv_rien">Aucun de ces relevés ne peut être ajouté.</string>
+    <string name="import_csv_dernier">Dernier : %1$s · %2$s %3$s</string>
+    <string name="import_csv_ligne">• ligne %1$d : %2$s</string>
+    <plurals name="import_csv_retenus">
+        <item quantity="one">%1$d relevé à ajouter, le %2$s.</item>
+        <item quantity="many">%1$d relevés à ajouter, du %2$s au %3$s.</item>
+        <item quantity="other">%1$d relevés à ajouter, du %2$s au %3$s.</item>
+    </plurals>
+    <plurals name="import_csv_deja">
+        <item quantity="one">%1$d date déjà relevée : elle reste telle quelle.</item>
+        <item quantity="many">%1$d dates déjà relevées : elles restent telles quelles.</item>
+        <item quantity="other">%1$d dates déjà relevées : elles restent telles quelles.</item>
+    </plurals>
+    <plurals name="import_csv_meme_jour">
+        <item quantity="one">%1$d relevé du même jour qu\'un autre : seul le plus haut est gardé.</item>
+        <item quantity="many">%1$d relevés du même jour qu\'un autre : seul le plus haut est gardé.</item>
+        <item quantity="other">%1$d relevés du même jour qu\'un autre : seul le plus haut est gardé.</item>
+    </plurals>
+    <plurals name="import_csv_incoherents">
+        <item quantity="one">%1$d relevé écarté : l\'index recule.</item>
+        <item quantity="many">%1$d relevés écartés : l\'index recule.</item>
+        <item quantity="other">%1$d relevés écartés : l\'index recule.</item>
+    </plurals>
+    <plurals name="import_csv_ignorees">
+        <item quantity="one">%1$d ligne non comprise :</item>
+        <item quantity="many">%1$d lignes non comprises :</item>
+        <item quantity="other">%1$d lignes non comprises :</item>
+    </plurals>
+    <plurals name="import_csv_importes">
+        <item quantity="one">%1$d relevé importé</item>
+        <item quantity="many">%1$d relevés importés</item>
+        <item quantity="other">%1$d relevés importés</item>
+    </plurals>
     <string name="ajouter_une_ligne">Ajouter une ligne</string>
     <string name="radiateur">Radiateur</string>
     <string name="radiateurs_titre">Radiateurs (%1$d)</string>

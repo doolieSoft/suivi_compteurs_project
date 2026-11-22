@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.withTransaction
 import be.suivicompteurs.app.R
 import be.suivicompteurs.app.classeur.ImportClasseur
+import be.suivicompteurs.app.classeur.ImportCsv
 import be.suivicompteurs.app.donnees.AchatLocal
 import be.suivicompteurs.app.donnees.BaseLocale
 import be.suivicompteurs.app.donnees.CompteurHistorique
@@ -186,6 +187,26 @@ class Gestion(contexte: Context) {
         if (dateAvant != null && dateAvant != releve.date) dao.supprimerReleve(releve.compteurId, dateAvant)
         dao.enregistrerReleve(releve)
         rafraichirSaisie()
+    }
+
+    /** Ce que donnerait l'import de ces relevés sur ce compteur, sans rien écrire. */
+    suspend fun trierImport(compteurId: Long, releves: List<Pair<LocalDate, Double>>): ImportCsv.Tri =
+        ImportCsv.trier(releves, dao.relevesDe(compteurId).associate { LocalDate.parse(it.date) to (it.index to (it.tourComplet != 0.0)) })
+
+    /**
+     * Relevés repris d'un fichier, d'un seul coup : les jours déjà relevés et
+     * les index incohérents sont laissés de côté. Rend le nombre enregistré.
+     */
+    suspend fun importerReleves(compteurId: Long, releves: List<Pair<LocalDate, Double>>): Int {
+        val retenus = base.withTransaction {
+            trierImport(compteurId, releves).retenus.also { tri ->
+                dao.enregistrerReleves(tri.map { (jour, index) ->
+                    ReleveHistorique(compteurId, jour.toString(), index, annuel = false, source = "IMPORT")
+                })
+            }
+        }
+        rafraichirSaisie()
+        return retenus.size
     }
 
     suspend fun supprimerReleve(compteurId: Long, date: String) {
