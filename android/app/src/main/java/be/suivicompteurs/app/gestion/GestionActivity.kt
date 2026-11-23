@@ -218,6 +218,8 @@ fun Cadre(
     surSuppression: (() -> Unit)? = null,
     surAjout: (() -> Unit)? = null,
     defilant: Boolean = true,
+    /** Icônes supplémentaires dans la barre de titre. */
+    actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {},
     contenu: @Composable () -> Unit,
 ) {
     Scaffold(
@@ -230,6 +232,7 @@ fun Cadre(
                     }
                 },
                 actions = {
+                    actions()
                     if (surSuppression != null) {
                         IconButton(onClick = surSuppression) {
                             Icon(Icons.Filled.Delete, stringResource(R.string.supprimer))

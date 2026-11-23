@@ -622,6 +622,7 @@ class SaisieActivity : AppCompatActivity() {
          */
         private const val COTE_UTILE_MIN = 2200
         private val formatIso = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
-        private val formatAffichage = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
+        // Format long de la langue : « 23 novembre 2026 », « 23. November 2026 ».
+        private val formatAffichage = java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, Locale.getDefault())
     }
 }

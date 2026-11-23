@@ -5,6 +5,7 @@ Erfasse deine Wasser-, Gas-, Strom- und Heizölzähler und sieh, wohin dein Jahr
 ABLESEN IN SEKUNDEN
 • Fotografiere den Zähler: Der Stand wird automatisch erkannt, auf dem Telefon, offline (nicht in der F-Droid-Version).
 • Die App prüft die Ablesung: Ein Zähler läuft nie rückwärts, und eine Seriennummer wird nicht für einen Zählerstand gehalten.
+• Vertippt? „Korrigieren“ direkt nach dem Speichern, oder langes Drücken auf einen Zähler, um alle seine Zählerstände zu sehen und zu bearbeiten.
 • Ableseerinnerungen, so oft du willst.
 • Nach jeder Ablesung: was sie an der Prognose ändert, und dein Verbrauch im Vergleich zu dem, was das Wetter erwarten ließ.
 
@@ -22,6 +23,7 @@ DEINE DATEN BLEIBEN BEI DIR
 • Kein Konto, kein Server, keine Werbung.
 • Alle Daten bleiben auf dem Telefon; nur der Standort des Hauses wird für das Wetter an Open-Meteo gesendet.
 • Excel-Export und -Import: Sicherung auf Google Drive oder anderswo, Übernahme eines vorhandenen Verlaufs.
+• Du kommst von einer anderen App? Importiere den Verlauf eines Zählers aus einer CSV-Datei mit zwei Spalten (Datum, Stand).
 
 UND AUSSERDEM
 • Mehrere Häuser, Zählertausch, Zweitarifzähler, Tarife und Ereignisse (Dämmung, Arbeiten…).

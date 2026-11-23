@@ -66,8 +66,8 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
 - Textes de l'application en quatre langues : `res/values` (anglais, langue
   de secours des langues non prises en charge), `values-fr`, `values-nl`,
   `values-de` (toujours les quatre ; échapper les apostrophes `\'`). La fiche
-  des stores (`fastlane/`, notes de version comprises) a aussi l'allemand,
-  sans captures ; `docs/` reste en trois langues.
+  des stores (`fastlane/`, notes de version et captures comprises) a aussi
+  l'allemand ; `docs/` reste en trois langues.
 - Icônes : Material Symbols (Apache 2.0) converties en vector drawables
   `res/drawable/ic_*.xml`, servant aux écrans XML comme à Compose.
 - `fastlane/metadata/android/` : fiche des stores (titre, descriptions,
@@ -101,19 +101,29 @@ Chaque version publiée suit toutes ces étapes, sans attendre qu'on les demande
 - Utiliser l'adb du SDK (`~/Android/Sdk/platform-tools/adb`) : un autre adb
   sur la machine se dispute le serveur (« device offline »).
 - Émulateur : AVD `Essai_API34` (Android 34, léger ; l'AVD Android 37 sature
-  ce PC de 8 Go). KVM requis. Changer la langue du système :
-  `adb shell cmd locale set-device-locale de-DE` (l'interface redémarre :
-  attendre). Le clavier de l'émulateur intercepte parfois la saisie
+  ce PC de 8 Go). KVM requis. Le lancer avec `-memory 2048`, Gradle arrêté
+  (les deux ensemble saturent la mémoire), et le désigner par
+  `adb -s emulator-5554` : `adb -e` compte aussi le téléphone en Wi-Fi.
+  Langue de l'application (`set-device-locale` n'existe pas sur cet AVD) :
+  `adb shell cmd locale set-app-locales be.suivicompteurs.app --locales de-DE`.
+  Le clavier de l'émulateur intercepte parfois la saisie
   (`adb shell input text`), vérifier le champ après coup.
 
 ## Captures d'écran des stores
 
-Refaire les 8 captures par langue (et les 4 de `docs/captures/`) quand
-l'interface change. Données de démonstration : le script générateur dépend de
-l'ancien site Django ; le lancer depuis une copie temporaire
-(`git worktree add <tmp> v1.2.2`, avec `db.sqlite3` copié pour la météo),
-importer les classeurs « Ma maison » / « My house » / « Mijn huis » sur
-l'émulateur, recadrer les captures en 1080 × 2150 (sans barres système).
+Refaire les 8 captures par langue (fr, en, nl, de) et les 4 de
+`docs/captures/` (fr, en, nl : captures 2, 3, 6 et 8 réduites à 540 × 1075 en
+WebP) quand l'interface change. Tout est dans `fastlane/demo/` :
+- `generer.py` (Python avec `openpyxl`) écrit les classeurs « Ma maison »,
+  « My house », « Mijn huis », « Mein Haus » : météo réelle de Liège
+  (Open-Meteo), consommations simulées, graine fixe ; changer `FIN` et
+  `DERNIERS` pour rapprocher les derniers relevés de la date des captures ;
+- `ecran.sh` pilote l'émulateur (fonctions `importer`, `captures`, `saisie`,
+  exemple en fin de fichier) : installer la construction `completRelease`,
+  copier les classeurs dans `/sdcard/Download/`, puis une langue après
+  l'autre. Captures recadrées en 1080 × 2150 sous la barre d'état ; anglais
+  `en-GB`, néerlandais `nl-BE`, français `fr-BE`, allemand `de-DE`.
+L'émulateur rame vite : regarder chaque planche avant de la garder.
 `README.md` et `README.fr.md` affichent les huit captures anglaises et françaises
 de `fastlane/`, légendées : ils suivent d'eux-mêmes.
 

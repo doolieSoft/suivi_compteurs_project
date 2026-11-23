@@ -427,6 +427,7 @@ class CompteurAdapter(
 
     private fun formaterDate(iso: String): String = runCatching {
         val source = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).parse(iso)!!
-        SimpleDateFormat("d MMMM yyyy", Locale.getDefault()).format(source)
+        // Format long de la langue : « 9 novembre 2026 », « 9. November 2026 ».
+        java.text.DateFormat.getDateInstance(java.text.DateFormat.LONG, Locale.getDefault()).format(source)
     }.getOrDefault(iso)
 }

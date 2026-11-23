@@ -1,8 +1,6 @@
 package be.suivicompteurs.app.analyse
 
 import android.content.Intent
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.foundation.layout.fillMaxWidth
 import be.suivicompteurs.app.gestion.GestionActivity
 import androidx.compose.material3.SnackbarHostState
 import be.suivicompteurs.app.gestion.iconeEnergie
@@ -144,7 +142,29 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
         )
     }
 
-    Cadre(titre = d?.let { "${it.maison} – ${textes.libelle(it.ligne)}" } ?: "", surRetour = surRetour, messages = messages) {
+    // Les relevés derrière ces chiffres, pour en corriger un : ceux du compteur
+    // relevé en dernier (après un remplacement, le nouveau).
+    val compteurRecent = d?.ligne?.compteurs?.maxByOrNull { c -> c.releves.maxOfOrNull { it.date } ?: LocalDate.MIN }
+    Cadre(
+        titre = d?.let { "${it.maison} – ${textes.libelle(it.ligne)}" } ?: "",
+        surRetour = surRetour,
+        messages = messages,
+        actions = {
+            if (compteurRecent != null) {
+                androidx.compose.material3.IconButton(onClick = {
+                    ficheOuverte = true
+                    contexte.startActivity(
+                        Intent(contexte, GestionActivity::class.java).putExtra(GestionActivity.FICHE_COMPTEUR, compteurRecent.id)
+                    )
+                }) {
+                    androidx.compose.material3.Icon(
+                        androidx.compose.ui.res.painterResource(R.drawable.ic_releve),
+                        contentDescription = stringResource(R.string.voir_releves),
+                    )
+                }
+            }
+        },
+    ) {
         if (d == null) {
             Chargement()
             return@Cadre
@@ -190,20 +210,6 @@ fun EcranLigne(maisonId: Long, energie: Energie, plage: Plage, surRetour: () -> 
                     c.evolutionDjPct?.takeIf { ligne.thermosensible }?.let { stringResource(R.string.climat_vs_an_dernier, textes.pourcent(it)) },
                 ),
             )
-        }
-
-        // Les relevés derrière ces chiffres, pour en corriger un : ceux du
-        // compteur relevé en dernier (après un remplacement, le nouveau).
-        ligne.compteurs.maxByOrNull { c -> c.releves.maxOfOrNull { it.date } ?: LocalDate.MIN }?.let { c ->
-            OutlinedButton(
-                onClick = {
-                    ficheOuverte = true
-                    contexte.startActivity(
-                        Intent(contexte, GestionActivity::class.java).putExtra(GestionActivity.FICHE_COMPTEUR, c.id)
-                    )
-                },
-                Modifier.fillMaxWidth().padding(vertical = 8.dp),
-            ) { IconeTexte(R.drawable.ic_releve, stringResource(R.string.voir_releves)) }
         }
 
         // --- cumul depuis le 1er janvier, une courbe par année ---------------

@@ -3,6 +3,7 @@ Noteer je meters voor water, gas, elektriciteit en stookolie, en zie waar je jaa
 AFLEZEN IN ENKELE SECONDEN
 • Fotografeer de meter: de stand wordt automatisch gelezen, op de telefoon, zonder netwerk.
 • De app controleert de lezing: een meter loopt nooit terug, en een serienummer wordt niet voor een meterstand aangezien.
+• Een tikfout? "Corrigeren" meteen na het opslaan, of lang drukken op een meter om al zijn meterstanden te zien en aan te passen.
 • Herinneringen om af te lezen, zo vaak als je wilt.
 • Na elke stand: wat die aan de prognose verandert, en je verbruik tegenover wat het weer deed verwachten.
 
@@ -20,6 +21,7 @@ JE GEGEVENS BLIJVEN BIJ JOU
 • Geen account, geen server, geen reclame.
 • Alle gegevens blijven op de telefoon; alleen de ligging van de woning gaat naar Open-Meteo voor het weer.
 • Excel-export en -import: maak een back-up op Google Drive of elders, neem een bestaande historiek over.
+• Kom je van een andere app? Importeer de historiek van een meter uit een CSV-bestand met twee kolommen (datum, stand).
 
 EN OOK
 • Meerdere woningen, vervanging van meters, dubbeltariefmeters, tarieven en gebeurtenissen (isolatie, werken…).

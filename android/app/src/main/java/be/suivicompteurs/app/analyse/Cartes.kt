@@ -64,8 +64,11 @@ fun Tableau(entetes: List<String>, lignes: List<List<String>>, poids: List<Float
     Column {
         Row(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
             entetes.forEachIndexed { i, e ->
+                // Un espace entre les colonnes : un titre long (« Abweichung ») ne
+                // touche plus le suivant.
                 Text(
-                    e, Modifier.weight(p[i]), style = MaterialTheme.typography.labelSmall, color = Couleurs.encre3,
+                    e, Modifier.weight(p[i]).padding(start = if (i == 0) 0.dp else 8.dp),
+                    style = MaterialTheme.typography.labelSmall, color = Couleurs.encre3,
                     textAlign = if (i == 0) TextAlign.Start else TextAlign.End,
                 )
             }
@@ -75,7 +78,8 @@ fun Tableau(entetes: List<String>, lignes: List<List<String>>, poids: List<Float
             Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                 l.forEachIndexed { i, v ->
                     Text(
-                        v, Modifier.weight(p[i]), style = MaterialTheme.typography.bodySmall,
+                        v, Modifier.weight(p[i]).padding(start = if (i == 0) 0.dp else 8.dp),
+                        style = MaterialTheme.typography.bodySmall,
                         textAlign = if (i == 0) TextAlign.Start else TextAlign.End,
                     )
                 }

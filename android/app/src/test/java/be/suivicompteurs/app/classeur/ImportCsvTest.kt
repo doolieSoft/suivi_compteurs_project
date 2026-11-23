@@ -23,6 +23,14 @@ class ImportCsvTest {
         assertEquals(listOf(d("2024-01-31") to 1234.5, d("2024-02-05") to 1240.25), l.releves)
     }
 
+    /** Export réel cité dans l'issue #10 : horodatage ISO complet, virgule suivie d'une espace. */
+    @Test
+    fun `horodatage ISO avec fuseau, comme l'export de l'issue 10`() {
+        val l = ImportCsv.lire("Timestamp, Value\n2025-10-12T13:08:31.100+01:00, 24511.0\n2025-11-09T08:12:04.512+01:00, 24718.5\n")
+        assertEquals(listOf(d("2025-10-12") to 24511.0, d("2025-11-09") to 24718.5), l.releves)
+        assertTrue(l.ignorees.isEmpty())
+    }
+
     @Test
     fun `dates americaines reconnues a un mois au-dela de 12`() {
         val l = ImportCsv.lire("01/31/2024,100\n02/05/2024,110\n")
