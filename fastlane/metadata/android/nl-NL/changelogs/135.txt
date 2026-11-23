@@ -1,0 +1,3 @@
+• Meterstanden van een meter importeren uit een CSV-bestand met twee kolommen (datum, stand) van een andere app, met een voorbeeld vóór het opslaan.
+• Meterstanden makkelijker corrigeren: "Corrigeren" meteen na het opslaan, lang drukken op een meter in het startscherm, of het meterstandenpictogram bovenaan de analyse.
+• Het menu heet nu "Woningen, meters en meterstanden".

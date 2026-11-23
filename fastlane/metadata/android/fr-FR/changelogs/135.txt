@@ -1,0 +1,3 @@
+• Import des relevés d'un compteur depuis un fichier CSV à deux colonnes (date, index) exporté par une autre application, avec un aperçu avant tout enregistrement.
+• Relevés plus faciles à corriger : « Corriger » juste après l'enregistrement, appui long sur un compteur de l'accueil, ou l'icône des relevés en haut de l'analyse.
+• Le menu devient « Maisons, compteurs et relevés ».

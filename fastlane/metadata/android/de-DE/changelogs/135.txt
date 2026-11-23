@@ -1,0 +1,4 @@
+• Zählerstände eines Zählers aus einer CSV-Datei mit zwei Spalten (Datum, Stand) einer anderen App importieren, mit einer Vorschau vor dem Speichern.
+• Zählerstände leichter korrigieren: „Korrigieren“ direkt nach dem Speichern, langes Drücken auf einen Zähler im Startbildschirm oder das Zählerstand-Symbol oben in der Analyse.
+• Der Menüeintrag heißt jetzt „Häuser, Zähler und Zählerstände“.
+• Datumsangaben und Tabellenüberschriften werden auf Deutsch korrekt angezeigt.

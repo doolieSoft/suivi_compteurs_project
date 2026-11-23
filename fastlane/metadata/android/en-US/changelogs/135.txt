@@ -1,0 +1,3 @@
+• Import a meter's readings from a two-column CSV file (date, index) exported by another app, with a preview before anything is saved.
+• Readings are easier to correct: "Correct" right after saving one, a long press on a meter on the home screen, or the readings icon at the top of the analysis.
+• The menu entry is now "Houses, meters and readings".
